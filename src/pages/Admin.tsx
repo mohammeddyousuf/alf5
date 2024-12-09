@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { WhatsAppSettings } from "@/components/admin/WhatsAppSettings";
 import { WebsiteSettings } from "@/components/admin/WebsiteSettings";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -97,66 +98,68 @@ const Admin = () => {
   });
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+    <ProtectedRoute>
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Categories</h2>
+            <p className="text-3xl font-bold mb-4">{categories?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/categories")}>Manage Categories</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Subcategories</h2>
+            <p className="text-3xl font-bold mb-4">{subcategories?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/categories")}>Manage Subcategories</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Collections</h2>
+            <p className="text-3xl font-bold mb-4">{collections?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/collections")}>Manage Collections</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Products</h2>
+            <p className="text-3xl font-bold mb-4">{products?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/products")}>Manage Products</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Sliders</h2>
+            <p className="text-3xl font-bold mb-4">{sliders?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/sliders")}>Manage Sliders</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">News Ticker</h2>
+            <p className="text-3xl font-bold mb-4">{newsTicker?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/news")}>Manage News</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Pages</h2>
+            <p className="text-3xl font-bold mb-4">{pages?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/pages")}>Manage Pages</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Orders</h2>
+            <p className="text-3xl font-bold mb-4">{orders?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/orders")}>View Orders</Button>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <WhatsAppSettings />
+          <WebsiteSettings />
+        </div>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-2">Categories</h2>
-          <p className="text-3xl font-bold mb-4">{categories?.length || 0}</p>
-          <Button onClick={() => navigate("/admin/categories")}>Manage Categories</Button>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-2">Subcategories</h2>
-          <p className="text-3xl font-bold mb-4">{subcategories?.length || 0}</p>
-          <Button onClick={() => navigate("/admin/categories")}>Manage Subcategories</Button>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-2">Collections</h2>
-          <p className="text-3xl font-bold mb-4">{collections?.length || 0}</p>
-          <Button onClick={() => navigate("/admin/collections")}>Manage Collections</Button>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-2">Products</h2>
-          <p className="text-3xl font-bold mb-4">{products?.length || 0}</p>
-          <Button onClick={() => navigate("/admin/products")}>Manage Products</Button>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-2">Sliders</h2>
-          <p className="text-3xl font-bold mb-4">{sliders?.length || 0}</p>
-          <Button onClick={() => navigate("/admin/sliders")}>Manage Sliders</Button>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-2">News Ticker</h2>
-          <p className="text-3xl font-bold mb-4">{newsTicker?.length || 0}</p>
-          <Button onClick={() => navigate("/admin/news")}>Manage News</Button>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-2">Pages</h2>
-          <p className="text-3xl font-bold mb-4">{pages?.length || 0}</p>
-          <Button onClick={() => navigate("/admin/pages")}>Manage Pages</Button>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-2">Orders</h2>
-          <p className="text-3xl font-bold mb-4">{orders?.length || 0}</p>
-          <Button onClick={() => navigate("/admin/orders")}>View Orders</Button>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <WhatsAppSettings />
-        <WebsiteSettings />
-      </div>
-    </div>
+    </ProtectedRoute>
   );
 };
 
