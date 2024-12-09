@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 const AuthPage = () => {
   const { toast } = useToast();
@@ -35,7 +35,7 @@ const AuthPage = () => {
         redirectTo={window.location.origin}
         showLinks={false}
         view="sign_in"
-        onError={(error) => {
+        onAuthError={(error) => {
           console.error("Auth error:", error);
           toast({
             variant: "destructive",
