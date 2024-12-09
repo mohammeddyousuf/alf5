@@ -1,6 +1,8 @@
 import { WhatsAppButton } from "@/components/product/WhatsAppButton";
 import { OrderDialog } from "@/components/product/OrderDialog";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductInfoProps {
   name: string;
@@ -23,6 +25,27 @@ export function ProductInfo({
 }: ProductInfoProps) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const formatPrice = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      currencyDisplay: 'narrowSymbol'
+    }).format(amount).replace('$', settings?.currency_symbol || '$');
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-foreground">{name}</h1>
@@ -33,11 +56,11 @@ export function ProductInfo({
       
       <div className="space-y-2">
         <p className="text-2xl font-bold text-foreground">
-          ${salePrice || price}
+          {formatPrice(salePrice || price)}
         </p>
         {salePrice && (
           <p className="text-lg text-muted-foreground line-through">
-            ${price}
+            {formatPrice(price)}
           </p>
         )}
       </div>

@@ -1,5 +1,7 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductCardProps {
   id: string;
@@ -11,11 +13,25 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: ProductCardProps) => {
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-    }).format(amount);
+      currencyDisplay: 'narrowSymbol'
+    }).format(amount).replace('$', settings?.currency_symbol || '$');
   };
 
   const formatUrlSlug = (name: string) => {

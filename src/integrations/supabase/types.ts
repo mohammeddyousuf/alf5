@@ -226,6 +226,7 @@ export type Database = {
           clearance_sale_active: boolean | null
           clearance_sale_end_date: string | null
           created_at: string
+          currency_symbol: string | null
           facebook_url: string | null
           favicon_url: string | null
           foreground_color: string | null
@@ -245,6 +246,7 @@ export type Database = {
           clearance_sale_active?: boolean | null
           clearance_sale_end_date?: string | null
           created_at?: string
+          currency_symbol?: string | null
           facebook_url?: string | null
           favicon_url?: string | null
           foreground_color?: string | null
@@ -264,6 +266,7 @@ export type Database = {
           clearance_sale_active?: boolean | null
           clearance_sale_end_date?: string | null
           created_at?: string
+          currency_symbol?: string | null
           facebook_url?: string | null
           favicon_url?: string | null
           foreground_color?: string | null
