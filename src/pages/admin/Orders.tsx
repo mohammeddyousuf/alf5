@@ -16,7 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 export default function Orders() {
   const { toast } = useToast();
   
-  const { data: orders, error } = useQuery({
+  const { data: orders, error, isLoading } = useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
       console.log("Fetching orders...");
@@ -88,6 +88,27 @@ export default function Orders() {
         <div className="bg-destructive/15 text-destructive p-4 rounded-md">
           <p className="font-medium">Error loading orders</p>
           <p className="text-sm mt-1">Please make sure the orders table exists in your database</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <h1 className="text-3xl font-bold mb-6">Orders</h1>
+        <div className="text-muted-foreground">Loading orders...</div>
+      </div>
+    );
+  }
+
+  if (!orders || orders.length === 0) {
+    return (
+      <div className="container mx-auto p-6">
+        <h1 className="text-3xl font-bold mb-6">Orders</h1>
+        <div className="bg-muted/50 p-8 rounded-lg text-center">
+          <p className="text-lg text-muted-foreground">No orders found</p>
+          <p className="text-sm text-muted-foreground mt-1">Orders will appear here once customers start placing them</p>
         </div>
       </div>
     );
