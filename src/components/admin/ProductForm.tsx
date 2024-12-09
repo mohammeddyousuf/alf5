@@ -19,8 +19,8 @@ import { useToast } from "@/components/ui/use-toast";
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
-  price: z.string().min(1, "Price is required").transform(Number),
-  sale_price: z.string().optional().transform(val => val ? Number(val) : null),
+  price: z.coerce.number().min(0, "Price must be a positive number"),
+  sale_price: z.coerce.number().min(0, "Sale price must be a positive number").optional().nullable(),
   images: z.array(z.string()).optional(),
   video_urls: z.array(z.string()).optional(),
 });
@@ -39,8 +39,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     defaultValues: {
       name: product?.name ?? "",
       description: product?.description ?? "",
-      price: product?.price?.toString() ?? "",
-      sale_price: product?.sale_price?.toString() ?? "",
+      price: product?.price ?? 0,
+      sale_price: product?.sale_price ?? null,
       images: product?.images ?? [],
       video_urls: product?.video_urls ?? [],
     },
@@ -139,7 +139,16 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
               <FormItem>
                 <FormLabel>Sale Price (Optional)</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" {...field} />
+                  <Input 
+                    type="number" 
+                    step="0.01" 
+                    {...field} 
+                    value={field.value ?? ''} 
+                    onChange={(e) => {
+                      const value = e.target.value === '' ? null : e.target.value;
+                      field.onChange(value);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
