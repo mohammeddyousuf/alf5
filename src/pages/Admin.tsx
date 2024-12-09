@@ -43,6 +43,15 @@ const Admin = () => {
     },
   });
 
+  const { data: pages } = useQuery({
+    queryKey: ["pages"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("pages").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
@@ -70,6 +79,12 @@ const Admin = () => {
           <h2 className="text-xl font-semibold mb-2">News Ticker</h2>
           <p className="text-3xl font-bold mb-4">{newsTicker?.length || 0}</p>
           <Button onClick={() => navigate("/admin/news")}>Manage News</Button>
+        </Card>
+
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-2">Pages</h2>
+          <p className="text-3xl font-bold mb-4">{pages?.length || 0}</p>
+          <Button onClick={() => navigate("/admin/pages")}>Manage Pages</Button>
         </Card>
       </div>
     </div>
