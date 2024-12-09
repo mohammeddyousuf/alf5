@@ -122,7 +122,7 @@ export default function Products() {
                     className="h-full w-full object-cover"
                   />
                   {product.sale_price && product.sale_price < product.price && (
-                    <div className="absolute top-2 right-2">
+                    <div className="absolute top-2 left-2">
                       <Badge variant="destructive">Sale</Badge>
                     </div>
                   )}
