@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import CollectionDetail from "./pages/CollectionDetail";
+import ProductDetail from "./pages/ProductDetail";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,16 @@ const App = () => {
                   element={
                     isAuthenticated ? (
                       <CollectionDetail />
+                    ) : (
+                      <Navigate to="/auth" replace />
+                    )
+                  }
+                />
+                <Route
+                  path="/product/:id"
+                  element={
+                    isAuthenticated ? (
+                      <ProductDetail />
                     ) : (
                       <Navigate to="/auth" replace />
                     )
