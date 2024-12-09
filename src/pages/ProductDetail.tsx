@@ -66,10 +66,13 @@ const ProductDetail = () => {
 
   const handleOrderSubmit = (formData: any) => {
     const whatsappNumber = settings?.whatsapp_number || "+1234567890";
+    const websiteName = settings?.website_name || "Our Store";
     
     if (!product) return;
     
-    const message = `Product Name: ${formData.productName}
+    const message = `${websiteName}
+
+Product Name: ${formData.productName}
 ${formData.productBrand ? `Brand: ${formData.productBrand}\n` : ''}Price: $${formData.productPrice}
 Name: ${formData.name}
 Email: ${formData.email}
