@@ -17,6 +17,7 @@ import EditPage from "@/pages/admin/pages/[id]";
 import Categories from "@/pages/admin/Categories";
 import ProductDetail from "@/pages/ProductDetail";
 import Orders from "@/pages/admin/Orders";
+import Auth from "@/pages/Auth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { initializeThemeColors } from "@/utils/themeUtils";
@@ -62,6 +63,7 @@ function App() {
             <Route path="/contact" element={<Page />} />
             <Route path="/privacy-policy" element={<Page />} />
             <Route path="/terms-of-service" element={<Page />} />
+            <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/collections" element={<Collections />} />
             <Route path="/admin/products" element={<Products />} />
