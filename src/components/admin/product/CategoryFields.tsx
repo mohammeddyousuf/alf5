@@ -45,6 +45,7 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
         .order("name");
       
       if (error) throw error;
+      console.log("Fetched subcategories:", data);
       return data;
     },
     enabled: Boolean(form.watch("category_id")),
@@ -53,18 +54,11 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
   // Reset subcategory when category changes
   useEffect(() => {
     const categoryId = form.watch("category_id");
-    const currentSubcategoryId = form.watch("subcategory_id");
-    
-    if (categoryId && subcategories) {
-      const subcategoryBelongsToCategory = subcategories.some(
-        (sub) => sub.id === currentSubcategoryId
-      );
-      
-      if (!subcategoryBelongsToCategory) {
-        form.setValue("subcategory_id", null);
-      }
+    if (categoryId) {
+      // Always reset subcategory when category changes
+      form.setValue("subcategory_id", null, { shouldDirty: true });
     }
-  }, [form.watch("category_id"), subcategories]);
+  }, [form.watch("category_id")]);
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -75,7 +69,11 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
           <FormItem>
             <FormLabel>Category</FormLabel>
             <Select
-              onValueChange={field.onChange}
+              onValueChange={(value) => {
+                field.onChange(value);
+                // Ensure form knows this field was changed
+                form.setValue("category_id", value, { shouldDirty: true });
+              }}
               value={field.value || undefined}
             >
               <FormControl>
@@ -103,7 +101,11 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
           <FormItem>
             <FormLabel>Subcategory</FormLabel>
             <Select
-              onValueChange={field.onChange}
+              onValueChange={(value) => {
+                field.onChange(value);
+                // Ensure form knows this field was changed
+                form.setValue("subcategory_id", value, { shouldDirty: true });
+              }}
               value={field.value || undefined}
               disabled={!form.watch("category_id")}
             >
