@@ -21,11 +21,12 @@ const Shop = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   
   const { data: products, isLoading, error } = useQuery({
-    queryKey: ["shop-products", selectedCategory, selectedSubcategory],
+    queryKey: ["shop-products", selectedCategory, selectedSubcategory, showFeaturedOnly],
     queryFn: async () => {
       console.log("Fetching products with filters:", {
         selectedCategory,
         selectedSubcategory,
+        showFeaturedOnly
       });
 
       let query = supabase
@@ -39,6 +40,10 @@ const Shop = () => {
 
       if (selectedSubcategory) {
         query = query.eq("subcategory_id", selectedSubcategory);
+      }
+
+      if (showFeaturedOnly) {
+        query = query.eq("featured", true);
       }
 
       const { data, error } = await query;
@@ -62,7 +67,6 @@ const Shop = () => {
     const price = product.sale_price || product.price;
     const meetsPrice = price >= priceRange[0] && price <= priceRange[1];
     const meetsSale = showSaleOnly ? product.sale_price !== null : true;
-    const meetsFeatured = showFeaturedOnly ? product.featured : true;
     const meetsBrand = selectedBrand ? product.brand === selectedBrand : true;
     
     const isNewArrival = product.added_date 
@@ -70,7 +74,7 @@ const Shop = () => {
       : false;
     const meetsNewArrival = showNewArrivalsOnly ? isNewArrival : true;
 
-    return meetsPrice && meetsSale && meetsFeatured && meetsNewArrival && meetsBrand;
+    return meetsPrice && meetsSale && meetsNewArrival && meetsBrand;
   });
 
   const sortedProducts = [...(filteredProducts || [])].sort((a, b) => {
