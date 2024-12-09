@@ -43,11 +43,11 @@ const ProductDetail = () => {
     queryFn: async () => {
       if (!shortId) throw new Error("Product ID not found");
       
-      // Use ilike to match the first part of the UUID
+      // Convert UUID to text before comparing the start of the string
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .ilike('id', `${shortId}%`)
+        .filter('id::text', 'like', `${shortId}%`)
         .single();
       
       if (error) throw error;
