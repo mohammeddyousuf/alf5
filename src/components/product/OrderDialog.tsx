@@ -161,10 +161,10 @@ export function OrderDialog({
                         <SelectValue placeholder="Select payment mode" className="text-foreground" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="bg-white border border-gray-200">
-                      <SelectItem value="cash" className="text-foreground hover:text-white hover:bg-primary">Cash</SelectItem>
-                      <SelectItem value="upi" className="text-foreground hover:text-white hover:bg-primary">UPI</SelectItem>
-                      <SelectItem value="bank_transfer" className="text-foreground hover:text-white hover:bg-primary">Bank Transfer</SelectItem>
+                    <SelectContent className="bg-background">
+                      <SelectItem value="cash" className="hover:bg-primary hover:text-white">Cash</SelectItem>
+                      <SelectItem value="upi" className="hover:bg-primary hover:text-white">UPI</SelectItem>
+                      <SelectItem value="bank_transfer" className="hover:bg-primary hover:text-white">Bank Transfer</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
