@@ -17,6 +17,11 @@ const Shop = () => {
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["shop-products", selectedCategory, selectedSubcategory],
     queryFn: async () => {
+      console.log("Fetching products with filters:", {
+        selectedCategory,
+        selectedSubcategory,
+      });
+
       let query = supabase
         .from("products")
         .select("*")

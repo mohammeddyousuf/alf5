@@ -8,8 +8,9 @@ import { Loader2 } from "lucide-react";
 
 const Index = () => {
   const { data: products, isLoading: isLoadingProducts } = useQuery({
-    queryKey: ["products"],
+    queryKey: ["latest-products"],
     queryFn: async () => {
+      console.log("Fetching latest products");
       const { data, error } = await supabase
         .from("products")
         .select("*")
@@ -17,7 +18,12 @@ const Index = () => {
         .order("created_at", { ascending: false })
         .limit(8);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching latest products:", error);
+        throw error;
+      }
+      
+      console.log("Fetched latest products:", data);
       return data;
     },
   });
