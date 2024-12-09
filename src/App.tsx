@@ -1,71 +1,68 @@
-import { QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
-import { queryClient } from "@/lib/react-query";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 import Layout from "@/components/layout";
-import Home from "@/pages";
+import Home from "@/pages/index";
 import Shop from "@/pages/Shop";
+import ProductDetail from "@/pages/products/[id]";
+import CollectionDetail from "@/pages/collections/[id]";
 import Page from "@/pages/Page";
 import Admin from "@/pages/Admin";
-import Collections from "@/pages/admin/Collections";
 import Products from "@/pages/admin/Products";
-import Sliders from "@/pages/admin/Sliders";
-import News from "@/pages/admin/News";
-import Pages from "@/pages/admin/Pages";
+import NewProduct from "@/pages/admin/products/New";
+import EditProduct from "@/pages/admin/products/[id]";
 import Categories from "@/pages/admin/Categories";
-import ProductDetail from "@/pages/ProductDetail";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { initializeThemeColors } from "@/utils/themeUtils";
-import "./App.css";
-
-// Separate component for theme initialization
-function ThemeInitializer() {
-  useQuery({
-    queryKey: ["settings"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("settings")
-        .select("*")
-        .single();
-      
-      if (error) throw error;
-      
-      if (data) {
-        console.log('Loading initial theme colors');
-        initializeThemeColors(data);
-      }
-      
-      return data;
-    },
-  });
-
-  return null;
-}
+import NewCategory from "@/pages/admin/categories/New";
+import EditCategory from "@/pages/admin/categories/[id]";
+import Collections from "@/pages/admin/Collections";
+import NewCollection from "@/pages/admin/collections/New";
+import EditCollection from "@/pages/admin/collections/[id]";
+import Pages from "@/pages/admin/Pages";
+import NewPage from "@/pages/admin/pages/New";
+import EditPage from "@/pages/admin/pages/[id]";
+import Sliders from "@/pages/admin/Sliders";
+import NewSlider from "@/pages/admin/sliders/New";
+import EditSlider from "@/pages/admin/sliders/[id]";
+import News from "@/pages/admin/News";
+import NewNews from "@/pages/admin/news/New";
+import EditNews from "@/pages/admin/news/[id]";
+import Settings from "@/pages/admin/Settings";
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeInitializer />
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/shop" element={<Shop />} />
-            <Route path="/products/:id" element={<ProductDetail />} />
-            <Route path="/page/:slug" element={<Page />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/admin/collections" element={<Collections />} />
-            <Route path="/admin/products" element={<Products />} />
-            <Route path="/admin/sliders" element={<Sliders />} />
-            <Route path="/admin/news" element={<News />} />
-            <Route path="/admin/pages" element={<Pages />} />
-            <Route path="/admin/categories" element={<Categories />} />
-          </Routes>
-        </Layout>
-        <Toaster />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+      <Toaster />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="shop" element={<Shop />} />
+          <Route path="products/:id" element={<ProductDetail />} />
+          <Route path="collections/:id" element={<CollectionDetail />} />
+          <Route path="pages/:slug" element={<Page />} />
+          <Route path="admin" element={<Admin />}>
+            <Route path="products" element={<Products />} />
+            <Route path="products/new" element={<NewProduct />} />
+            <Route path="products/:id" element={<EditProduct />} />
+            <Route path="categories" element={<Categories />} />
+            <Route path="categories/new" element={<NewCategory />} />
+            <Route path="categories/:id" element={<EditCategory />} />
+            <Route path="collections" element={<Collections />} />
+            <Route path="collections/new" element={<NewCollection />} />
+            <Route path="collections/:id" element={<EditCollection />} />
+            <Route path="pages" element={<Pages />} />
+            <Route path="pages/new" element={<NewPage />} />
+            <Route path="pages/:id" element={<EditPage />} />
+            <Route path="sliders" element={<Sliders />} />
+            <Route path="sliders/new" element={<NewSlider />} />
+            <Route path="sliders/:id" element={<EditSlider />} />
+            <Route path="news" element={<News />} />
+            <Route path="news/new" element={<NewNews />} />
+            <Route path="news/:id" element={<EditNews />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+        </Route>
+      </Routes>
+    </ThemeProvider>
   );
 }
 
