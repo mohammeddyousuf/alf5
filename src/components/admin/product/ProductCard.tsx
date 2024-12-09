@@ -29,6 +29,14 @@ interface ProductCardProps {
 export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: ProductCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+  const formatPrice = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   const getStatusBadgeVariant = (status: string | null) => {
     switch (status) {
       case "published":
@@ -81,10 +89,10 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
         </Button>
       </div>
       <p className="text-sm text-muted-foreground mb-4">
-        ${product.price}
+        {formatPrice(product.price)}
         {product.sale_price && product.sale_price < product.price && (
           <span className="ml-2 text-destructive line-through">
-            ${product.sale_price}
+            {formatPrice(product.sale_price)}
           </span>
         )}
       </p>

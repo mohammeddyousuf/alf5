@@ -23,6 +23,14 @@ export function ProductInfo({
 }: ProductInfoProps) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
+  const formatPrice = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-foreground">{name}</h1>
@@ -33,11 +41,11 @@ export function ProductInfo({
       
       <div className="space-y-2">
         <p className="text-2xl font-bold text-foreground">
-          ${salePrice || price}
+          {formatPrice(salePrice || price)}
         </p>
         {salePrice && (
           <p className="text-lg text-muted-foreground line-through">
-            ${price}
+            {formatPrice(price)}
           </p>
         )}
       </div>
