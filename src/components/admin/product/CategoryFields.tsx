@@ -50,8 +50,9 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
     enabled: Boolean(form.watch("category_id")),
   });
 
+  // Reset subcategory when category changes
   useEffect(() => {
-    form.setValue("subcategory_id", null);
+    form.setValue("subcategory_id", null, { shouldDirty: true });
   }, [form.watch("category_id")]);
 
   return (
@@ -63,7 +64,10 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
           <FormItem>
             <FormLabel>Category</FormLabel>
             <Select
-              onValueChange={field.onChange}
+              onValueChange={(value) => {
+                field.onChange(value);
+                form.setValue("category_id", value, { shouldDirty: true });
+              }}
               value={field.value || undefined}
             >
               <FormControl>
@@ -91,7 +95,10 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
           <FormItem>
             <FormLabel>Subcategory</FormLabel>
             <Select
-              onValueChange={field.onChange}
+              onValueChange={(value) => {
+                field.onChange(value);
+                form.setValue("subcategory_id", value, { shouldDirty: true });
+              }}
               value={field.value || undefined}
               disabled={!form.watch("category_id")}
             >

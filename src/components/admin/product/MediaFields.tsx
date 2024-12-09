@@ -48,7 +48,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
         })
       );
 
-      form.setValue("images", [...currentImages, ...newImages]);
+      form.setValue("images", [...currentImages, ...newImages], { shouldDirty: true });
       toast({
         title: "Success",
         description: "Images uploaded successfully",
@@ -70,14 +70,15 @@ export function MediaFields({ form }: MediaFieldsProps) {
     const currentImages = form.getValues("images") || [];
     form.setValue(
       "images",
-      currentImages.filter((_, index) => index !== indexToRemove)
+      currentImages.filter((_, index) => index !== indexToRemove),
+      { shouldDirty: true }
     );
   };
 
   const addVideoUrl = () => {
     if (!newVideoUrl) return;
     const currentUrls = form.getValues("video_urls") || [];
-    form.setValue("video_urls", [...currentUrls, newVideoUrl]);
+    form.setValue("video_urls", [...currentUrls, newVideoUrl], { shouldDirty: true });
     setNewVideoUrl("");
   };
 
@@ -85,7 +86,8 @@ export function MediaFields({ form }: MediaFieldsProps) {
     const currentUrls = form.getValues("video_urls") || [];
     form.setValue(
       "video_urls",
-      currentUrls.filter((_, index) => index !== indexToRemove)
+      currentUrls.filter((_, index) => index !== indexToRemove),
+      { shouldDirty: true }
     );
   };
 
@@ -130,35 +132,44 @@ export function MediaFields({ form }: MediaFieldsProps) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <FormLabel>Video URLs</FormLabel>
-        <div className="flex gap-2">
-          <Input
-            value={newVideoUrl}
-            onChange={(e) => setNewVideoUrl(e.target.value)}
-            placeholder="Enter video URL"
-          />
-          <Button type="button" onClick={addVideoUrl} variant="outline">
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-        <div className="space-y-2">
-          {form.watch("video_urls")?.map((url, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <Input value={url} readOnly />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() => removeVideoUrl(index)}
-                className="shrink-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+      <FormField
+        control={form.control}
+        name="video_urls"
+        render={() => (
+          <FormItem>
+            <FormLabel>Video URLs</FormLabel>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Input
+                  value={newVideoUrl}
+                  onChange={(e) => setNewVideoUrl(e.target.value)}
+                  placeholder="Enter video URL"
+                />
+                <Button type="button" onClick={addVideoUrl} variant="outline">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {form.watch("video_urls")?.map((url, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Input value={url} readOnly />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeVideoUrl(index)}
+                      className="shrink-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }
