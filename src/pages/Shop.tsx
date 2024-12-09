@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2 } from "lucide-react";
+import { Loader2, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ShopFilters } from "@/components/shop/ShopFilters";
 import { ProductGrid } from "@/components/shop/ProductGrid";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Shop = () => {
   const { toast } = useToast();
@@ -13,6 +15,7 @@ const Shop = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">("default");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["shop-products", selectedCategory, selectedSubcategory],
@@ -88,19 +91,50 @@ const Shop = () => {
     <div className="container py-12">
       <h1 className="text-4xl font-bold text-center mb-8">Our Products</h1>
 
-      <div className="flex gap-8">
-        <ShopFilters
-          priceRange={priceRange}
-          setPriceRange={setPriceRange}
-          showSaleOnly={showSaleOnly}
-          setShowSaleOnly={setShowSaleOnly}
-          sortOrder={sortOrder}
-          setSortOrder={setSortOrder}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-          selectedSubcategory={selectedSubcategory}
-          setSelectedSubcategory={setSelectedSubcategory}
-        />
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Mobile Filter Button */}
+        <div className="md:hidden mb-4">
+          <Sheet open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="w-full">
+                <Filter className="mr-2 h-4 w-4" />
+                Filters
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+              <div className="py-4">
+                <ShopFilters
+                  priceRange={priceRange}
+                  setPriceRange={setPriceRange}
+                  showSaleOnly={showSaleOnly}
+                  setShowSaleOnly={setShowSaleOnly}
+                  sortOrder={sortOrder}
+                  setSortOrder={setSortOrder}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                  selectedSubcategory={selectedSubcategory}
+                  setSelectedSubcategory={setSelectedSubcategory}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
+        {/* Desktop Filters */}
+        <div className="hidden md:block">
+          <ShopFilters
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            showSaleOnly={showSaleOnly}
+            setShowSaleOnly={setShowSaleOnly}
+            sortOrder={sortOrder}
+            setSortOrder={setSortOrder}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            selectedSubcategory={selectedSubcategory}
+            setSelectedSubcategory={setSelectedSubcategory}
+          />
+        </div>
 
         <div className="flex-1">
           <ProductGrid products={sortedProducts} />
