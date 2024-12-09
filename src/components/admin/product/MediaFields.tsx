@@ -18,6 +18,7 @@ interface MediaFieldsProps {
 export function MediaFields({ form }: MediaFieldsProps) {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<Record<number, boolean>>({});
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -65,10 +66,40 @@ export function MediaFields({ form }: MediaFieldsProps) {
     }
   };
 
-  const removeImage = (indexToRemove: number) => {
-    const currentImages = form.getValues("images") || [];
-    const updatedImages = currentImages.filter((_, index) => index !== indexToRemove);
-    form.setValue("images", updatedImages);
+  const removeImage = async (indexToRemove: number, imageUrl: string) => {
+    try {
+      setIsDeleting(prev => ({ ...prev, [indexToRemove]: true }));
+      
+      // Extract the filename from the URL
+      const fileName = imageUrl.split("/").pop();
+      if (!fileName) throw new Error("Invalid file URL");
+
+      // Delete from Supabase Storage
+      const { error: deleteError } = await supabase.storage
+        .from("product-images")
+        .remove([fileName]);
+
+      if (deleteError) throw deleteError;
+
+      // Update form state
+      const currentImages = form.getValues("images") || [];
+      const updatedImages = currentImages.filter((_, index) => index !== indexToRemove);
+      form.setValue("images", updatedImages);
+
+      toast({
+        title: "Success",
+        description: "Image removed successfully",
+      });
+    } catch (error: any) {
+      console.error("Error removing image:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to remove image. " + error.message,
+      });
+    } finally {
+      setIsDeleting(prev => ({ ...prev, [indexToRemove]: false }));
+    }
   };
 
   return (
@@ -85,10 +116,15 @@ export function MediaFields({ form }: MediaFieldsProps) {
               />
               <button
                 type="button"
-                onClick={() => removeImage(index)}
-                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => removeImage(index, url)}
+                disabled={isDeleting[index]}
+                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
               >
-                <X className="h-4 w-4" />
+                {isDeleting[index] ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <X className="h-4 w-4" />
+                )}
               </button>
             </div>
           ))}
