@@ -42,10 +42,10 @@ const Pages = () => {
       <div className="grid gap-4">
         {pages?.map((page) => (
           <Card key={page.id} className="p-4">
-            <div className="flex justify-between items-center">
-              <div>
+            <div className="flex justify-between items-start">
+              <div className="space-y-1">
                 <h2 className="text-xl font-semibold">{page.title}</h2>
-                <p className="text-sm text-muted-foreground">/{page.slug}</p>
+                <p className="text-sm text-muted-foreground leading-none">/{page.slug}</p>
               </div>
               <Button 
                 variant="default" 
