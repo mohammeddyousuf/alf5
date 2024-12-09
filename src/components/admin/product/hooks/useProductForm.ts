@@ -58,7 +58,6 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
   const onSubmit = async (values: ProductFormData) => {
     try {
       console.log("Form values before submission:", values);
-      console.log("Current form state:", form.getValues());
 
       const data = {
         name: values.name,
@@ -66,7 +65,7 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
         price: values.price,
         sale_price: values.sale_price,
         images: values.images,
-        video_urls: values.video_urls || [],
+        video_urls: values.video_urls,
         status: values.status,
         category_id: values.category_id || null,
         subcategory_id: values.subcategory_id || null,
