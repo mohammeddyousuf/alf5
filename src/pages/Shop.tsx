@@ -22,17 +22,15 @@ const Shop = () => {
         .select("*")
         .eq("status", "published");
 
-      // Only apply category filter if one is selected
       if (selectedCategory) {
         query = query.eq("category_id", selectedCategory);
       }
 
-      // Only apply subcategory filter if one is selected
       if (selectedSubcategory) {
         query = query.eq("subcategory_id", selectedSubcategory);
       }
 
-      const { data, error } = await query.order("created_at", { ascending: false });
+      const { data, error } = await query;
       
       if (error) {
         console.error("Error fetching products:", error);
@@ -44,7 +42,7 @@ const Shop = () => {
         throw error;
       }
       
-      console.log("Fetched products:", data); // Debug log
+      console.log("Fetched products:", data);
       return data || [];
     },
   });
