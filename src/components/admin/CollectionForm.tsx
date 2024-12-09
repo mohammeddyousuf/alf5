@@ -50,7 +50,9 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
 
     setIsUploading(true);
     try {
-      const fileName = `${crypto.randomUUID()}-${file.name}`;
+      // Keep the original filename but ensure it's URL-safe
+      const fileName = encodeURIComponent(file.name);
+
       const { error: uploadError } = await supabase.storage
         .from("product-images")
         .upload(fileName, file, {
