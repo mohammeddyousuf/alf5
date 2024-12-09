@@ -70,10 +70,13 @@ const ProductDetail = () => {
     
     if (!product) return;
     
-    const message = `${websiteName}
+    const message = `*${websiteName}*
 
-Product Name: ${formData.productName}
+*Order Details:*
+Product: ${formData.productName}
 ${formData.productBrand ? `Brand: ${formData.productBrand}\n` : ''}Price: $${formData.productPrice}
+
+*Customer Details:*
 Name: ${formData.name}
 Email: ${formData.email}
 Mobile: ${formData.mobile}
@@ -115,23 +118,23 @@ Payment Mode: ${formData.paymentMode}`;
     <>
       <Helmet>
         {/* Basic Meta Tags */}
-        <title>{`${product.name} | ${websiteName}`}</title>
-        <meta name="description" content={product.description || `${product.name} - ${websiteName}`} />
+        <title>{`${product?.name} | ${settings?.website_name || 'Our Store'}`}</title>
+        <meta name="description" content={product?.description || `${product?.name} - ${settings?.website_name || 'Our Store'}`} />
 
         {/* Open Graph Meta Tags */}
-        <meta property="og:title" content={`${product.name} | ${websiteName}`} />
-        <meta property="og:description" content={product.description || `${product.name} - ${websiteName}`} />
-        {productImage && <meta property="og:image" content={productImage} />}
+        <meta property="og:title" content={`${product?.name} | ${settings?.website_name || 'Our Store'}`} />
+        <meta property="og:description" content={product?.description || `${product?.name} - ${settings?.website_name || 'Our Store'}`} />
+        {product?.images?.[0] && <meta property="og:image" content={product.images[0]} />}
         <meta property="og:type" content="product" />
-        <meta property="og:price:amount" content={productPrice.toString()} />
+        <meta property="og:price:amount" content={String(product?.sale_price || product?.price)} />
         <meta property="og:price:currency" content="USD" />
-        {product.brand && <meta property="og:brand" content={product.brand} />}
+        {product?.brand && <meta property="og:brand" content={product.brand} />}
 
         {/* Twitter Card Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${product.name} | ${websiteName}`} />
-        <meta name="twitter:description" content={product.description || `${product.name} - ${websiteName}`} />
-        {productImage && <meta name="twitter:image" content={productImage} />}
+        <meta name="twitter:title" content={`${product?.name} | ${settings?.website_name || 'Our Store'}`} />
+        <meta name="twitter:description" content={product?.description || `${product?.name} - ${settings?.website_name || 'Our Store'}`} />
+        {product?.images?.[0] && <meta name="twitter:image" content={product.images[0]} />}
       </Helmet>
 
       <div className="container py-8">
@@ -159,18 +162,18 @@ Payment Mode: ${formData.paymentMode}`;
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <ProductMedia
-            images={product.images}
-            videoUrls={product.video_urls}
-            productName={product.name}
+            images={product?.images}
+            videoUrls={product?.video_urls}
+            productName={product?.name}
             getYouTubeVideoId={getYouTubeVideoId}
-            salePrice={product.sale_price}
+            salePrice={product?.sale_price}
           />
           <ProductInfo
-            name={product.name}
-            brand={product.brand}
-            description={product.description}
-            price={product.price}
-            salePrice={product.sale_price}
+            name={product?.name || ''}
+            brand={product?.brand}
+            description={product?.description}
+            price={product?.price || 0}
+            salePrice={product?.sale_price}
             onOrderSubmit={handleOrderSubmit}
           />
         </div>
