@@ -28,7 +28,7 @@ const AuthPage = () => {
         theme="light"
         providers={[]}
         redirectTo={window.location.origin}
-        showLinks={true}
+        showLinks={false}
         view="sign_in"
         localization={{
           variables: {
@@ -37,11 +37,9 @@ const AuthPage = () => {
               password_label: 'Password',
               button_label: 'Sign In',
               loading_button_label: 'Signing in...',
-              link_text: 'Forgot your password?'
             }
           },
         }}
-        onlyThirdPartyProviders={false}
       />
     </div>
   );
