@@ -35,7 +35,7 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
   // Load product data into form when available
   useEffect(() => {
     if (product && !isInitialized) {
-      console.log("Loading product data:", product);
+      console.log("[useProductForm] Loading existing product:", product);
       
       const formData = {
         name: product.name,
@@ -49,7 +49,7 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
         subcategory_id: product.subcategory_id,
       };
       
-      console.log("Setting form data to:", formData);
+      console.log("[useProductForm] Setting form data:", formData);
       form.reset(formData);
       setIsInitialized(true);
     }
@@ -57,7 +57,7 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
 
   const onSubmit = async (values: ProductFormData) => {
     try {
-      console.log("Form values before submission:", values);
+      console.log("[useProductForm] Form values before submission:", values);
 
       const data = {
         name: values.name,
@@ -71,16 +71,17 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
         subcategory_id: values.subcategory_id || null,
       };
 
-      console.log("Submitting to Supabase:", data);
+      console.log("[useProductForm] Data to be sent to Supabase:", data);
 
       if (product?.id) {
+        console.log("[useProductForm] Updating existing product:", product.id);
         const { error, data: updatedData } = await supabase
           .from("products")
           .update(data)
           .eq("id", product.id)
           .select();
         
-        console.log("Supabase update response:", { error, data: updatedData });
+        console.log("[useProductForm] Update response:", { error, data: updatedData });
         
         if (error) throw error;
         
@@ -89,12 +90,13 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
           description: "Product updated successfully",
         });
       } else {
+        console.log("[useProductForm] Creating new product");
         const { error, data: insertedData } = await supabase
           .from("products")
           .insert(data)
           .select();
         
-        console.log("Supabase insert response:", { error, data: insertedData });
+        console.log("[useProductForm] Insert response:", { error, data: insertedData });
         
         if (error) throw error;
         
@@ -110,7 +112,7 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
       
       onSuccess?.();
     } catch (error: any) {
-      console.error("Error submitting product:", error);
+      console.error("[useProductForm] Error submitting product:", error);
       toast({
         variant: "destructive",
         title: "Error",
