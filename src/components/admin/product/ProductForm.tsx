@@ -64,8 +64,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         images: product.images ?? [],
         video_urls: product.video_urls ?? [],
         status: product.status ?? "draft",
-        category_id: product.category_id,
-        subcategory_id: product.subcategory_id,
+        category_id: product.category_id ?? null,
+        subcategory_id: product.subcategory_id ?? null,
       });
     }
   }, [product, form]);
@@ -80,14 +80,14 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
       const data = {
         name: values.name,
-        description: values.description,
+        description: values.description || null,
         price: values.price,
         sale_price: values.sale_price,
         images: values.images,
-        video_urls: values.video_urls || [], // Ensure video_urls is always an array
+        video_urls: values.video_urls || [],
         status: values.status,
-        category_id: values.category_id,
-        subcategory_id: values.subcategory_id,
+        category_id: values.category_id || null,
+        subcategory_id: values.subcategory_id || null,
       };
 
       console.log("Submitting product data:", data);
