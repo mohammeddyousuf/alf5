@@ -19,8 +19,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { initializeThemeColors } from "@/utils/themeUtils";
 import "./App.css";
 
-function App() {
-  // Initialize theme colors when the app loads
+// Separate component for theme initialization
+function ThemeInitializer() {
   useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
@@ -31,7 +31,6 @@ function App() {
       
       if (error) throw error;
       
-      // Initialize theme colors when settings are loaded
       if (data) {
         console.log('Loading initial theme colors');
         initializeThemeColors(data);
@@ -41,8 +40,13 @@ function App() {
     },
   });
 
+  return null;
+}
+
+function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeInitializer />
       <BrowserRouter>
         <Layout>
           <Routes>
