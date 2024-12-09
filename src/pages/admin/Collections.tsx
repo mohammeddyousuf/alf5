@@ -56,11 +56,13 @@ export default function Collections() {
           <DialogTrigger asChild>
             <Button>Add Collection</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto p-6">
             <DialogHeader>
               <DialogTitle>Add New Collection</DialogTitle>
             </DialogHeader>
-            <CollectionForm onSuccess={() => refetch()} />
+            <div className="mt-4">
+              <CollectionForm onSuccess={() => refetch()} />
+            </div>
           </DialogContent>
         </Dialog>
       </div>
@@ -97,11 +99,13 @@ export default function Collections() {
                 <DialogTrigger asChild>
                   <Button variant="outline" className="flex-1">Edit</Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-h-[90vh] overflow-y-auto p-6">
                   <DialogHeader>
                     <DialogTitle>Edit Collection</DialogTitle>
                   </DialogHeader>
-                  <CollectionForm collection={collection} onSuccess={() => refetch()} />
+                  <div className="mt-4">
+                    <CollectionForm collection={collection} onSuccess={() => refetch()} />
+                  </div>
                 </DialogContent>
               </Dialog>
               <Button 
