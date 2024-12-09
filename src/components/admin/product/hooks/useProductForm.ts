@@ -44,8 +44,6 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
 
   const onSubmit = async (values: ProductFormData) => {
     try {
-      console.log("[useProductForm] Form values before submission:", values);
-
       const data = {
         name: values.name,
         description: values.description || null,

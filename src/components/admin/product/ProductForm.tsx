@@ -21,6 +21,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     onSuccess 
   });
 
+  if (!form) return null;
+
   return (
     <ScrollArea className="h-[80vh] pr-4">
       <Form {...form}>
