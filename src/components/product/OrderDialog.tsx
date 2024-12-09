@@ -4,6 +4,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -73,7 +74,14 @@ export function OrderDialog({
 
   const handleSubmit = async (data: OrderFormData) => {
     try {
-      // Save order to database
+      console.log("Attempting to save order:", {
+        product_id: productId,
+        product_name: productName,
+        product_brand: productBrand,
+        product_price: productPrice,
+        ...data
+      });
+
       const { error } = await supabase.from("orders").insert({
         product_id: productId,
         product_name: productName,
@@ -86,8 +94,13 @@ export function OrderDialog({
         payment_mode: data.paymentMode,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error saving order:", error);
+        throw error;
+      }
 
+      console.log("Order saved successfully");
+      
       // Call the original onSubmit to handle WhatsApp redirection
       onSubmit(data);
       
@@ -96,6 +109,7 @@ export function OrderDialog({
         description: "Your order has been saved successfully",
       });
     } catch (error) {
+      console.error("Failed to save order:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -109,6 +123,9 @@ export function OrderDialog({
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-foreground">Contact on WhatsApp</DialogTitle>
+          <DialogDescription>
+            Fill in your details to place the order
+          </DialogDescription>
         </DialogHeader>
 
         <div className="mb-4 space-y-1">
