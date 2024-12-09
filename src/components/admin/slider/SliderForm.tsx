@@ -25,6 +25,7 @@ export const SliderForm = ({ slider, onSuccess }: SliderFormProps) => {
     description: slider?.description || "",
     image_url: slider?.image_url || "",
     link_url: slider?.link_url || "",
+    button_text: slider?.button_text || "Learn More",
     active: slider?.active ?? true,
     order_index: slider?.order_index || 0,
   });
@@ -100,6 +101,15 @@ export const SliderForm = ({ slider, onSuccess }: SliderFormProps) => {
           id="link_url"
           value={formData.link_url}
           onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="button_text">Button Text</Label>
+        <Input
+          id="button_text"
+          value={formData.button_text}
+          onChange={(e) => setFormData({ ...formData, button_text: e.target.value })}
         />
       </div>
 

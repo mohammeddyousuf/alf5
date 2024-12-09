@@ -69,7 +69,7 @@ export const HeroSlider = () => {
                     to={slide.link_url}
                     className="inline-block bg-whatsapp-primary hover:bg-whatsapp-secondary text-white px-6 py-3 rounded-lg transition-colors"
                   >
-                    Learn More
+                    {slide.button_text || "Learn More"}
                   </Link>
                 )}
               </div>

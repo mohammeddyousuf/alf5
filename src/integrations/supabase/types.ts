@@ -249,6 +249,7 @@ export type Database = {
       sliders: {
         Row: {
           active: boolean | null
+          button_text: string | null
           created_at: string
           description: string | null
           id: string
@@ -260,6 +261,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean | null
+          button_text?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -271,6 +273,7 @@ export type Database = {
         }
         Update: {
           active?: boolean | null
+          button_text?: string | null
           created_at?: string
           description?: string | null
           id?: string
