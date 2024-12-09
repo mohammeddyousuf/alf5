@@ -48,7 +48,7 @@ export const HeroSlider = () => {
         className="flex h-full transition-transform duration-500 ease-out w-full"
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
       >
-        {slides.map((slide) => (
+        {slides?.map((slide) => (
           <div
             key={slide.id}
             className="min-w-full h-full relative"
@@ -67,9 +67,11 @@ export const HeroSlider = () => {
                 {slide.link_url && (
                   <Link 
                     to={slide.link_url}
-                    className="inline-block bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg transition-colors"
+                    className="inline-block"
                   >
-                    {slide.button_text || "Learn More"}
+                    <Button variant="default" size="lg">
+                      {slide.button_text || "Learn More"}
+                    </Button>
                   </Link>
                 )}
               </div>
@@ -78,12 +80,12 @@ export const HeroSlider = () => {
         ))}
       </div>
       
-      {slides.length > 1 && (
+      {slides?.length > 1 && (
         <>
           <Button
             variant="outline"
             size="icon"
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background text-foreground"
+            className="absolute left-4 top-1/2 -translate-y-1/2"
             onClick={prevSlide}
           >
             <ChevronLeft className="h-6 w-6" />
@@ -92,7 +94,7 @@ export const HeroSlider = () => {
           <Button
             variant="outline"
             size="icon"
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background text-foreground"
+            className="absolute right-4 top-1/2 -translate-y-1/2"
             onClick={nextSlide}
           >
             <ChevronRight className="h-6 w-6" />

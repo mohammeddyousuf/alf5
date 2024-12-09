@@ -1,8 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, MessageCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Breadcrumb,
@@ -20,6 +19,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { OrderDialog } from "@/components/product/OrderDialog";
+import { WhatsAppButton } from "@/components/product/WhatsAppButton";
 import { useState } from "react";
 
 const ProductDetail = () => {
@@ -127,20 +127,20 @@ Payment Mode: ${formData.paymentMode}`;
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{product.name}</BreadcrumbPage>
+            <BreadcrumbPage>{product?.name}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-4">
-          {mediaItems.length > 0 ? (
+          {mediaItems?.length > 0 ? (
             <div className="relative group">
               <Carousel className="w-full">
                 <CarouselContent>
                   {mediaItems.map((item, index) => (
                     <CarouselItem key={index}>
-                      {product.images?.includes(item) ? (
+                      {product?.images?.includes(item) ? (
                         <img
                           src={item}
                           alt={`${product.name} - ${index + 1}`}
@@ -150,7 +150,7 @@ Payment Mode: ${formData.paymentMode}`;
                         <div className="aspect-square w-full">
                           <iframe
                             src={`https://www.youtube.com/embed/${getYouTubeVideoId(item)}`}
-                            title={`${product.name} - Video ${index + 1}`}
+                            title={`${product?.name} - Video ${index + 1}`}
                             className="w-full h-full rounded-lg"
                             allowFullScreen
                           />
@@ -161,45 +161,38 @@ Payment Mode: ${formData.paymentMode}`;
                 </CarouselContent>
                 {mediaItems.length > 1 && (
                   <>
-                    <CarouselPrevious className="absolute left-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <CarouselNext className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CarouselPrevious />
+                    <CarouselNext />
                   </>
                 )}
               </Carousel>
             </div>
           ) : (
-            <div className="w-full rounded-lg bg-gray-100 aspect-square flex items-center justify-center">
-              <p className="text-gray-500">No media available</p>
+            <div className="w-full rounded-lg bg-muted aspect-square flex items-center justify-center">
+              <p className="text-muted-foreground">No media available</p>
             </div>
           )}
         </div>
 
         <div className="space-y-6">
-          <h1 className="text-3xl font-bold">{product.name}</h1>
+          <h1 className="text-3xl font-bold text-foreground">{product?.name}</h1>
           
           <div className="space-y-2">
-            <p className="text-2xl font-bold text-whatsapp-dark">
-              ${product.sale_price || product.price}
+            <p className="text-2xl font-bold text-foreground">
+              ${product?.sale_price || product?.price}
             </p>
-            {product.sale_price && (
-              <p className="text-lg text-gray-500 line-through">
-                ${product.price}
+            {product?.sale_price && (
+              <p className="text-lg text-muted-foreground line-through">
+                ${product?.price}
               </p>
             )}
           </div>
 
-          {product.description && (
-            <p className="text-gray-600">{product.description}</p>
+          {product?.description && (
+            <p className="text-muted-foreground">{product.description}</p>
           )}
 
-          <Button
-            size="lg"
-            className="w-full md:w-auto bg-whatsapp-primary hover:bg-whatsapp-secondary"
-            onClick={() => setOrderDialogOpen(true)}
-          >
-            <MessageCircle className="mr-2 h-5 w-5" />
-            Contact on WhatsApp
-          </Button>
+          <WhatsAppButton onClick={() => setOrderDialogOpen(true)} />
 
           <OrderDialog
             open={orderDialogOpen}
