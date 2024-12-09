@@ -140,7 +140,11 @@ export const PageForm = ({ initialData }: PageFormProps) => {
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {initialData ? "Update" : "Create"} Page
           </Button>
-          <Button type="button" variant="outline" onClick={() => navigate("/admin/pages")}>
+          <Button 
+            type="button" 
+            variant="destructive" 
+            onClick={() => navigate("/admin/pages")}
+          >
             Cancel
           </Button>
         </div>
