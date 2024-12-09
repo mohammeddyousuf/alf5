@@ -1,5 +1,6 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { Tag } from "lucide-react";
 
 interface ProductCardProps {
   id: string;
@@ -20,13 +21,20 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl }: ProductCar
   return (
     <Link to={`/products/${id}`}>
       <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
-        <div className="aspect-square overflow-hidden">
+        <div className="aspect-square overflow-hidden relative">
           {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={name}
-              className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-            />
+            <>
+              <img
+                src={imageUrl}
+                alt={name}
+                className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+              />
+              {salePrice && (
+                <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground rounded-full p-1.5">
+                  <Tag className="h-4 w-4" />
+                </div>
+              )}
+            </>
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-muted">
               <span className="text-muted-foreground">No image</span>
