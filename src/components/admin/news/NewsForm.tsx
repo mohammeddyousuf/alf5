@@ -6,24 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Database } from "@/integrations/supabase/types";
-
-type NewsRow = Database["public"]["Tables"]["news_ticker"]["Row"];
 
 interface NewsFormProps {
-  initialData?: NewsRow;
+  news?: any;
   onSuccess?: () => void;
 }
 
-export const NewsForm = ({ initialData, onSuccess }: NewsFormProps) => {
+export const NewsForm = ({ news, onSuccess }: NewsFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
-    message: initialData?.message || "",
-    active: initialData?.active ?? true,
-    order_index: initialData?.order_index || 0,
+    message: news?.message || "",
+    active: news?.active ?? true,
+    order_index: news?.order_index || 0,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,11 +28,11 @@ export const NewsForm = ({ initialData, onSuccess }: NewsFormProps) => {
     setIsLoading(true);
 
     try {
-      if (initialData) {
+      if (news) {
         const { error } = await supabase
           .from("news_ticker")
           .update(formData)
-          .eq("id", initialData.id);
+          .eq("id", news.id);
 
         if (error) throw error;
         toast({ description: "News item updated successfully" });
@@ -93,7 +90,7 @@ export const NewsForm = ({ initialData, onSuccess }: NewsFormProps) => {
       </div>
 
       <Button type="submit" disabled={isLoading}>
-        {isLoading ? "Saving..." : initialData ? "Update News" : "Create News"}
+        {isLoading ? "Saving..." : news ? "Update News" : "Create News"}
       </Button>
     </form>
   );

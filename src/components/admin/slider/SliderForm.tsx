@@ -8,29 +8,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { ImageUploadField } from "../shared/ImageUploadField";
-import { Database } from "@/integrations/supabase/types";
-
-type SliderRow = Database["public"]["Tables"]["sliders"]["Row"];
 
 interface SliderFormProps {
-  initialData?: SliderRow;
+  slider?: any;
   onSuccess?: () => void;
 }
 
-export const SliderForm = ({ initialData, onSuccess }: SliderFormProps) => {
+export const SliderForm = ({ slider, onSuccess }: SliderFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
-    title: initialData?.title || "",
-    description: initialData?.description || "",
-    image_url: initialData?.image_url || "",
-    link_url: initialData?.link_url || "",
-    button_text: initialData?.button_text || "Learn More",
-    active: initialData?.active ?? true,
-    order_index: initialData?.order_index || 0,
+    title: slider?.title || "",
+    description: slider?.description || "",
+    image_url: slider?.image_url || "",
+    link_url: slider?.link_url || "",
+    button_text: slider?.button_text || "Learn More",
+    active: slider?.active ?? true,
+    order_index: slider?.order_index || 0,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,11 +35,11 @@ export const SliderForm = ({ initialData, onSuccess }: SliderFormProps) => {
     setIsLoading(true);
 
     try {
-      if (initialData) {
+      if (slider) {
         const { error } = await supabase
           .from("sliders")
           .update(formData)
-          .eq("id", initialData.id);
+          .eq("id", slider.id);
 
         if (error) throw error;
         toast({ description: "Slider updated successfully" });
@@ -140,7 +137,7 @@ export const SliderForm = ({ initialData, onSuccess }: SliderFormProps) => {
       </div>
 
       <Button type="submit" disabled={isLoading} className="w-full">
-        {isLoading ? "Saving..." : initialData ? "Update Slider" : "Create Slider"}
+        {isLoading ? "Saving..." : slider ? "Update Slider" : "Create Slider"}
       </Button>
     </form>
   );

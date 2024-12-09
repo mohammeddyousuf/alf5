@@ -1,43 +1,43 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Loader2, Plus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { NewsForm } from "@/components/admin/news/NewsForm";
 
 const News = () => {
   const [open, setOpen] = useState(false);
-  const [selectedNews, setSelectedNews] = useState(null);
-  const queryClient = useQueryClient();
+  const [selectedNews, setSelectedNews] = useState<any>(null);
 
-  const { data: news } = useQuery({
-    queryKey: ["news_ticker"],
+  const { data: newsItems, isLoading } = useQuery({
+    queryKey: ["news-ticker"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("news_ticker")
         .select("*")
-        .order("order_index");
+        .order("order_index", { ascending: true });
+      
       if (error) throw error;
       return data;
     },
   });
 
-  const handleEdit = (newsItem: any) => {
-    setSelectedNews(newsItem);
-    setOpen(true);
-  };
-
-  const handleSuccess = () => {
-    setOpen(false);
-    setSelectedNews(null);
-    queryClient.invalidateQueries({ queryKey: ["news_ticker"] });
-  };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-48">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6">
@@ -45,38 +45,53 @@ const News = () => {
         <h1 className="text-3xl font-bold">News Ticker</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => setSelectedNews(null)}>Add News Item</Button>
+            <Button onClick={() => setSelectedNews(null)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add News
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{selectedNews ? "Edit News" : "Add News Item"}</DialogTitle>
             </DialogHeader>
             <NewsForm 
-              initialData={selectedNews} 
-              onSuccess={handleSuccess} 
+              news={selectedNews} 
+              onSuccess={() => setOpen(false)} 
             />
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="space-y-4">
-        {news?.map((item: any) => (
-          <div
-            key={item.id}
-            className="flex items-center justify-between p-4 bg-card rounded-lg shadow"
-          >
-            <div>
-              <p className="font-medium">{item.message}</p>
-              <p className="text-sm text-muted-foreground">
-                Order: {item.order_index}
-              </p>
-            </div>
-            <Button variant="outline" onClick={() => handleEdit(item)}>
-              Edit
-            </Button>
-          </div>
-        ))}
-      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Message</TableHead>
+            <TableHead>Order</TableHead>
+            <TableHead>Active</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {newsItems?.map((item) => (
+            <TableRow key={item.id}>
+              <TableCell>{item.message}</TableCell>
+              <TableCell>{item.order_index}</TableCell>
+              <TableCell>{item.active ? "Yes" : "No"}</TableCell>
+              <TableCell>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setSelectedNews(item);
+                    setOpen(true);
+                  }}
+                >
+                  Edit
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };

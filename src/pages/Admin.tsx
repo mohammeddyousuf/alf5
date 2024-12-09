@@ -8,7 +8,7 @@ import { WebsiteSettings } from "@/components/admin/WebsiteSettings";
 
 const Admin = () => {
   const navigate = useNavigate();
-  
+
   const { data: collections } = useQuery({
     queryKey: ["collections"],
     queryFn: async () => {
@@ -18,7 +18,7 @@ const Admin = () => {
     },
   });
 
-  const { data: products } = useQuery({
+  const { data: products, ...productsQuery } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
       const { data, error } = await supabase.from("products").select("*");
@@ -27,7 +27,7 @@ const Admin = () => {
     },
   });
 
-  const { data: categories } = useQuery({
+  const { data: categories, ...categoriesQuery } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const { data, error } = await supabase.from("categories").select("*");
@@ -36,7 +36,7 @@ const Admin = () => {
     },
   });
 
-  const { data: subcategories } = useQuery({
+  const { data: subcategories, ...subcategoriesQuery } = useQuery({
     queryKey: ["subcategories"],
     queryFn: async () => {
       const { data, error } = await supabase.from("subcategories").select("*");
@@ -45,7 +45,7 @@ const Admin = () => {
     },
   });
 
-  const { data: sliders } = useQuery({
+  const { data: sliders, ...slidersQuery } = useQuery({
     queryKey: ["sliders"],
     queryFn: async () => {
       const { data, error } = await supabase.from("sliders").select("*");
@@ -54,7 +54,7 @@ const Admin = () => {
     },
   });
 
-  const { data: newsTicker } = useQuery({
+  const { data: newsTicker, ...newsTickerQuery } = useQuery({
     queryKey: ["news_ticker"],
     queryFn: async () => {
       const { data, error } = await supabase.from("news_ticker").select("*");
@@ -63,7 +63,7 @@ const Admin = () => {
     },
   });
 
-  const { data: pages } = useQuery({
+  const { data: pages, ...pagesQuery } = useQuery({
     queryKey: ["pages"],
     queryFn: async () => {
       const { data, error } = await supabase.from("pages").select("*");
@@ -72,9 +72,17 @@ const Admin = () => {
     },
   });
 
-  const handleNavigation = (path: string) => {
-    navigate(`/admin/${path}`);
-  };
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -84,78 +92,43 @@ const Admin = () => {
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-2">Categories</h2>
           <p className="text-3xl font-bold mb-4">{categories?.length || 0}</p>
-          <Button 
-            className="w-full"
-            onClick={() => handleNavigation("categories")}
-          >
-            Manage Categories
-          </Button>
+          <Button onClick={() => navigate("/admin/categories")}>Manage Categories</Button>
         </Card>
 
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-2">Subcategories</h2>
           <p className="text-3xl font-bold mb-4">{subcategories?.length || 0}</p>
-          <Button 
-            className="w-full"
-            onClick={() => handleNavigation("categories")}
-          >
-            Manage Subcategories
-          </Button>
+          <Button onClick={() => navigate("/admin/categories")}>Manage Subcategories</Button>
         </Card>
 
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-2">Collections</h2>
           <p className="text-3xl font-bold mb-4">{collections?.length || 0}</p>
-          <Button 
-            className="w-full"
-            onClick={() => handleNavigation("collections")}
-          >
-            Manage Collections
-          </Button>
+          <Button onClick={() => navigate("/admin/collections")}>Manage Collections</Button>
         </Card>
 
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-2">Products</h2>
           <p className="text-3xl font-bold mb-4">{products?.length || 0}</p>
-          <Button 
-            className="w-full"
-            onClick={() => handleNavigation("products")}
-          >
-            Manage Products
-          </Button>
+          <Button onClick={() => navigate("/admin/products")}>Manage Products</Button>
         </Card>
 
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-2">Sliders</h2>
           <p className="text-3xl font-bold mb-4">{sliders?.length || 0}</p>
-          <Button 
-            className="w-full"
-            onClick={() => handleNavigation("sliders")}
-          >
-            Manage Sliders
-          </Button>
+          <Button onClick={() => navigate("/admin/sliders")}>Manage Sliders</Button>
         </Card>
 
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-2">News Ticker</h2>
           <p className="text-3xl font-bold mb-4">{newsTicker?.length || 0}</p>
-          <Button 
-            className="w-full"
-            onClick={() => handleNavigation("news")}
-          >
-            Manage News
-          </Button>
+          <Button onClick={() => navigate("/admin/news")}>Manage News</Button>
         </Card>
 
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-2">Pages</h2>
           <p className="text-3xl font-bold mb-4">{pages?.length || 0}</p>
-          <Button 
-            className="w-full"
-            onClick={() => handleNavigation("pages")}
-          >
-            Manage Pages
-          </Button>
+          <Button onClick={() => navigate("/admin/pages")}>Manage Pages</Button>
         </Card>
       </div>
 
