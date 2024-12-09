@@ -3,8 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const AuthPage = () => {
+  const { toast } = useToast();
+
+  console.log("Rendering Auth page");
+
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold text-center mb-6">Admin Login</h1>
@@ -30,6 +35,14 @@ const AuthPage = () => {
         redirectTo={window.location.origin}
         showLinks={false}
         view="sign_in"
+        onError={(error) => {
+          console.error("Auth error:", error);
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "Please check your credentials and try again.",
+          });
+        }}
         localization={{
           variables: {
             sign_in: {

@@ -9,11 +9,17 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    flowType: 'pkce'
+    flowType: 'pkce',
+    storage: window.localStorage,
   },
   global: {
     headers: {
       'apikey': SUPABASE_PUBLISHABLE_KEY,
     },
   },
+});
+
+// Add debug logging
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log('Auth state changed:', event, session);
 });
