@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Link as LinkIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Breadcrumb,
@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import { ProductMedia } from "@/components/product/ProductMedia";
 import { ProductInfo } from "@/components/product/ProductInfo";
 import { Helmet } from "react-helmet";
+import { Button } from "@/components/ui/button";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -44,14 +45,12 @@ const ProductDetail = () => {
     queryFn: async () => {
       if (!shortId) throw new Error("Product ID not found");
       
-      // Get all products and filter in JS since Supabase is having issues with UUID text search
       const { data, error } = await supabase
         .from("products")
         .select("*");
       
       if (error) throw error;
       
-      // Find the product whose ID starts with our shortId
       const matchingProduct = data?.find(p => p.id.startsWith(shortId));
       if (!matchingProduct) throw new Error("Product not found");
       
@@ -64,6 +63,22 @@ const ProductDetail = () => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
     return match && match[2].length === 11 ? match[2] : null;
+  };
+
+  const handleCopyLink = () => {
+    const currentUrl = window.location.href;
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      toast({
+        title: "Link Copied!",
+        description: "Product link has been copied to clipboard",
+      });
+    }).catch(() => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to copy link",
+      });
+    });
   };
 
   const handleOrderSubmit = (formData: any) => {
@@ -134,25 +149,37 @@ Payment Mode: ${formData.paymentMode}`;
       </Helmet>
 
       <div className="container py-8">
-        <Breadcrumb className="mb-6">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <Link to="/" className="transition-colors hover:text-foreground">
-                Home
-              </Link>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <Link to="/shop" className="transition-colors hover:text-foreground">
-                Shop
-              </Link>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{product?.name}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <div className="flex justify-between items-center mb-6">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <Link to="/" className="transition-colors hover:text-foreground">
+                  Home
+                </Link>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <Link to="/shop" className="transition-colors hover:text-foreground">
+                  Shop
+                </Link>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{product?.name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={handleCopyLink}
+          >
+            <LinkIcon className="h-4 w-4" />
+            Copy Link
+          </Button>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <ProductMedia
