@@ -114,6 +114,15 @@ Payment Mode: ${formData.paymentMode}`;
   const productImage = product.images && product.images.length > 0 ? product.images[0] : null;
   const productPrice = product.sale_price || product.price;
   const currentUrl = window.location.href;
+  
+  // Convert relative image URLs to absolute URLs
+  const getAbsoluteUrl = (url: string) => {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+  };
+
+  const absoluteProductImage = productImage ? getAbsoluteUrl(productImage) : null;
 
   return (
     <>
@@ -126,7 +135,7 @@ Payment Mode: ${formData.paymentMode}`;
         <meta property="og:url" content={currentUrl} />
         <meta property="og:title" content={`${product.name} | ${websiteName}`} />
         <meta property="og:description" content={product.description || `${product.name} - Available at ${websiteName}`} />
-        {productImage && <meta property="og:image" content={productImage} />}
+        {absoluteProductImage && <meta property="og:image" content={absoluteProductImage} />}
         <meta property="product:price:amount" content={String(productPrice)} />
         <meta property="product:price:currency" content="USD" />
         {product.brand && <meta property="product:brand" content={product.brand} />}
@@ -135,7 +144,7 @@ Payment Mode: ${formData.paymentMode}`;
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${product.name} | ${websiteName}`} />
         <meta name="twitter:description" content={product.description || `${product.name} - Available at ${websiteName}`} />
-        {productImage && <meta property="twitter:image" content={productImage} />}
+        {absoluteProductImage && <meta name="twitter:image" content={absoluteProductImage} />}
       </Helmet>
 
       <div className="container py-8">
