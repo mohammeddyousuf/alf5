@@ -9,7 +9,219 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      collections: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      news_ticker: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          id: string
+          message: string
+          order_index: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          id?: string
+          message: string
+          order_index?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          id?: string
+          message?: string
+          order_index?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          images: string[] | null
+          name: string
+          price: number
+          sale_price: number | null
+          status: Database["public"]["Enums"]["product_status"] | null
+          updated_at: string
+          video_urls: string[] | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          name: string
+          price: number
+          sale_price?: number | null
+          status?: Database["public"]["Enums"]["product_status"] | null
+          updated_at?: string
+          video_urls?: string[] | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          name?: string
+          price?: number
+          sale_price?: number | null
+          status?: Database["public"]["Enums"]["product_status"] | null
+          updated_at?: string
+          video_urls?: string[] | null
+        }
+        Relationships: []
+      }
+      products_collections: {
+        Row: {
+          collection_id: string
+          product_id: string
+        }
+        Insert: {
+          collection_id: string
+          product_id: string
+        }
+        Update: {
+          collection_id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_collections_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_collections_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      settings: {
+        Row: {
+          clearance_sale_active: boolean | null
+          clearance_sale_end_date: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          whatsapp_number: string
+        }
+        Insert: {
+          clearance_sale_active?: boolean | null
+          clearance_sale_end_date?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          whatsapp_number: string
+        }
+        Update: {
+          clearance_sale_active?: boolean | null
+          clearance_sale_end_date?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          whatsapp_number?: string
+        }
+        Relationships: []
+      }
+      sliders: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string
+          link_url: string | null
+          order_index: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url: string
+          link_url?: string | null
+          order_index?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string
+          link_url?: string | null
+          order_index?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +230,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      product_status: "draft" | "published" | "archived"
     }
     CompositeTypes: {
       [_ in never]: never
