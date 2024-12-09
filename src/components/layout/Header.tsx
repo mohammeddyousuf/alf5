@@ -2,12 +2,13 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -22,6 +23,16 @@ export const Header = () => {
     },
   });
 
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
+  const linkClasses = (path: string) => {
+    return `font-medium transition-colors text-foreground hover:text-primary ${
+      isActive(path) ? "text-primary underline underline-offset-4" : ""
+    }`;
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
@@ -33,19 +44,39 @@ export const Header = () => {
           </SheetTrigger>
           <SheetContent side="left" className="w-[300px] sm:w-[400px]">
             <nav className="flex flex-col gap-4">
-              <Link to="/" onClick={() => setIsOpen(false)} className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/" 
+                onClick={() => setIsOpen(false)} 
+                className={`text-lg font-semibold ${linkClasses('/')}`}
+              >
                 Home
               </Link>
-              <Link to="/shop" onClick={() => setIsOpen(false)} className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/shop" 
+                onClick={() => setIsOpen(false)} 
+                className={`text-lg font-semibold ${linkClasses('/shop')}`}
+              >
                 Shop
               </Link>
-              <Link to="/about" onClick={() => setIsOpen(false)} className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/about" 
+                onClick={() => setIsOpen(false)} 
+                className={`text-lg font-semibold ${linkClasses('/about')}`}
+              >
                 About
               </Link>
-              <Link to="/contact" onClick={() => setIsOpen(false)} className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/contact" 
+                onClick={() => setIsOpen(false)} 
+                className={`text-lg font-semibold ${linkClasses('/contact')}`}
+              >
                 Contact
               </Link>
-              <Link to="/faq" onClick={() => setIsOpen(false)} className="text-lg font-semibold text-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/faq" 
+                onClick={() => setIsOpen(false)} 
+                className={`text-lg font-semibold ${linkClasses('/faq')}`}
+              >
                 FAQ
               </Link>
             </nav>
@@ -70,19 +101,19 @@ export const Header = () => {
 
         <div className="flex items-center gap-6">
           <nav className="hidden md:flex items-center gap-6 text-sm">
-            <Link to="/" className="font-medium transition-colors text-foreground hover:text-primary">
+            <Link to="/" className={linkClasses('/')}>
               Home
             </Link>
-            <Link to="/shop" className="font-medium transition-colors text-foreground hover:text-primary">
+            <Link to="/shop" className={linkClasses('/shop')}>
               Shop
             </Link>
-            <Link to="/about" className="font-medium transition-colors text-foreground hover:text-primary">
+            <Link to="/about" className={linkClasses('/about')}>
               About
             </Link>
-            <Link to="/contact" className="font-medium transition-colors text-foreground hover:text-primary">
+            <Link to="/contact" className={linkClasses('/contact')}>
               Contact
             </Link>
-            <Link to="/faq" className="font-medium transition-colors text-foreground hover:text-primary">
+            <Link to="/faq" className={linkClasses('/faq')}>
               FAQ
             </Link>
           </nav>
