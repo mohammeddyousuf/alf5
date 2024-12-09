@@ -50,10 +50,28 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
     enabled: Boolean(form.watch("category_id")),
   });
 
-  // Reset subcategory when category changes
+  // Reset subcategory only when category changes and it's not the initial load
   useEffect(() => {
-    form.setValue("subcategory_id", null, { shouldDirty: true });
-  }, [form.watch("category_id")]);
+    const categoryId = form.watch("category_id");
+    const subcategoryId = form.watch("subcategory_id");
+    
+    // Only reset if there's a category change and current subcategory exists
+    if (categoryId && subcategoryId) {
+      // Check if the current subcategory belongs to the selected category
+      const subcategoryBelongsToCategory = subcategories?.some(
+        (sub) => sub.id === subcategoryId
+      );
+      
+      if (!subcategoryBelongsToCategory) {
+        form.setValue("subcategory_id", null);
+      }
+    }
+  }, [form.watch("category_id"), subcategories]);
+
+  console.log("Current form values:", {
+    category_id: form.watch("category_id"),
+    subcategory_id: form.watch("subcategory_id"),
+  });
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -64,10 +82,7 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
           <FormItem>
             <FormLabel>Category</FormLabel>
             <Select
-              onValueChange={(value) => {
-                field.onChange(value);
-                form.setValue("category_id", value, { shouldDirty: true });
-              }}
+              onValueChange={field.onChange}
               value={field.value || undefined}
             >
               <FormControl>
@@ -95,10 +110,7 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
           <FormItem>
             <FormLabel>Subcategory</FormLabel>
             <Select
-              onValueChange={(value) => {
-                field.onChange(value);
-                form.setValue("subcategory_id", value, { shouldDirty: true });
-              }}
+              onValueChange={field.onChange}
               value={field.value || undefined}
               disabled={!form.watch("category_id")}
             >

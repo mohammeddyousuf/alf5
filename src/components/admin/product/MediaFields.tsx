@@ -48,7 +48,9 @@ export function MediaFields({ form }: MediaFieldsProps) {
         })
       );
 
-      form.setValue("images", [...currentImages, ...newImages], { shouldDirty: true });
+      const updatedImages = [...currentImages, ...newImages];
+      form.setValue("images", updatedImages, { shouldDirty: true });
+      
       toast({
         title: "Success",
         description: "Images uploaded successfully",
@@ -68,28 +70,29 @@ export function MediaFields({ form }: MediaFieldsProps) {
 
   const removeImage = (indexToRemove: number) => {
     const currentImages = form.getValues("images") || [];
-    form.setValue(
-      "images",
-      currentImages.filter((_, index) => index !== indexToRemove),
-      { shouldDirty: true }
-    );
+    const updatedImages = currentImages.filter((_, index) => index !== indexToRemove);
+    form.setValue("images", updatedImages, { shouldDirty: true });
   };
 
   const addVideoUrl = () => {
     if (!newVideoUrl) return;
     const currentUrls = form.getValues("video_urls") || [];
-    form.setValue("video_urls", [...currentUrls, newVideoUrl], { shouldDirty: true });
+    const updatedUrls = [...currentUrls, newVideoUrl];
+    form.setValue("video_urls", updatedUrls, { shouldDirty: true });
     setNewVideoUrl("");
+    
+    console.log("Updated video URLs:", updatedUrls);
   };
 
   const removeVideoUrl = (indexToRemove: number) => {
     const currentUrls = form.getValues("video_urls") || [];
-    form.setValue(
-      "video_urls",
-      currentUrls.filter((_, index) => index !== indexToRemove),
-      { shouldDirty: true }
-    );
+    const updatedUrls = currentUrls.filter((_, index) => index !== indexToRemove);
+    form.setValue("video_urls", updatedUrls, { shouldDirty: true });
+    
+    console.log("Updated video URLs after removal:", updatedUrls);
   };
+
+  console.log("Current video URLs in form:", form.watch("video_urls"));
 
   return (
     <div className="space-y-4">
@@ -135,7 +138,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
       <FormField
         control={form.control}
         name="video_urls"
-        render={() => (
+        render={({ field }) => (
           <FormItem>
             <FormLabel>Video URLs</FormLabel>
             <div className="space-y-2">
@@ -150,7 +153,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
                 </Button>
               </div>
               <div className="space-y-2">
-                {form.watch("video_urls")?.map((url, index) => (
+                {field.value?.map((url, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <Input value={url} readOnly />
                     <Button
