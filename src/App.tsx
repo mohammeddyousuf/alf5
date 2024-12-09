@@ -16,6 +16,7 @@ import NewPage from "@/pages/admin/pages/New";
 import EditPage from "@/pages/admin/pages/[id]";
 import Categories from "@/pages/admin/Categories";
 import ProductDetail from "@/pages/ProductDetail";
+import Orders from "@/pages/admin/Orders";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { initializeThemeColors } from "@/utils/themeUtils";
@@ -70,6 +71,7 @@ function App() {
             <Route path="/admin/pages/new" element={<NewPage />} />
             <Route path="/admin/pages/:id" element={<EditPage />} />
             <Route path="/admin/categories" element={<Categories />} />
+            <Route path="/admin/orders" element={<Orders />} />
           </Routes>
         </Layout>
         <Toaster />
