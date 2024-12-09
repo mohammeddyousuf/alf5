@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,15 +14,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
-  price: z.coerce.number().min(0, "Price must be a positive number"),
-  sale_price: z.coerce.number().min(0, "Sale price must be a positive number").optional().nullable(),
-  images: z.array(z.string()).optional(),
-  video_urls: z.array(z.string()).optional(),
-});
+import { PriceFields } from "./PriceFields";
+import { MediaFields } from "./MediaFields";
+import { productFormSchema, type ProductFormData } from "./schema";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
@@ -34,8 +27,8 @@ interface ProductFormProps {
 
 export function ProductForm({ product, onSuccess }: ProductFormProps) {
   const { toast } = useToast();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<ProductFormData>({
+    resolver: zodResolver(productFormSchema),
     defaultValues: {
       name: product?.name ?? "",
       description: product?.description ?? "",
@@ -46,21 +39,12 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: ProductFormData) => {
     try {
-      const submitData = {
-        name: values.name,
-        description: values.description,
-        price: values.price,
-        sale_price: values.sale_price,
-        images: values.images,
-        video_urls: values.video_urls,
-      };
-
       if (product) {
         const { error } = await supabase
           .from("products")
-          .update(submitData)
+          .update(values)
           .eq("id", product.id);
         if (error) throw error;
         toast({
@@ -68,7 +52,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           description: "Product updated successfully",
         });
       } else {
-        const { error } = await supabase.from("products").insert(submitData);
+        const { error } = await supabase.from("products").insert(values);
         if (error) throw error;
         toast({
           title: "Success",
@@ -117,44 +101,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           )}
         />
 
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Price</FormLabel>
-                <FormControl>
-                  <Input type="number" step="0.01" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="sale_price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Sale Price (Optional)</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    step="0.01" 
-                    {...field} 
-                    value={field.value ?? ''} 
-                    onChange={(e) => {
-                      const value = e.target.value === '' ? null : e.target.value;
-                      field.onChange(value);
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <PriceFields form={form} />
+        <MediaFields form={form} />
 
         <Button type="submit">
           {product ? "Update Product" : "Create Product"}
