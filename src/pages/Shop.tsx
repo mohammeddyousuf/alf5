@@ -14,6 +14,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 const Shop = () => {
   const { toast } = useToast();
@@ -74,7 +75,6 @@ const Shop = () => {
   });
 
   if (error) {
-    console.error("Query error:", error);
     return (
       <div className="container py-12">
         <p className="text-center text-destructive">
@@ -96,66 +96,82 @@ const Shop = () => {
     <div className="container py-12">
       <h1 className="text-4xl font-bold text-center mb-8">Our Products</h1>
 
-      <div className="mb-8 space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex-1 space-y-2">
-            <Label>Price Range (${priceRange[0]} - ${priceRange[1]})</Label>
-            <Slider
-              defaultValue={[0, 1000]}
-              max={1000}
-              step={10}
-              value={priceRange}
-              onValueChange={setPriceRange}
-              className="w-full"
-            />
+      <div className="flex gap-8">
+        {/* Filters Sidebar */}
+        <div className="w-64 shrink-0 space-y-6">
+          <div className="space-y-4">
+            <h2 className="font-semibold text-lg">Filters</h2>
+            <Separator />
+            
+            <div className="space-y-2">
+              <Label>Price Range</Label>
+              <div className="text-sm text-muted-foreground mb-2">
+                ${priceRange[0]} - ${priceRange[1]}
+              </div>
+              <Slider
+                defaultValue={[0, 1000]}
+                max={1000}
+                step={10}
+                value={priceRange}
+                onValueChange={setPriceRange}
+                className="w-full"
+              />
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <Label>Sort By</Label>
+              <Select
+                value={sortOrder}
+                onValueChange={(value: "asc" | "desc" | "default") => setSortOrder(value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Sort by price" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="default">Default</SelectItem>
+                  <SelectItem value="asc">Price: Low to High</SelectItem>
+                  <SelectItem value="desc">Price: High to Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Separator />
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="sale-mode"
+                checked={showSaleOnly}
+                onCheckedChange={setShowSaleOnly}
+              />
+              <Label htmlFor="sale-mode">Show Sale Items Only</Label>
+            </div>
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        <div className="flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {sortedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                salePrice={product.sale_price}
+                imageUrl={product.images?.[0]}
+              />
+            ))}
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="sale-mode"
-              checked={showSaleOnly}
-              onCheckedChange={setShowSaleOnly}
-            />
-            <Label htmlFor="sale-mode">Show Sale Items Only</Label>
-          </div>
-
-          <Select
-            value={sortOrder}
-            onValueChange={(value: "asc" | "desc" | "default") => setSortOrder(value)}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by price" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="default">Default</SelectItem>
-              <SelectItem value="asc">Price: Low to High</SelectItem>
-              <SelectItem value="desc">Price: High to Low</SelectItem>
-            </SelectContent>
-          </Select>
+          {(!sortedProducts || sortedProducts.length === 0) && (
+            <p className="text-center text-muted-foreground">
+              No products available at the moment.
+            </p>
+          )}
         </div>
       </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {sortedProducts.map((product) => {
-          console.log("Rendering product:", product);
-          return (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              price={product.price}
-              salePrice={product.sale_price}
-              imageUrl={product.images?.[0]}
-            />
-          );
-        })}
-      </div>
-
-      {(!sortedProducts || sortedProducts.length === 0) && (
-        <p className="text-center text-muted-foreground">
-          No products available at the moment.
-        </p>
-      )}
     </div>
   );
 };
