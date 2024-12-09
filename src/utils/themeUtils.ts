@@ -1,41 +1,85 @@
+// Function to convert hex to HSL
+const hexToHSL = (hex: string): string => {
+  // Remove the hash if present
+  hex = hex.replace(/^#/, '');
+
+  // Parse the hex values
+  const r = parseInt(hex.slice(0, 2), 16) / 255;
+  const g = parseInt(hex.slice(2, 4), 16) / 255;
+  const b = parseInt(hex.slice(4, 6), 16) / 255;
+
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  let h = 0;
+  let s = 0;
+  const l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    
+    h /= 6;
+  }
+
+  // Convert to degrees and percentages
+  const hDeg = Math.round(h * 360);
+  const sPct = Math.round(s * 100);
+  const lPct = Math.round(l * 100);
+
+  return `${hDeg} ${sPct}% ${lPct}%`;
+}
+
 export const updateThemeColor = (colorKey: string, value: string) => {
   const root = document.documentElement;
+  const hslValue = hexToHSL(value);
   
-  // Remove any spaces and convert to lowercase
-  const cleanValue = value.trim().toLowerCase();
-  
-  // Set the CSS variable
   switch (colorKey) {
     case 'primary':
-      root.style.setProperty('--primary', cleanValue);
-      root.style.setProperty('--primary-foreground', '#ffffff');
+      root.style.setProperty('--primary', hslValue);
       break;
     case 'secondary':
-      root.style.setProperty('--secondary', cleanValue);
-      root.style.setProperty('--secondary-foreground', '#ffffff');
+      root.style.setProperty('--secondary', hslValue);
       break;
     case 'accent':
-      root.style.setProperty('--accent', cleanValue);
-      root.style.setProperty('--accent-foreground', '#ffffff');
+      root.style.setProperty('--accent', hslValue);
       break;
     case 'background':
-      root.style.setProperty('--background', cleanValue);
+      root.style.setProperty('--background', hslValue);
       break;
     case 'foreground':
-      root.style.setProperty('--foreground', cleanValue);
+      root.style.setProperty('--foreground', hslValue);
       break;
-    default:
-      console.warn(`Unknown color key: ${colorKey}`);
   }
 };
 
-// Initialize theme colors from settings
 export const initializeThemeColors = (settings: any) => {
-  if (settings) {
-    updateThemeColor('primary', settings.primary_color || '#9b87f5');
-    updateThemeColor('secondary', settings.secondary_color || '#7E69AB');
-    updateThemeColor('accent', settings.accent_color || '#6E59A5');
-    updateThemeColor('background', settings.background_color || '#FFFFFF');
-    updateThemeColor('foreground', settings.foreground_color || '#000000');
+  if (!settings) return;
+  
+  if (settings.primary_color) {
+    updateThemeColor('primary', settings.primary_color);
+  }
+  if (settings.secondary_color) {
+    updateThemeColor('secondary', settings.secondary_color);
+  }
+  if (settings.accent_color) {
+    updateThemeColor('accent', settings.accent_color);
+  }
+  if (settings.background_color) {
+    updateThemeColor('background', settings.background_color);
+  }
+  if (settings.foreground_color) {
+    updateThemeColor('foreground', settings.foreground_color);
   }
 };
