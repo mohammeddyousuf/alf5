@@ -51,12 +51,12 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
     }
   };
 
-  const ensureHttps = (url: string) => {
+  const ensureValidUrl = (url: string) => {
     if (!url) return url;
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      return `https://${url}`;
-    }
-    return url;
+    // Remove any existing protocol
+    url = url.replace(/^(https?:\/\/)?(www\.)?/, '');
+    // Add https:// protocol
+    return `https://${url}`;
   };
 
   const handleSocialMediaUpdate = async () => {
@@ -64,8 +64,8 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       const { error } = await supabase
         .from('settings')
         .update({
-          instagram_url: ensureHttps(instagramUrl),
-          facebook_url: ensureHttps(facebookUrl),
+          instagram_url: ensureValidUrl(instagramUrl),
+          facebook_url: ensureValidUrl(facebookUrl),
         })
         .eq('id', settings?.id);
 
@@ -147,7 +147,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
             id="instagramUrl"
             value={instagramUrl}
             onChange={(e) => setInstagramUrl(e.target.value)}
-            placeholder="Enter Instagram URL (e.g., www.instagram.com/your-profile)"
+            placeholder="instagram.com/your-profile"
           />
         </div>
         <div className="space-y-2">
@@ -156,7 +156,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
             id="facebookUrl"
             value={facebookUrl}
             onChange={(e) => setFacebookUrl(e.target.value)}
-            placeholder="Enter Facebook URL (e.g., www.facebook.com/your-profile)"
+            placeholder="facebook.com/your-profile"
           />
         </div>
         <Button onClick={handleSocialMediaUpdate}>Save Social Media Links</Button>
