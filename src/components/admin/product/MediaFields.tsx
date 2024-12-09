@@ -20,6 +20,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [newVideoUrl, setNewVideoUrl] = useState("");
 
+  // Image handling functions
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
@@ -72,7 +73,8 @@ export function MediaFields({ form }: MediaFieldsProps) {
     form.setValue("images", updatedImages);
   };
 
-  const handleAddVideoUrl = () => {
+  // Video URL handling functions
+  const addVideoUrl = () => {
     const url = newVideoUrl.trim();
     if (!url) {
       toast({
@@ -83,12 +85,21 @@ export function MediaFields({ form }: MediaFieldsProps) {
       return;
     }
 
-    const currentUrls = form.getValues("video_urls") || [];
-    form.setValue("video_urls", [...currentUrls, url], { shouldDirty: true });
-    setNewVideoUrl("");
+    console.log("[MediaFields] Current form values:", form.getValues());
+    console.log("[MediaFields] Adding video URL:", url);
 
-    console.log("Added video URL:", url);
-    console.log("Current video URLs:", [...currentUrls, url]);
+    const currentUrls = form.getValues("video_urls") || [];
+    const updatedUrls = [...currentUrls, url];
+
+    console.log("[MediaFields] Updated video URLs:", updatedUrls);
+
+    form.setValue("video_urls", updatedUrls, { 
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true 
+    });
+
+    setNewVideoUrl("");
 
     toast({
       title: "Success",
@@ -96,13 +107,19 @@ export function MediaFields({ form }: MediaFieldsProps) {
     });
   };
 
-  const handleRemoveVideoUrl = (indexToRemove: number) => {
+  const removeVideoUrl = (indexToRemove: number) => {
+    console.log("[MediaFields] Removing video URL at index:", indexToRemove);
+    
     const currentUrls = form.getValues("video_urls") || [];
     const updatedUrls = currentUrls.filter((_, index) => index !== indexToRemove);
-    form.setValue("video_urls", updatedUrls, { shouldDirty: true });
     
-    console.log("Removed video URL at index:", indexToRemove);
-    console.log("Updated video URLs:", updatedUrls);
+    console.log("[MediaFields] Updated video URLs after removal:", updatedUrls);
+    
+    form.setValue("video_urls", updatedUrls, { 
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true 
+    });
   };
 
   return (
@@ -161,13 +178,13 @@ export function MediaFields({ form }: MediaFieldsProps) {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
-                      handleAddVideoUrl();
+                      addVideoUrl();
                     }
                   }}
                 />
                 <Button 
                   type="button" 
-                  onClick={handleAddVideoUrl}
+                  onClick={addVideoUrl}
                   variant="outline"
                 >
                   <Plus className="h-4 w-4" />
@@ -181,7 +198,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      onClick={() => handleRemoveVideoUrl(index)}
+                      onClick={() => removeVideoUrl(index)}
                       className="shrink-0"
                     >
                       <X className="h-4 w-4" />
