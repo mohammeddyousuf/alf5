@@ -113,7 +113,7 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
-          id?: string
+          id: string
           slug?: string
           title?: string
           updated_at?: string
@@ -435,10 +435,10 @@ export type Tables<
         PublicSchema["Views"])
     ? (PublicSchema["Tables"] &
         PublicSchema["Views"])[PublicTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
+      Row: infer R
+    }
+    ? R
+    : never
     : never
 
 export type TablesInsert<

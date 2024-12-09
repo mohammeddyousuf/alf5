@@ -64,7 +64,7 @@ export const PageForm = ({ initialData }: PageFormProps) => {
         if (error) throw error;
       } else {
         const newPage = {
-          ...values,
+          ...values, // This spreads required fields: title, slug, content
           id: crypto.randomUUID(),
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
