@@ -1,13 +1,21 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 const Admin = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const { data: collections } = useQuery({
+  const { data: collections, ...collectionsQuery } = useQuery({
     queryKey: ["collections"],
     queryFn: async () => {
       const { data, error } = await supabase.from("collections").select("*");
@@ -16,7 +24,7 @@ const Admin = () => {
     },
   });
 
-  const { data: products } = useQuery({
+  const { data: products, ...productsQuery } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
       const { data, error } = await supabase.from("products").select("*");
@@ -25,7 +33,7 @@ const Admin = () => {
     },
   });
 
-  const { data: categories } = useQuery({
+  const { data: categories, ...categoriesQuery } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const { data, error } = await supabase.from("categories").select("*");
@@ -34,7 +42,7 @@ const Admin = () => {
     },
   });
 
-  const { data: subcategories } = useQuery({
+  const { data: subcategories, ...subcategoriesQuery } = useQuery({
     queryKey: ["subcategories"],
     queryFn: async () => {
       const { data, error } = await supabase.from("subcategories").select("*");
@@ -43,7 +51,7 @@ const Admin = () => {
     },
   });
 
-  const { data: sliders } = useQuery({
+  const { data: sliders, ...slidersQuery } = useQuery({
     queryKey: ["sliders"],
     queryFn: async () => {
       const { data, error } = await supabase.from("sliders").select("*");
@@ -52,7 +60,7 @@ const Admin = () => {
     },
   });
 
-  const { data: newsTicker } = useQuery({
+  const { data: newsTicker, ...newsTickerQuery } = useQuery({
     queryKey: ["news_ticker"],
     queryFn: async () => {
       const { data, error } = await supabase.from("news_ticker").select("*");
@@ -61,7 +69,7 @@ const Admin = () => {
     },
   });
 
-  const { data: pages } = useQuery({
+  const { data: pages, ...pagesQuery } = useQuery({
     queryKey: ["pages"],
     queryFn: async () => {
       const { data, error } = await supabase.from("pages").select("*");
@@ -69,6 +77,47 @@ const Admin = () => {
       return data;
     },
   });
+
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .single();
+      if (error) throw error;
+      if (data) {
+        setWhatsappNumber(data.whatsapp_number);
+      }
+      return data;
+    },
+  });
+
+  const handleUpdateWhatsApp = async () => {
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from("settings")
+        .update({ whatsapp_number: whatsappNumber })
+        .eq("id", settings?.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "WhatsApp number updated successfully",
+      });
+    } catch (error) {
+      console.error("Error updating WhatsApp number:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update WhatsApp number",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -115,6 +164,34 @@ const Admin = () => {
           <h2 className="text-xl font-semibold mb-2">Pages</h2>
           <p className="text-3xl font-bold mb-4">{pages?.length || 0}</p>
           <Button onClick={() => navigate("/admin/pages")}>Manage Pages</Button>
+        </Card>
+
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-2">WhatsApp Settings</h2>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="whatsapp">WhatsApp Number</Label>
+              <Input
+                id="whatsapp"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                placeholder="Enter WhatsApp number"
+              />
+            </div>
+            <Button 
+              onClick={handleUpdateWhatsApp}
+              disabled={isUpdating}
+            >
+              {isUpdating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Update WhatsApp'
+              )}
+            </Button>
+          </div>
         </Card>
       </div>
     </div>
