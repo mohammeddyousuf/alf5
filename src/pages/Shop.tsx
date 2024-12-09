@@ -21,15 +21,54 @@ const Shop = () => {
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [showSaleOnly, setShowSaleOnly] = useState(false);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">("default");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .order("name");
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: subcategories } = useQuery({
+    queryKey: ["subcategories", selectedCategory],
+    queryFn: async () => {
+      if (!selectedCategory) return [];
+      const { data, error } = await supabase
+        .from("subcategories")
+        .select("*")
+        .eq("category_id", selectedCategory)
+        .order("name");
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!selectedCategory,
+  });
   
   const { data: products, isLoading, error } = useQuery({
-    queryKey: ["shop-products"],
+    queryKey: ["shop-products", selectedCategory, selectedSubcategory],
     queryFn: async () => {
-      console.log("Starting to fetch products...");
-      const { data, error } = await supabase
+      let query = supabase
         .from("products")
         .select("*")
-        .order("created_at", { ascending: false });
+        .eq("status", "published");
+
+      if (selectedCategory) {
+        query = query.eq("category_id", selectedCategory);
+      }
+      if (selectedSubcategory) {
+        query = query.eq("subcategory_id", selectedSubcategory);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false });
       
       if (error) {
         console.error("Error fetching products:", error);
@@ -40,25 +79,10 @@ const Shop = () => {
         });
         throw error;
       }
-
-      console.log("Raw products data:", data);
-      console.log("Number of products found:", data?.length || 0);
-      
-      if (!data || data.length === 0) {
-        console.log("No products found or empty data array returned");
-      } else {
-        console.log("Products retrieved successfully:", data.map(p => ({ id: p.id, name: p.name })));
-      }
       
       return data || [];
     },
-    retry: 1,
-    staleTime: 1000 * 60 * 5, // 5 minutes
   });
-
-  console.log("Render phase - products:", products);
-  console.log("Render phase - isLoading:", isLoading);
-  console.log("Render phase - error:", error);
 
   const filteredProducts = products?.filter((product) => {
     const price = product.sale_price || product.price;
@@ -73,6 +97,11 @@ const Shop = () => {
     const priceB = b.sale_price || b.price;
     return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
   });
+
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategory(value);
+    setSelectedSubcategory(null); // Reset subcategory when category changes
+  };
 
   if (error) {
     return (
@@ -101,6 +130,50 @@ const Shop = () => {
         <div className="w-64 shrink-0 space-y-6">
           <div className="space-y-4">
             <h2 className="font-semibold text-lg">Filters</h2>
+            <Separator />
+
+            <div className="space-y-2">
+              <Label>Category</Label>
+              <Select
+                value={selectedCategory || ""}
+                onValueChange={handleCategoryChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Categories</SelectItem>
+                  {categories?.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {selectedCategory && (
+              <div className="space-y-2">
+                <Label>Subcategory</Label>
+                <Select
+                  value={selectedSubcategory || ""}
+                  onValueChange={setSelectedSubcategory}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select subcategory" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Subcategories</SelectItem>
+                    {subcategories?.map((subcategory) => (
+                      <SelectItem key={subcategory.id} value={subcategory.id}>
+                        {subcategory.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             <Separator />
             
             <div className="space-y-2">
