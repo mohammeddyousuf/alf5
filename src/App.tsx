@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Admin from "./pages/Admin";
 import CollectionDetail from "./pages/CollectionDetail";
 import ProductDetail from "./pages/ProductDetail";
 
@@ -57,6 +58,16 @@ const App = () => {
                   element={
                     isAuthenticated ? (
                       <Index />
+                    ) : (
+                      <Navigate to="/auth" replace />
+                    )
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    isAuthenticated ? (
+                      <Admin />
                     ) : (
                       <Navigate to="/auth" replace />
                     )
