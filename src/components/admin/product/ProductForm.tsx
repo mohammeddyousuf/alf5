@@ -58,7 +58,9 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   useEffect(() => {
     if (product && !isInitialized) {
       console.log("Loading product data:", product);
-      form.reset({
+      console.log("Current form values before reset:", form.getValues());
+      
+      const formData = {
         name: product.name,
         description: product.description ?? "",
         price: product.price,
@@ -68,8 +70,13 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         status: product.status ?? "draft",
         category_id: product.category_id,
         subcategory_id: product.subcategory_id,
-      });
+      };
+      
+      console.log("Setting form data to:", formData);
+      form.reset(formData);
       setIsInitialized(true);
+      
+      console.log("Form values after reset:", form.getValues());
     }
   }, [product, form, isInitialized]);
 
