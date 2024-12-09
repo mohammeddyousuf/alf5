@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ImageUploadField } from "./shared/ImageUploadField";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { updateThemeColor } from "@/utils/themeUtils";
 
 export const WebsiteSettings = () => {
   const { toast } = useToast();
@@ -102,22 +103,8 @@ export const WebsiteSettings = () => {
 
   const handleColorChange = (colorKey: keyof typeof colors, value: string) => {
     setColors(prev => ({ ...prev, [colorKey]: value }));
+    updateThemeColor(colorKey, value);
     
-    // Update CSS variables
-    const root = document.documentElement;
-    if (colorKey === 'primary') {
-      root.style.setProperty('--primary', value);
-    } else if (colorKey === 'secondary') {
-      root.style.setProperty('--secondary', value);
-    } else if (colorKey === 'accent') {
-      root.style.setProperty('--accent', value);
-    } else if (colorKey === 'background') {
-      root.style.setProperty('--background', value);
-    } else if (colorKey === 'foreground') {
-      root.style.setProperty('--foreground', value);
-    }
-
-    // Show toast notification
     toast({
       title: "Theme Updated",
       description: `${colorKey} color has been updated`,
