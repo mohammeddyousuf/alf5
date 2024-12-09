@@ -72,6 +72,14 @@ export function OrderDialog({
     },
   });
 
+  const formatPrice = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   const handleSubmit = async (data: OrderFormData) => {
     try {
       console.log("Attempting to save order:", {
@@ -101,7 +109,6 @@ export function OrderDialog({
         console.error("Error saving order:", error);
         let errorMessage = "Failed to save order. Please try again.";
         
-        // Handle specific error cases
         if (error.code === '42501') {
           errorMessage = "Authorization error. Please try again or contact support.";
         }
@@ -116,8 +123,13 @@ export function OrderDialog({
 
       console.log("Order saved successfully");
       
-      // Call the original onSubmit to handle WhatsApp redirection
-      onSubmit(data);
+      // Pass the complete data to onSubmit for WhatsApp message
+      onSubmit({
+        ...data,
+        productName,
+        productBrand,
+        productPrice: formatPrice(productPrice)
+      });
       
       toast({
         title: "Order Saved",
@@ -148,7 +160,7 @@ export function OrderDialog({
           {productBrand && (
             <p className="text-sm text-muted-foreground">Brand: {productBrand}</p>
           )}
-          <p className="text-sm font-medium text-foreground">Price: ${productPrice}</p>
+          <p className="text-sm font-medium text-foreground">Price: {formatPrice(productPrice)}</p>
         </div>
 
         <Form {...form}>

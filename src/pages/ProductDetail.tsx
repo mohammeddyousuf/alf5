@@ -74,7 +74,7 @@ const ProductDetail = () => {
 
 *Order Details:*
 Product: ${formData.productName}
-${formData.productBrand ? `Brand: ${formData.productBrand}\n` : ''}Price: $${formData.productPrice}
+${formData.productBrand ? `Brand: ${formData.productBrand}\n` : ''}Price: ${formData.productPrice}
 
 *Customer Details:*
 Name: ${formData.name}
