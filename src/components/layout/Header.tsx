@@ -1,4 +1,4 @@
-import { ShoppingCart, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
@@ -86,10 +86,6 @@ export const Header = () => {
               FAQ
             </Link>
           </nav>
-          
-          <Button variant="ghost" size="icon" className="text-foreground">
-            <ShoppingCart className="h-5 w-5" />
-          </Button>
         </div>
       </div>
     </header>
