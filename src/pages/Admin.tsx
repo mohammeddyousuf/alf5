@@ -80,9 +80,6 @@ const Admin = () => {
         .select("*")
         .single();
       if (error) throw error;
-      if (data) {
-        setWhatsappNumber(data.whatsapp_number);
-      }
       return data;
     },
   });
