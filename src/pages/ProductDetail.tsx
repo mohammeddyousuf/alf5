@@ -31,7 +31,6 @@ const ProductDetail = () => {
         return null;
       }
       
-      // Return the first settings object or null if none exists
       return data && data.length > 0 ? data[0] : null;
     },
   });
@@ -51,7 +50,6 @@ const ProductDetail = () => {
   });
 
   const handleWhatsAppClick = () => {
-    // Default WhatsApp number if settings are not available
     const whatsappNumber = settings?.whatsapp_number || "+1234567890";
     
     if (!product) return;
@@ -89,15 +87,15 @@ const ProductDetail = () => {
       <Breadcrumb className="mb-6">
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink as={Link} to="/">
+            <Link to="/" className="transition-colors hover:text-foreground">
               Home
-            </BreadcrumbLink>
+            </Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink as={Link} to="/shop">
+            <Link to="/shop" className="transition-colors hover:text-foreground">
               Shop
-            </BreadcrumbLink>
+            </Link>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
