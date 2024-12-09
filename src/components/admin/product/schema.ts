@@ -5,8 +5,8 @@ export const productFormSchema = z.object({
   description: z.string().optional(),
   price: z.coerce.number().min(0, "Price must be a positive number"),
   sale_price: z.coerce.number().min(0, "Sale price must be a positive number").optional().nullable(),
-  images: z.array(z.string()).optional(),
-  video_urls: z.array(z.string()).optional(),
+  images: z.array(z.string()).default([]),
+  video_urls: z.array(z.string()).default([]),
 });
 
 export type ProductFormData = z.infer<typeof productFormSchema>;

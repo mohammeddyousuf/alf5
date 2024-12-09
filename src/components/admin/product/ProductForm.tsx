@@ -41,10 +41,15 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
   const onSubmit = async (values: ProductFormData) => {
     try {
+      const data = {
+        ...values,
+        status: product?.status ?? 'draft',
+      };
+
       if (product) {
         const { error } = await supabase
           .from("products")
-          .update(values)
+          .update(data)
           .eq("id", product.id);
         if (error) throw error;
         toast({
@@ -52,7 +57,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           description: "Product updated successfully",
         });
       } else {
-        const { error } = await supabase.from("products").insert(values);
+        const { error } = await supabase.from("products").insert(data);
         if (error) throw error;
         toast({
           title: "Success",
