@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Database } from "@/integrations/supabase/types";
 
 const categoryFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -21,34 +22,53 @@ const categoryFormSchema = z.object({
 });
 
 type CategoryFormValues = z.infer<typeof categoryFormSchema>;
+type CategoryRow = Database["public"]["Tables"]["categories"]["Row"];
 
 interface CategoryFormProps {
+  initialData?: CategoryRow;
   onSuccess?: () => void;
 }
 
-export function CategoryForm({ onSuccess }: CategoryFormProps) {
+export function CategoryForm({ initialData, onSuccess }: CategoryFormProps) {
   const { toast } = useToast();
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
     defaultValues: {
-      name: "",
-      description: "",
+      name: initialData?.name ?? "",
+      description: initialData?.description ?? "",
     },
   });
 
   const onSubmit = async (values: CategoryFormValues) => {
     try {
-      const { error } = await supabase.from("categories").insert({
-        name: values.name,
-        description: values.description || null,
-      });
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Success",
-        description: "Category created successfully",
-      });
+      if (initialData) {
+        const { error } = await supabase
+          .from("categories")
+          .update({
+            name: values.name,
+            description: values.description || null,
+          })
+          .eq("id", initialData.id);
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "Category updated successfully",
+        });
+      } else {
+        const { error } = await supabase.from("categories").insert({
+          name: values.name,
+          description: values.description || null,
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Success",
+          description: "Category created successfully",
+        });
+      }
       form.reset();
       onSuccess?.();
     } catch (error: any) {
@@ -92,7 +112,7 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
         />
 
         <Button type="submit" className="w-full">
-          Create Category
+          {initialData ? "Update Category" : "Create Category"}
         </Button>
       </form>
     </Form>
