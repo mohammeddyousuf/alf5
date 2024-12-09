@@ -34,8 +34,8 @@ export const HeroSlider = () => {
 
   if (isLoading) {
     return (
-      <div className="h-[300px] md:h-[500px] flex items-center justify-center bg-gray-100 w-full">
-        <Loader2 className="h-8 w-8 animate-spin" />
+      <div className="h-[300px] md:h-[500px] flex items-center justify-center bg-background w-full">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -58,8 +58,8 @@ export const HeroSlider = () => {
               alt={slide.title}
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-center">
-              <div className="text-white px-4">
+            <div className="absolute inset-0 bg-background/40 flex items-center justify-center text-center">
+              <div className="text-background-foreground px-4">
                 <h2 className="text-4xl md:text-6xl font-bold mb-4">{slide.title}</h2>
                 {slide.description && (
                   <p className="text-xl md:text-2xl mb-6">{slide.description}</p>
@@ -67,7 +67,7 @@ export const HeroSlider = () => {
                 {slide.link_url && (
                   <Link 
                     to={slide.link_url}
-                    className="inline-block bg-whatsapp-primary hover:bg-whatsapp-secondary text-white px-6 py-3 rounded-lg transition-colors"
+                    className="inline-block bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg transition-colors"
                   >
                     {slide.button_text || "Learn More"}
                   </Link>
@@ -81,18 +81,18 @@ export const HeroSlider = () => {
       {slides.length > 1 && (
         <>
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white"
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background text-foreground"
             onClick={prevSlide}
           >
             <ChevronLeft className="h-6 w-6" />
           </Button>
           
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white"
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 hover:bg-background text-foreground"
             onClick={nextSlide}
           >
             <ChevronRight className="h-6 w-6" />

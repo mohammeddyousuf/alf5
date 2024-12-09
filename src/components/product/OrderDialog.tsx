@@ -77,12 +77,12 @@ export function OrderDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Contact on WhatsApp</DialogTitle>
+          <DialogTitle className="text-foreground">Contact on WhatsApp</DialogTitle>
         </DialogHeader>
 
         <div className="mb-4">
-          <p className="text-sm font-medium">Product: {productName}</p>
-          <p className="text-sm font-medium">Price: ${productPrice}</p>
+          <p className="text-sm font-medium text-foreground">Product: {productName}</p>
+          <p className="text-sm font-medium text-foreground">Price: ${productPrice}</p>
         </div>
 
         <Form {...form}>
@@ -92,9 +92,9 @@ export function OrderDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel className="text-foreground">Name</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} className="bg-background text-foreground" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -106,9 +106,9 @@ export function OrderDialog({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-foreground">Email</FormLabel>
                   <FormControl>
-                    <Input type="email" {...field} />
+                    <Input type="email" {...field} className="bg-background text-foreground" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -120,9 +120,9 @@ export function OrderDialog({
               name="mobile"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mobile</FormLabel>
+                  <FormLabel className="text-foreground">Mobile</FormLabel>
                   <FormControl>
-                    <Input type="tel" {...field} />
+                    <Input type="tel" {...field} className="bg-background text-foreground" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -134,9 +134,9 @@ export function OrderDialog({
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Address</FormLabel>
+                  <FormLabel className="text-foreground">Address</FormLabel>
                   <FormControl>
-                    <Textarea {...field} />
+                    <Textarea {...field} className="bg-background text-foreground" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -148,10 +148,10 @@ export function OrderDialog({
               name="paymentMode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Payment Mode</FormLabel>
+                  <FormLabel className="text-foreground">Payment Mode</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-background text-foreground">
                         <SelectValue placeholder="Select payment mode" />
                       </SelectTrigger>
                     </FormControl>
@@ -166,7 +166,7 @@ export function OrderDialog({
               )}
             />
 
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
               Contact on WhatsApp
             </Button>
           </form>
