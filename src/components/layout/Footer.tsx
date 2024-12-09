@@ -1,8 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { queryClient } from "@/lib/react-query";
 
 export const Footer = () => {
+  const navigate = useNavigate();
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
@@ -30,21 +32,53 @@ export const Footer = () => {
     return `https://${url}`;
   };
 
+  const handleShopClick = (filter: 'all' | 'new' | 'featured') => {
+    // Reset all filters in the query cache
+    queryClient.setQueryData(["shop-filters"], {
+      showSaleOnly: false,
+      showFeaturedOnly: filter === 'featured',
+      showNewArrivalsOnly: filter === 'new',
+      selectedCategory: null,
+      selectedSubcategory: null,
+      selectedBrand: null,
+      priceRange: [0, 1000],
+      sortOrder: "default"
+    });
+
+    // Navigate to shop page
+    navigate('/shop', { 
+      state: { 
+        filter,
+        showFeaturedOnly: filter === 'featured',
+        showNewArrivalsOnly: filter === 'new' 
+      } 
+    });
+  };
+
   return (
     <footer className="border-t bg-background">
       <div className="container py-8 md:py-12">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div className="flex flex-col gap-2">
             <h3 className="text-lg font-semibold">Shop</h3>
-            <Link to="/shop" className="text-sm text-muted-foreground hover:text-foreground">
+            <button 
+              onClick={() => handleShopClick('all')}
+              className="text-left text-sm text-muted-foreground hover:text-foreground"
+            >
               All Products
-            </Link>
-            <Link to="/shop" className="text-sm text-muted-foreground hover:text-foreground">
+            </button>
+            <button 
+              onClick={() => handleShopClick('new')}
+              className="text-left text-sm text-muted-foreground hover:text-foreground"
+            >
               New Arrivals
-            </Link>
-            <Link to="/shop" className="text-sm text-muted-foreground hover:text-foreground">
+            </button>
+            <button 
+              onClick={() => handleShopClick('featured')}
+              className="text-left text-sm text-muted-foreground hover:text-foreground"
+            >
               Featured
-            </Link>
+            </button>
           </div>
           <div className="flex flex-col gap-2">
             <h3 className="text-lg font-semibold">Company</h3>

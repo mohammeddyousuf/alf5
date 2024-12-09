@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Filter } from "lucide-react";
+import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ShopFilters } from "@/components/shop/ShopFilters";
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Shop = () => {
+  const location = useLocation();
   const { toast } = useToast();
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [showSaleOnly, setShowSaleOnly] = useState(false);
@@ -19,6 +21,22 @@ const Shop = () => {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  // Handle state from footer navigation
+  useEffect(() => {
+    if (location.state) {
+      const { showFeaturedOnly: featured, showNewArrivalsOnly: newArrivals } = location.state;
+      setShowFeaturedOnly(featured || false);
+      setShowNewArrivalsOnly(newArrivals || false);
+      // Reset other filters
+      setShowSaleOnly(false);
+      setSelectedCategory(null);
+      setSelectedSubcategory(null);
+      setSelectedBrand(null);
+      setPriceRange([0, 1000]);
+      setSortOrder("default");
+    }
+  }, [location.state]);
   
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["shop-products", selectedCategory, selectedSubcategory, showFeaturedOnly, showSaleOnly, showNewArrivalsOnly],
@@ -36,19 +54,23 @@ const Shop = () => {
         .select("*")
         .eq("status", "published");
 
-      // Apply category filter
       if (selectedCategory) {
         query = query.eq("category_id", selectedCategory);
       }
 
-      // Apply subcategory filter
       if (selectedSubcategory) {
         query = query.eq("subcategory_id", selectedSubcategory);
       }
 
-      // Apply featured filter
       if (showFeaturedOnly) {
         query = query.eq("featured", true);
+      }
+
+      if (showNewArrivalsOnly) {
+        // Filter for products added in the last 30 days
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        query = query.gte('added_date', thirtyDaysAgo.toISOString());
       }
 
       const { data, error } = await query;
