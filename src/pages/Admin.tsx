@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { WhatsAppSettings } from "@/components/admin/WhatsAppSettings";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -93,32 +94,6 @@ const Admin = () => {
     },
   });
 
-  const handleUpdateWhatsApp = async () => {
-    setIsUpdating(true);
-    try {
-      const { error } = await supabase
-        .from("settings")
-        .update({ whatsapp_number: whatsappNumber })
-        .eq("id", settings?.id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "WhatsApp number updated successfully",
-      });
-    } catch (error) {
-      console.error("Error updating WhatsApp number:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update WhatsApp number",
-      });
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
   return (
     <div className="container mx-auto p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
@@ -166,33 +141,7 @@ const Admin = () => {
           <Button onClick={() => navigate("/admin/pages")}>Manage Pages</Button>
         </Card>
 
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-2">WhatsApp Settings</h2>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="whatsapp">WhatsApp Number</Label>
-              <Input
-                id="whatsapp"
-                value={whatsappNumber}
-                onChange={(e) => setWhatsappNumber(e.target.value)}
-                placeholder="Enter WhatsApp number"
-              />
-            </div>
-            <Button 
-              onClick={handleUpdateWhatsApp}
-              disabled={isUpdating}
-            >
-              {isUpdating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Updating...
-                </>
-              ) : (
-                'Update WhatsApp'
-              )}
-            </Button>
-          </div>
-        </Card>
+        <WhatsAppSettings />
       </div>
     </div>
   );
