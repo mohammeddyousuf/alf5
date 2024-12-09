@@ -35,15 +35,19 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
   const { data: subcategories } = useQuery({
     queryKey: ["subcategories", form.watch("category_id")],
     queryFn: async () => {
+      const categoryId = form.watch("category_id");
+      if (!categoryId) return [];
+      
       const { data, error } = await supabase
         .from("subcategories")
         .select("*")
-        .eq("category_id", form.watch("category_id"))
+        .eq("category_id", categoryId)
         .order("name");
+      
       if (error) throw error;
       return data;
     },
-    enabled: !!form.watch("category_id"),
+    enabled: Boolean(form.watch("category_id")), // Only run query when category_id exists and is not empty
   });
 
   // Reset subcategory when category changes
