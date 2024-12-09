@@ -63,7 +63,6 @@ export function MediaFields({ form }: MediaFieldsProps) {
       });
     } finally {
       setIsUploading(false);
-      // Reset the input value so the same file can be uploaded again
       event.target.value = "";
     }
   };
@@ -80,19 +79,13 @@ export function MediaFields({ form }: MediaFieldsProps) {
     const updatedUrls = [...currentUrls, newVideoUrl];
     form.setValue("video_urls", updatedUrls, { shouldDirty: true });
     setNewVideoUrl("");
-    
-    console.log("Updated video URLs:", updatedUrls);
   };
 
   const removeVideoUrl = (indexToRemove: number) => {
     const currentUrls = form.getValues("video_urls") || [];
     const updatedUrls = currentUrls.filter((_, index) => index !== indexToRemove);
     form.setValue("video_urls", updatedUrls, { shouldDirty: true });
-    
-    console.log("Updated video URLs after removal:", updatedUrls);
   };
-
-  console.log("Current video URLs in form:", form.watch("video_urls"));
 
   return (
     <div className="space-y-4">
