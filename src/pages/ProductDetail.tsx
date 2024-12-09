@@ -15,9 +15,13 @@ const ProductDetail = () => {
       const { data, error } = await supabase
         .from("settings")
         .select("*")
+        .limit(1)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching settings:", error);
+        return null;
+      }
       return data;
     },
   });
@@ -37,11 +41,14 @@ const ProductDetail = () => {
   });
 
   const handleWhatsAppClick = () => {
-    if (!settings?.whatsapp_number || !product) return;
+    // Default WhatsApp number if settings are not available
+    const whatsappNumber = settings?.whatsapp_number || "+1234567890";
+    
+    if (!product) return;
     
     const message = `Hi! I'm interested in ${product.name}`;
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${settings.whatsapp_number}?text=${encodedMessage}`;
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
     
     window.open(whatsappUrl, "_blank");
     
