@@ -45,19 +45,52 @@ export default function Products() {
   });
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("products").delete().eq("id", id);
-    if (error) {
+    try {
+      // First, get the product's images
+      const { data: product } = await supabase
+        .from("products")
+        .select("images")
+        .eq("id", id)
+        .single();
+
+      if (product?.images?.length) {
+        // Delete images from storage
+        const fileNames = product.images.map(url => decodeURIComponent(url.split("/").pop() || ""));
+        console.log("Attempting to delete files:", fileNames);
+        
+        const { error: storageError } = await supabase.storage
+          .from("product-images")
+          .remove(fileNames);
+
+        if (storageError) {
+          console.error("Error deleting images from storage:", storageError);
+          // Continue with product deletion even if image deletion fails
+        }
+      }
+
+      // Delete the product from the database
+      const { error } = await supabase.from("products").delete().eq("id", id);
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message,
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Product and associated images deleted successfully",
+        });
+        refetch();
+      }
+    } catch (error: any) {
+      console.error("Error deleting product:", error);
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message,
       });
-    } else {
-      toast({
-        title: "Success",
-        description: "Product deleted successfully",
-      });
-      refetch();
     }
   };
 
