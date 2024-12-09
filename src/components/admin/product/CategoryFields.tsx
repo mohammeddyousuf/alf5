@@ -50,18 +50,18 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
     enabled: Boolean(form.watch("category_id")),
   });
 
-  // Only reset subcategory if the category changes and the current subcategory doesn't belong to the new category
+  // Reset subcategory when category changes
   useEffect(() => {
     const categoryId = form.watch("category_id");
-    const subcategoryId = form.watch("subcategory_id");
+    const currentSubcategoryId = form.watch("subcategory_id");
     
-    if (categoryId && subcategoryId) {
-      const subcategoryBelongsToCategory = subcategories?.some(
-        (sub) => sub.id === subcategoryId && sub.category_id === categoryId
+    if (categoryId && subcategories) {
+      const subcategoryBelongsToCategory = subcategories.some(
+        (sub) => sub.id === currentSubcategoryId
       );
       
       if (!subcategoryBelongsToCategory) {
-        form.setValue("subcategory_id", null, { shouldDirty: true });
+        form.setValue("subcategory_id", null);
       }
     }
   }, [form.watch("category_id"), subcategories]);
@@ -75,14 +75,11 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
           <FormItem>
             <FormLabel>Category</FormLabel>
             <Select
-              onValueChange={(value) => {
-                field.onChange(value);
-                form.setValue("category_id", value, { shouldDirty: true });
-              }}
+              onValueChange={field.onChange}
               value={field.value || undefined}
             >
               <FormControl>
-                <SelectTrigger className="w-full bg-white">
+                <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
               </FormControl>
@@ -106,15 +103,12 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
           <FormItem>
             <FormLabel>Subcategory</FormLabel>
             <Select
-              onValueChange={(value) => {
-                field.onChange(value);
-                form.setValue("subcategory_id", value, { shouldDirty: true });
-              }}
+              onValueChange={field.onChange}
               value={field.value || undefined}
               disabled={!form.watch("category_id")}
             >
               <FormControl>
-                <SelectTrigger className="w-full bg-white">
+                <SelectTrigger>
                   <SelectValue placeholder="Select subcategory" />
                 </SelectTrigger>
               </FormControl>

@@ -75,8 +75,13 @@ export function MediaFields({ form }: MediaFieldsProps) {
 
   const addVideoUrl = () => {
     if (!newVideoUrl) return;
+    
     const currentUrls = form.getValues("video_urls") || [];
+    console.log("Current video URLs:", currentUrls);
+    
     const updatedUrls = [...currentUrls, newVideoUrl];
+    console.log("Updated video URLs:", updatedUrls);
+    
     form.setValue("video_urls", updatedUrls, { shouldDirty: true });
     setNewVideoUrl("");
   };
@@ -146,7 +151,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
                 </Button>
               </div>
               <div className="space-y-2">
-                {field.value?.map((url, index) => (
+                {(field.value || []).map((url, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <Input value={url} readOnly />
                     <Button
