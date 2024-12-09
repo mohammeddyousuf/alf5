@@ -11,21 +11,12 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { OrderDialog } from "@/components/product/OrderDialog";
-import { WhatsAppButton } from "@/components/product/WhatsAppButton";
-import { useState } from "react";
+import { ProductMedia } from "@/components/product/ProductMedia";
+import { ProductInfo } from "@/components/product/ProductInfo";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { toast } = useToast();
-  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -64,7 +55,7 @@ const ProductDetail = () => {
     if (!product) return;
     
     const message = `Product Name: ${formData.productName}
-Price: $${formData.productPrice}
+${formData.productBrand ? `Brand: ${formData.productBrand}\n` : ''}Price: $${formData.productPrice}
 Name: ${formData.name}
 Email: ${formData.email}
 Mobile: ${formData.mobile}
@@ -75,7 +66,6 @@ Payment Mode: ${formData.paymentMode}`;
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
     
     window.open(whatsappUrl, "_blank");
-    setOrderDialogOpen(false);
     
     toast({
       title: "Order Placed",
@@ -105,11 +95,6 @@ Payment Mode: ${formData.paymentMode}`;
     );
   }
 
-  const mediaItems = [
-    ...(product.images || []),
-    ...(product.video_urls || [])
-  ];
-
   return (
     <div className="container py-8">
       <Breadcrumb className="mb-6">
@@ -133,75 +118,20 @@ Payment Mode: ${formData.paymentMode}`;
       </Breadcrumb>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-4">
-          {mediaItems?.length > 0 ? (
-            <div className="relative group">
-              <Carousel className="w-full">
-                <CarouselContent>
-                  {mediaItems.map((item, index) => (
-                    <CarouselItem key={index}>
-                      {product?.images?.includes(item) ? (
-                        <img
-                          src={item}
-                          alt={`${product.name} - ${index + 1}`}
-                          className="w-full rounded-lg object-cover aspect-square"
-                        />
-                      ) : (
-                        <div className="aspect-square w-full">
-                          <iframe
-                            src={`https://www.youtube.com/embed/${getYouTubeVideoId(item)}`}
-                            title={`${product?.name} - Video ${index + 1}`}
-                            className="w-full h-full rounded-lg"
-                            allowFullScreen
-                          />
-                        </div>
-                      )}
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                {mediaItems.length > 1 && (
-                  <>
-                    <CarouselPrevious />
-                    <CarouselNext />
-                  </>
-                )}
-              </Carousel>
-            </div>
-          ) : (
-            <div className="w-full rounded-lg bg-muted aspect-square flex items-center justify-center">
-              <p className="text-muted-foreground">No media available</p>
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-6">
-          <h1 className="text-3xl font-bold text-foreground">{product?.name}</h1>
-          
-          <div className="space-y-2">
-            <p className="text-2xl font-bold text-foreground">
-              ${product?.sale_price || product?.price}
-            </p>
-            {product?.sale_price && (
-              <p className="text-lg text-muted-foreground line-through">
-                ${product?.price}
-              </p>
-            )}
-          </div>
-
-          {product?.description && (
-            <p className="text-muted-foreground">{product.description}</p>
-          )}
-
-          <WhatsAppButton onClick={() => setOrderDialogOpen(true)} />
-
-          <OrderDialog
-            open={orderDialogOpen}
-            onOpenChange={setOrderDialogOpen}
-            productName={product?.name || ""}
-            productPrice={product?.sale_price || product?.price || 0}
-            onSubmit={handleOrderSubmit}
-          />
-        </div>
+        <ProductMedia
+          images={product.images}
+          videoUrls={product.video_urls}
+          productName={product.name}
+          getYouTubeVideoId={getYouTubeVideoId}
+        />
+        <ProductInfo
+          name={product.name}
+          brand={product.brand}
+          description={product.description}
+          price={product.price}
+          salePrice={product.sale_price}
+          onOrderSubmit={handleOrderSubmit}
+        />
       </div>
     </div>
   );

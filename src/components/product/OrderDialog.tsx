@@ -42,6 +42,7 @@ interface OrderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   productName: string;
+  productBrand: string | null;
   productPrice: number;
   onSubmit: (data: OrderFormData) => void;
 }
@@ -50,6 +51,7 @@ export function OrderDialog({
   open,
   onOpenChange,
   productName,
+  productBrand,
   productPrice,
   onSubmit,
 }: OrderDialogProps) {
@@ -68,6 +70,7 @@ export function OrderDialog({
     const formattedData = {
       ...data,
       productName,
+      productBrand,
       productPrice,
     };
     onSubmit(formattedData);
@@ -80,8 +83,11 @@ export function OrderDialog({
           <DialogTitle className="text-foreground">Contact on WhatsApp</DialogTitle>
         </DialogHeader>
 
-        <div className="mb-4">
+        <div className="mb-4 space-y-1">
           <p className="text-sm font-medium text-foreground">Product: {productName}</p>
+          {productBrand && (
+            <p className="text-sm text-muted-foreground">Brand: {productBrand}</p>
+          )}
           <p className="text-sm font-medium text-foreground">Price: ${productPrice}</p>
         </div>
 
