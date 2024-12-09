@@ -52,8 +52,11 @@ export const Header = () => {
           </SheetContent>
         </Sheet>
         
-        <div className="flex flex-1 items-center justify-between md:justify-end">
-          <Link to="/" className="md:mr-6 flex items-center gap-2">
+        <div className="flex flex-1 items-center justify-between md:justify-start">
+          <Link 
+            to="/" 
+            className="flex items-center gap-2 mx-auto md:mx-0"
+          >
             {settings?.logo_url && (
               <img 
                 src={settings.logo_url} 
@@ -61,12 +64,12 @@ export const Header = () => {
                 className="h-8 w-auto"
               />
             )}
-            <span className="text-2xl font-bold text-whatsapp-dark">
+            <span className="text-xl md:text-2xl font-bold text-whatsapp-dark truncate max-w-[200px] md:max-w-none">
               {settings?.website_name || "WhatsApp Store"}
             </span>
           </Link>
           
-          <nav className="hidden md:flex items-center gap-6 text-sm">
+          <nav className="hidden md:flex items-center gap-6 text-sm ml-8">
             <Link to="/" className="font-medium transition-colors hover:text-whatsapp-primary">
               Home
             </Link>
@@ -84,7 +87,7 @@ export const Header = () => {
             </Link>
           </nav>
           
-          <div className="ml-4">
+          <div className="flex items-center">
             <Button variant="ghost" size="icon">
               <ShoppingCart className="h-5 w-5" />
             </Button>
