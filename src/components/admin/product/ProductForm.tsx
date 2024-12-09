@@ -16,7 +16,10 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ product, onSuccess }: ProductFormProps) {
-  const { form, onSubmit, isSubmitting } = useProductForm({ product, onSuccess });
+  const { form, onSubmit, isSubmitting } = useProductForm({ 
+    product, 
+    onSuccess 
+  });
 
   return (
     <ScrollArea className="h-[80vh] pr-4">

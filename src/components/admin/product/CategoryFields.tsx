@@ -49,17 +49,6 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
     enabled: Boolean(form.watch("category_id")),
   });
 
-  const handleCategoryChange = (categoryId: string) => {
-    form.setValue("category_id", categoryId);
-    // Only reset subcategory if the new category has no subcategories
-    const hasValidSubcategory = subcategories?.some(
-      sub => sub.category_id === categoryId && sub.id === form.watch("subcategory_id")
-    );
-    if (!hasValidSubcategory) {
-      form.setValue("subcategory_id", null);
-    }
-  };
-
   return (
     <div className="grid grid-cols-2 gap-4">
       <FormField
@@ -69,7 +58,11 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
           <FormItem>
             <FormLabel>Category</FormLabel>
             <Select
-              onValueChange={handleCategoryChange}
+              onValueChange={(value) => {
+                field.onChange(value);
+                // Reset subcategory when category changes
+                form.setValue("subcategory_id", null);
+              }}
               value={field.value || undefined}
             >
               <FormControl>
