@@ -24,6 +24,10 @@ interface ShopFiltersProps {
   setSelectedCategory: (id: string | null) => void;
   selectedSubcategory: string | null;
   setSelectedSubcategory: (id: string | null) => void;
+  showFeaturedOnly: boolean;
+  setShowFeaturedOnly: (show: boolean) => void;
+  showNewArrivalsOnly: boolean;
+  setShowNewArrivalsOnly: (show: boolean) => void;
 }
 
 export function ShopFilters({
@@ -37,6 +41,10 @@ export function ShopFilters({
   setSelectedCategory,
   selectedSubcategory,
   setSelectedSubcategory,
+  showFeaturedOnly,
+  setShowFeaturedOnly,
+  showNewArrivalsOnly,
+  setShowNewArrivalsOnly,
 }: ShopFiltersProps) {
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -158,13 +166,33 @@ export function ShopFilters({
 
         <Separator />
 
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="sale-mode"
-            checked={showSaleOnly}
-            onCheckedChange={setShowSaleOnly}
-          />
-          <Label htmlFor="sale-mode">Show Sale Items Only</Label>
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="sale-mode"
+              checked={showSaleOnly}
+              onCheckedChange={setShowSaleOnly}
+            />
+            <Label htmlFor="sale-mode">Show Sale Items Only</Label>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="featured-mode"
+              checked={showFeaturedOnly}
+              onCheckedChange={setShowFeaturedOnly}
+            />
+            <Label htmlFor="featured-mode">Show Featured Items Only</Label>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="new-arrivals-mode"
+              checked={showNewArrivalsOnly}
+              onCheckedChange={setShowNewArrivalsOnly}
+            />
+            <Label htmlFor="new-arrivals-mode">Show New Arrivals Only</Label>
+          </div>
         </div>
       </div>
     </div>

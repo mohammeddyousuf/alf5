@@ -122,9 +122,11 @@ export type Database = {
       }
       products: {
         Row: {
+          added_date: string | null
           category_id: string | null
           created_at: string
           description: string | null
+          featured: boolean | null
           id: string
           images: string[] | null
           name: string
@@ -136,9 +138,11 @@ export type Database = {
           video_urls: string[] | null
         }
         Insert: {
+          added_date?: string | null
           category_id?: string | null
           created_at?: string
           description?: string | null
+          featured?: boolean | null
           id?: string
           images?: string[] | null
           name: string
@@ -150,9 +154,11 @@ export type Database = {
           video_urls?: string[] | null
         }
         Update: {
+          added_date?: string | null
           category_id?: string | null
           created_at?: string
           description?: string | null
+          featured?: boolean | null
           id?: string
           images?: string[] | null
           name?: string

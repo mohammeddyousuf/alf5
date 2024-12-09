@@ -12,6 +12,8 @@ const Shop = () => {
   const { toast } = useToast();
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [showSaleOnly, setShowSaleOnly] = useState(false);
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
+  const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(false);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">("default");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
@@ -59,7 +61,15 @@ const Shop = () => {
     const price = product.sale_price || product.price;
     const meetsPrice = price >= priceRange[0] && price <= priceRange[1];
     const meetsSale = showSaleOnly ? product.sale_price !== null : true;
-    return meetsPrice && meetsSale;
+    const meetsFeatured = showFeaturedOnly ? product.featured : true;
+    
+    // Consider products added in the last 30 days as new arrivals
+    const isNewArrival = product.added_date 
+      ? new Date(product.added_date) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      : false;
+    const meetsNewArrival = showNewArrivalsOnly ? isNewArrival : true;
+
+    return meetsPrice && meetsSale && meetsFeatured && meetsNewArrival;
   });
 
   const sortedProducts = [...(filteredProducts || [])].sort((a, b) => {
@@ -114,6 +124,10 @@ const Shop = () => {
                   setSelectedCategory={setSelectedCategory}
                   selectedSubcategory={selectedSubcategory}
                   setSelectedSubcategory={setSelectedSubcategory}
+                  showFeaturedOnly={showFeaturedOnly}
+                  setShowFeaturedOnly={setShowFeaturedOnly}
+                  showNewArrivalsOnly={showNewArrivalsOnly}
+                  setShowNewArrivalsOnly={setShowNewArrivalsOnly}
                 />
               </div>
             </SheetContent>
@@ -133,6 +147,10 @@ const Shop = () => {
             setSelectedCategory={setSelectedCategory}
             selectedSubcategory={selectedSubcategory}
             setSelectedSubcategory={setSelectedSubcategory}
+            showFeaturedOnly={showFeaturedOnly}
+            setShowFeaturedOnly={setShowFeaturedOnly}
+            showNewArrivalsOnly={showNewArrivalsOnly}
+            setShowNewArrivalsOnly={setShowNewArrivalsOnly}
           />
         </div>
 
