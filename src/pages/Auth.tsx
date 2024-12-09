@@ -9,7 +9,7 @@ const AuthPage = () => {
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold text-center mb-6">Welcome</h1>
       
-      <Alert variant="info" className="mb-6">
+      <Alert className="mb-6">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
           After signing up, you'll need to verify your email before logging in.
