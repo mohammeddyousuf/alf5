@@ -34,14 +34,17 @@ const Shop = () => {
         .select("*")
         .eq("status", "published");
 
+      // Apply category filter
       if (selectedCategory) {
         query = query.eq("category_id", selectedCategory);
       }
 
+      // Apply subcategory filter
       if (selectedSubcategory) {
         query = query.eq("subcategory_id", selectedSubcategory);
       }
 
+      // Apply featured filter - make sure it's a boolean comparison
       if (showFeaturedOnly) {
         query = query.eq("featured", true);
       }
