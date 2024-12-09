@@ -23,6 +23,7 @@ const formSchema = z.object({
   description: z.string().optional(),
   image_url: z.string().optional(),
   link_url: z.string().optional(),
+  button_text: z.string().optional(),
 });
 
 type CollectionRow = Database["public"]["Tables"]["collections"]["Row"];
@@ -43,6 +44,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
       description: collection?.description ?? "",
       image_url: collection?.image_url ?? "",
       link_url: collection?.link_url ?? "",
+      button_text: collection?.button_text ?? "",
     },
   });
 
@@ -56,6 +58,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
             description: values.description,
             image_url: values.image_url,
             link_url: values.link_url,
+            button_text: values.button_text,
           })
           .eq("id", collection.id);
         if (error) throw error;
@@ -69,6 +72,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
           description: values.description,
           image_url: values.image_url,
           link_url: values.link_url,
+          button_text: values.button_text,
         });
         if (error) throw error;
         toast({
@@ -128,6 +132,23 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
                 <Input 
                   {...field} 
                   placeholder="/shop?category=example"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="button_text"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Button Text</FormLabel>
+              <FormControl>
+                <Input 
+                  {...field} 
+                  placeholder="View Collection"
                 />
               </FormControl>
               <FormMessage />
