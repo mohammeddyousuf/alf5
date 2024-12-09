@@ -76,16 +76,18 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         throw new Error('Name and price are required');
       }
 
+      console.log("Submitting form values:", values);
+
       const data = {
         name: values.name,
         description: values.description,
         price: values.price,
         sale_price: values.sale_price,
         images: values.images,
-        video_urls: values.video_urls,
+        video_urls: values.video_urls || [], // Ensure video_urls is always an array
         status: values.status,
-        category_id: values.category_id || null,
-        subcategory_id: values.subcategory_id || null,
+        category_id: values.category_id,
+        subcategory_id: values.subcategory_id,
       };
 
       console.log("Submitting product data:", data);
@@ -126,7 +128,6 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     <ScrollArea className="h-[80vh] pr-4">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {/* Move status field to the top */}
           <FormField
             control={form.control}
             name="status"
