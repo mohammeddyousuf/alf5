@@ -26,7 +26,7 @@ import { MediaFields } from "./MediaFields";
 import { CategoryFields } from "./CategoryFields";
 import { productFormSchema, type ProductFormData } from "./schema";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
@@ -37,6 +37,8 @@ interface ProductFormProps {
 
 export function ProductForm({ product, onSuccess }: ProductFormProps) {
   const { toast } = useToast();
+  const [isInitialized, setIsInitialized] = useState(false);
+  
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
@@ -54,7 +56,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
   // Load product data into form when available
   useEffect(() => {
-    if (product) {
+    if (product && !isInitialized) {
       console.log("Loading product data:", product);
       form.reset({
         name: product.name,
@@ -67,8 +69,9 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         category_id: product.category_id,
         subcategory_id: product.subcategory_id,
       });
+      setIsInitialized(true);
     }
-  }, [product, form]);
+  }, [product, form, isInitialized]);
 
   const onSubmit = async (values: ProductFormData) => {
     try {
@@ -78,10 +81,6 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
       console.log("Submitting form values:", values);
 
-      // Convert empty strings to null for IDs
-      const category_id = values.category_id || null;
-      const subcategory_id = values.subcategory_id || null;
-
       const data = {
         name: values.name,
         description: values.description || null,
@@ -90,8 +89,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         images: values.images,
         video_urls: values.video_urls || [],
         status: values.status,
-        category_id,
-        subcategory_id,
+        category_id: values.category_id || null,
+        subcategory_id: values.subcategory_id || null,
       };
 
       console.log("Submitting product data:", data);
@@ -117,6 +116,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
       onSuccess?.();
       if (!product) {
         form.reset(); // Only reset form for new products
+        setIsInitialized(false);
       }
     } catch (error: any) {
       console.error("Error submitting product:", error);
