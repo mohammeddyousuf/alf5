@@ -8,6 +8,16 @@ import { ImagePlus, Loader2, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type FormData = z.infer<typeof productFormSchema>;
 
@@ -19,6 +29,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState<Record<number, boolean>>({});
+  const [imageToDelete, setImageToDelete] = useState<{ index: number; url: string } | null>(null);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -100,6 +111,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
       });
     } finally {
       setIsDeleting(prev => ({ ...prev, [indexToRemove]: false }));
+      setImageToDelete(null);
     }
   };
 
@@ -117,7 +129,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
               />
               <button
                 type="button"
-                onClick={() => removeImage(index, url)}
+                onClick={() => setImageToDelete({ index, url })}
                 disabled={isDeleting[index]}
                 className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
               >
@@ -148,6 +160,26 @@ export function MediaFields({ form }: MediaFieldsProps) {
           </div>
         </div>
       </div>
+
+      <AlertDialog open={!!imageToDelete} onOpenChange={(open) => !open && setImageToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the image.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => imageToDelete && removeImage(imageToDelete.index, imageToDelete.url)}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
