@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Download } from "lucide-react";
-import ProductCard from "@/components/admin/product/ProductCard";
-import ProductFilters from "@/components/admin/product/ProductFilters";
+import { ProductCard } from "@/components/admin/product/ProductCard";
+import { ProductFilters } from "@/components/admin/product/ProductFilters";
 
 const Products = () => {
   const navigate = useNavigate();
