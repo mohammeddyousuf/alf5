@@ -158,7 +158,7 @@ export function OrderDialog({
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="bg-background text-foreground">
-                        <SelectValue placeholder="Select payment mode" />
+                        <SelectValue placeholder="Select payment mode" className="text-foreground" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="bg-white border border-gray-200">
