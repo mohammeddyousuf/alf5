@@ -35,14 +35,6 @@ const AuthPage = () => {
         redirectTo={window.location.origin}
         showLinks={false}
         view="sign_in"
-        onError={(error) => {
-          console.error("Auth error:", error);
-          toast({
-            variant: "destructive",
-            title: "Authentication Error",
-            description: "Please check your credentials and try again.",
-          });
-        }}
         localization={{
           variables: {
             sign_in: {
@@ -50,6 +42,16 @@ const AuthPage = () => {
               password_label: 'Password',
               button_label: 'Sign In',
               loading_button_label: 'Signing in...',
+              email_input_placeholder: 'Your email address',
+              password_input_placeholder: 'Your password',
+            },
+            sign_up: {
+              email_label: 'Email',
+              password_label: 'Password',
+              button_label: 'Sign Up',
+              loading_button_label: 'Signing up...',
+              email_input_placeholder: 'Your email address',
+              password_input_placeholder: 'Your password',
             }
           },
         }}
