@@ -7,12 +7,12 @@ import { AlertCircle } from "lucide-react";
 const AuthPage = () => {
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold text-center mb-6">Welcome</h1>
+      <h1 className="text-2xl font-bold text-center mb-6">Admin Login</h1>
       
       <Alert className="mb-6">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          After signing up, you'll need to verify your email before logging in.
+          This page is for administrators only.
         </AlertDescription>
       </Alert>
 
@@ -28,7 +28,8 @@ const AuthPage = () => {
         theme="light"
         providers={[]}
         redirectTo={window.location.origin}
-        showLinks={true}
+        view="sign_in"
+        showLinks={false}
         localization={{
           variables: {
             sign_in: {
@@ -36,13 +37,7 @@ const AuthPage = () => {
               password_label: 'Password',
               button_label: 'Sign In',
               loading_button_label: 'Signing in...',
-            },
-            sign_up: {
-              email_label: 'Email',
-              password_label: 'Password',
-              button_label: 'Sign Up',
-              loading_button_label: 'Signing up...',
-            },
+            }
           },
         }}
       />
