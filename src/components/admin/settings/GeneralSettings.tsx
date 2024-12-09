@@ -15,6 +15,8 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const [websiteName, setWebsiteName] = useState(settings?.website_name || "");
+  const [instagramUrl, setInstagramUrl] = useState(settings?.instagram_url || "");
+  const [facebookUrl, setFacebookUrl] = useState(settings?.facebook_url || "");
 
   const handleWebsiteNameUpdate = async () => {
     try {
@@ -35,6 +37,33 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       toast({
         title: "Error",
         description: "Failed to update website name",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSocialMediaUpdate = async () => {
+    try {
+      const { error } = await supabase
+        .from('settings')
+        .update({
+          instagram_url: instagramUrl,
+          facebook_url: facebookUrl,
+        })
+        .eq('id', settings?.id);
+
+      if (error) throw error;
+
+      await refetch();
+      toast({
+        title: "Success",
+        description: "Social media links updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating social media links:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update social media links",
         variant: "destructive",
       });
     }
@@ -91,6 +120,29 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
           />
           <Button onClick={handleWebsiteNameUpdate}>Save</Button>
         </div>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Social Media Links</h3>
+        <div className="space-y-2">
+          <Label htmlFor="instagramUrl">Instagram URL</Label>
+          <Input
+            id="instagramUrl"
+            value={instagramUrl}
+            onChange={(e) => setInstagramUrl(e.target.value)}
+            placeholder="Enter Instagram URL"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="facebookUrl">Facebook URL</Label>
+          <Input
+            id="facebookUrl"
+            value={facebookUrl}
+            onChange={(e) => setFacebookUrl(e.target.value)}
+            placeholder="Enter Facebook URL"
+          />
+        </div>
+        <Button onClick={handleSocialMediaUpdate}>Save Social Media Links</Button>
       </div>
 
       <div className="space-y-2">
