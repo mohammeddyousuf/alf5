@@ -41,11 +41,11 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
             </div>
           )}
         </div>
-        <CardContent className="p-4">
-          {brand && (
-            <p className="text-sm text-muted-foreground mb-1">{brand}</p>
-          )}
+        <CardContent className="p-4 text-left">
           <h3 className="font-semibold line-clamp-2">{name}</h3>
+          {brand && (
+            <p className="text-sm text-muted-foreground mt-1">{brand}</p>
+          )}
         </CardContent>
         <CardFooter className="p-4 pt-0">
           <div className="flex flex-col">
