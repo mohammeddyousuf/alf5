@@ -1,11 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/home/ProductCard";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 const Shop = () => {
   const { toast } = useToast();
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [showSaleOnly, setShowSaleOnly] = useState(false);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
   
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["shop-products"],
@@ -45,6 +59,20 @@ const Shop = () => {
   console.log("Render phase - isLoading:", isLoading);
   console.log("Render phase - error:", error);
 
+  const filteredProducts = products?.filter((product) => {
+    const price = product.sale_price || product.price;
+    const meetsPrice = price >= priceRange[0] && price <= priceRange[1];
+    const meetsSale = showSaleOnly ? product.sale_price !== null : true;
+    return meetsPrice && meetsSale;
+  });
+
+  const sortedProducts = [...(filteredProducts || [])].sort((a, b) => {
+    if (!sortOrder) return 0;
+    const priceA = a.sale_price || a.price;
+    const priceB = b.sale_price || b.price;
+    return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
+  });
+
   if (error) {
     console.error("Query error:", error);
     return (
@@ -68,8 +96,47 @@ const Shop = () => {
     <div className="container py-12">
       <h1 className="text-4xl font-bold text-center mb-8">Our Products</h1>
 
+      <div className="mb-8 space-y-6">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex-1 space-y-2">
+            <Label>Price Range (${priceRange[0]} - ${priceRange[1]})</Label>
+            <Slider
+              defaultValue={[0, 1000]}
+              max={1000}
+              step={10}
+              value={priceRange}
+              onValueChange={setPriceRange}
+              className="w-full"
+            />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="sale-mode"
+              checked={showSaleOnly}
+              onCheckedChange={setShowSaleOnly}
+            />
+            <Label htmlFor="sale-mode">Show Sale Items Only</Label>
+          </div>
+
+          <Select
+            value={sortOrder || ""}
+            onValueChange={(value: "asc" | "desc" | "") => setSortOrder(value || null)}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Sort by price" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Default</SelectItem>
+              <SelectItem value="asc">Price: Low to High</SelectItem>
+              <SelectItem value="desc">Price: High to Low</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products?.map((product) => {
+        {sortedProducts.map((product) => {
           console.log("Rendering product:", product);
           return (
             <ProductCard
@@ -84,7 +151,7 @@ const Shop = () => {
         })}
       </div>
 
-      {(!products || products.length === 0) && (
+      {(!sortedProducts || sortedProducts.length === 0) && (
         <p className="text-center text-muted-foreground">
           No products available at the moment.
         </p>
