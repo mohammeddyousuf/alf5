@@ -60,16 +60,16 @@ export const HeroSlider = () => {
             />
             <div className="absolute inset-0 bg-background/40 flex items-center justify-center text-center">
               <div className="text-background-foreground px-4">
-                <h2 className="text-4xl md:text-6xl font-bold mb-4">{slide.title}</h2>
+                <h2 className="text-4xl md:text-6xl font-bold mb-4 text-white">{slide.title}</h2>
                 {slide.description && (
-                  <p className="text-xl md:text-2xl mb-6">{slide.description}</p>
+                  <p className="text-xl md:text-2xl mb-6 text-white">{slide.description}</p>
                 )}
                 {slide.link_url && (
                   <Link 
                     to={slide.link_url}
                     className="inline-block"
                   >
-                    <Button variant="default" size="lg">
+                    <Button variant="default" size="lg" className="text-white">
                       {slide.button_text || "Learn More"}
                     </Button>
                   </Link>
@@ -85,7 +85,7 @@ export const HeroSlider = () => {
           <Button
             variant="outline"
             size="icon"
-            className="absolute left-4 top-1/2 -translate-y-1/2"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white"
             onClick={prevSlide}
           >
             <ChevronLeft className="h-6 w-6" />
@@ -94,7 +94,7 @@ export const HeroSlider = () => {
           <Button
             variant="outline"
             size="icon"
-            className="absolute right-4 top-1/2 -translate-y-1/2"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white"
             onClick={nextSlide}
           >
             <ChevronRight className="h-6 w-6" />

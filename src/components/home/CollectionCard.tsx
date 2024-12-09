@@ -16,7 +16,7 @@ export const CollectionCard = ({
   imageUrl, 
   description, 
   linkUrl,
-  buttonText = "View Collection" // Default text if not provided
+  buttonText = "View Collection"
 }: CollectionCardProps) => {
   return (
     <div className="group relative overflow-hidden rounded-lg">
@@ -39,8 +39,8 @@ export const CollectionCard = ({
               <p className="text-sm text-white/80 line-clamp-2 mb-4">{description}</p>
             )}
             <Button 
-              variant="secondary"
-              className="mt-2"
+              variant="default"
+              className="text-white"
             >
               {buttonText}
             </Button>
