@@ -27,12 +27,20 @@ const Shop = () => {
         throw error;
       }
 
-      console.log("Fetched products:", data);
-      return data;
+      if (!data || data.length === 0) {
+        console.log("No products found or empty data array returned");
+      } else {
+        console.log("Successfully fetched products:", data);
+      }
+      
+      return data || [];
     },
+    retry: 1,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   if (error) {
+    console.error("Query error:", error);
     return (
       <div className="container py-12">
         <p className="text-center text-destructive">
@@ -67,7 +75,7 @@ const Shop = () => {
         ))}
       </div>
 
-      {!products?.length && (
+      {(!products || products.length === 0) && (
         <p className="text-center text-muted-foreground">
           No products available at the moment.
         </p>
