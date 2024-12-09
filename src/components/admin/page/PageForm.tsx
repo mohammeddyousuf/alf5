@@ -26,11 +26,7 @@ const formSchema = z.object({
 });
 
 // Define the type for our form values to match Supabase table
-type FormValues = {
-  title: string;
-  slug: string;
-  content: string;
-};
+type FormValues = z.infer<typeof formSchema>;
 
 interface PageFormProps {
   initialData?: {
@@ -67,9 +63,13 @@ export const PageForm = ({ initialData }: PageFormProps) => {
 
         if (error) throw error;
       } else {
+        // Generate a new UUID for the page
         const { error } = await supabase
           .from("pages")
-          .insert(values);
+          .insert({
+            ...values,
+            id: crypto.randomUUID(),
+          });
 
         if (error) throw error;
       }
