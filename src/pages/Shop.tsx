@@ -19,7 +19,7 @@ const Shop = () => {
   const { toast } = useToast();
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [showSaleOnly, setShowSaleOnly] = useState(false);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">("default");
   
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["shop-products"],
@@ -67,7 +67,7 @@ const Shop = () => {
   });
 
   const sortedProducts = [...(filteredProducts || [])].sort((a, b) => {
-    if (!sortOrder) return 0;
+    if (sortOrder === "default") return 0;
     const priceA = a.sale_price || a.price;
     const priceB = b.sale_price || b.price;
     return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
@@ -120,14 +120,14 @@ const Shop = () => {
           </div>
 
           <Select
-            value={sortOrder || ""}
-            onValueChange={(value: "asc" | "desc" | "") => setSortOrder(value || null)}
+            value={sortOrder}
+            onValueChange={(value: "asc" | "desc" | "default") => setSortOrder(value)}
           >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Sort by price" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Default</SelectItem>
+              <SelectItem value="default">Default</SelectItem>
               <SelectItem value="asc">Price: Low to High</SelectItem>
               <SelectItem value="desc">Price: High to Low</SelectItem>
             </SelectContent>
