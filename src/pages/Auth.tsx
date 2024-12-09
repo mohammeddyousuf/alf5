@@ -4,11 +4,22 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 const AuthPage = () => {
   const { toast } = useToast();
 
   console.log("Rendering Auth page");
+
+  useEffect(() => {
+    // Log current auth state on component mount
+    const logAuthState = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      console.log('Current session:', session);
+      if (error) console.error('Session error:', error);
+    };
+    logAuthState();
+  }, []);
 
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
@@ -38,6 +49,14 @@ const AuthPage = () => {
         redirectTo={window.location.origin}
         showLinks={false}
         view="sign_in"
+        onError={(error) => {
+          console.error('Auth UI error:', error);
+          toast({
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          });
+        }}
         localization={{
           variables: {
             sign_in: {

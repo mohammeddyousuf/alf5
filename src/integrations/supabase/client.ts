@@ -8,18 +8,30 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true,
-    flowType: 'pkce',
+    detectSessionInUrl: false,
     storage: window.localStorage,
-  },
-  global: {
-    headers: {
-      'apikey': SUPABASE_PUBLISHABLE_KEY,
-    },
   },
 });
 
-// Add debug logging
+// Add detailed debug logging
 supabase.auth.onAuthStateChange((event, session) => {
-  console.log('Auth state changed:', event, session);
+  console.log('Auth state changed:', event);
+  console.log('Session details:', session);
+  
+  if (event === 'SIGNED_IN') {
+    console.log('Sign in successful');
+  } else if (event === 'SIGNED_OUT') {
+    console.log('Sign out successful');
+  } else if (event === 'USER_UPDATED') {
+    console.log('User updated');
+  } else if (event === 'USER_DELETED') {
+    console.log('User deleted');
+  } else if (event === 'PASSWORD_RECOVERY') {
+    console.log('Password recovery initiated');
+  }
+});
+
+// Add error logging for auth operations
+supabase.auth.onError((error) => {
+  console.error('Auth error:', error);
 });
