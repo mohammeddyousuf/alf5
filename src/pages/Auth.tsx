@@ -28,6 +28,9 @@ const AuthPage = () => {
           style: {
             button: { background: 'rgb(var(--primary))', color: 'white' },
             anchor: { color: 'rgb(var(--primary))' },
+            message: {
+              color: 'rgb(239 68 68)'  // Red color for error messages
+            }
           },
         }}
         theme="light"
