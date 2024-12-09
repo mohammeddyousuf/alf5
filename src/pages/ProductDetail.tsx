@@ -13,6 +13,7 @@ import {
 import { Link } from "react-router-dom";
 import { ProductMedia } from "@/components/product/ProductMedia";
 import { ProductInfo } from "@/components/product/ProductInfo";
+import { Helmet } from "react-helmet";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -59,6 +60,12 @@ const ProductDetail = () => {
     enabled: !!shortId,
   });
 
+  const getYouTubeVideoId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
   const handleOrderSubmit = (formData: any) => {
     const whatsappNumber = settings?.whatsapp_number || "+1234567890";
     
@@ -83,12 +90,6 @@ Payment Mode: ${formData.paymentMode}`;
     });
   };
 
-  const getYouTubeVideoId = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-    const match = url.match(regExp);
-    return match && match[2].length === 11 ? match[2] : null;
-  };
-
   if (isLoading) {
     return (
       <div className="container py-8 flex justify-center">
@@ -105,45 +106,72 @@ Payment Mode: ${formData.paymentMode}`;
     );
   }
 
-  return (
-    <div className="container py-8">
-      <Breadcrumb className="mb-6">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <Link to="/" className="transition-colors hover:text-foreground">
-              Home
-            </Link>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <Link to="/shop" className="transition-colors hover:text-foreground">
-              Shop
-            </Link>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{product?.name}</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+  const websiteName = settings?.website_name || "Our Store";
+  const productImage = product.images && product.images.length > 0 ? product.images[0] : null;
+  const productPrice = product.sale_price || product.price;
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <ProductMedia
-          images={product.images}
-          videoUrls={product.video_urls}
-          productName={product.name}
-          getYouTubeVideoId={getYouTubeVideoId}
-        />
-        <ProductInfo
-          name={product.name}
-          brand={product.brand}
-          description={product.description}
-          price={product.price}
-          salePrice={product.sale_price}
-          onOrderSubmit={handleOrderSubmit}
-        />
+  return (
+    <>
+      <Helmet>
+        {/* Basic Meta Tags */}
+        <title>{`${product.name} | ${websiteName}`}</title>
+        <meta name="description" content={product.description || `${product.name} - ${websiteName}`} />
+
+        {/* Open Graph Meta Tags */}
+        <meta property="og:title" content={`${product.name} | ${websiteName}`} />
+        <meta property="og:description" content={product.description || `${product.name} - ${websiteName}`} />
+        {productImage && <meta property="og:image" content={productImage} />}
+        <meta property="og:type" content="product" />
+        <meta property="og:price:amount" content={productPrice.toString()} />
+        <meta property="og:price:currency" content="USD" />
+        {product.brand && <meta property="og:brand" content={product.brand} />}
+
+        {/* Twitter Card Meta Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${product.name} | ${websiteName}`} />
+        <meta name="twitter:description" content={product.description || `${product.name} - ${websiteName}`} />
+        {productImage && <meta name="twitter:image" content={productImage} />}
+      </Helmet>
+
+      <div className="container py-8">
+        <Breadcrumb className="mb-6">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <Link to="/" className="transition-colors hover:text-foreground">
+                Home
+              </Link>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <Link to="/shop" className="transition-colors hover:text-foreground">
+                Shop
+              </Link>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{product?.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <ProductMedia
+            images={product.images}
+            videoUrls={product.video_urls}
+            productName={product.name}
+            getYouTubeVideoId={getYouTubeVideoId}
+          />
+          <ProductInfo
+            name={product.name}
+            brand={product.brand}
+            description={product.description}
+            price={product.price}
+            salePrice={product.sale_price}
+            onOrderSubmit={handleOrderSubmit}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
