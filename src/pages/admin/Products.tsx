@@ -35,24 +35,7 @@ export default function Products() {
 
   const handleDelete = async (id: string) => {
     try {
-      // First, check if the product has any orders
-      const { data: orders, error: ordersError } = await supabase
-        .from("orders")
-        .select("id")
-        .eq("product_id", id);
-
-      if (ordersError) throw ordersError;
-
-      if (orders && orders.length > 0) {
-        toast({
-          variant: "destructive",
-          title: "Cannot Delete Product",
-          description: "This product has existing orders and cannot be deleted. Consider archiving it instead.",
-        });
-        return;
-      }
-
-      // If no orders exist, proceed with image deletion
+      // Get the product's images
       const { data: product } = await supabase
         .from("products")
         .select("images")
@@ -97,6 +80,29 @@ export default function Products() {
         title: "Error",
         description: error.message,
       });
+    }
+  };
+
+  const handleStatusChange = async (id: string, currentStatus: string | null) => {
+    const newStatus = currentStatus === "published" ? "draft" : "published";
+    
+    const { error } = await supabase
+      .from("products")
+      .update({ status: newStatus })
+      .eq("id", id);
+    
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: `Product ${newStatus === "published" ? "published" : "moved to draft"}`,
+      });
+      refetch();
     }
   };
 
