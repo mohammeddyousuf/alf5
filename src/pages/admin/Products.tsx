@@ -5,11 +5,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Download } from "lucide-react";
 import { ProductCard } from "@/components/admin/product/ProductCard";
 import { ProductFilters } from "@/components/admin/product/ProductFilters";
+import { useState } from "react";
 
 const Products = () => {
   const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [showSaleProducts, setShowSaleProducts] = useState(true);
+  const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
 
-  const { data: products, ...productsQuery } = useQuery({
+  const { data: products, refetch } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
       const { data, error } = await supabase.from("products").select("*");
@@ -18,16 +22,43 @@ const Products = () => {
     },
   });
 
+  const handleStatusChange = async (id: string, currentStatus: string | null) => {
+    const newStatus = currentStatus === "published" ? "draft" : "published";
+    const { error } = await supabase
+      .from("products")
+      .update({ status: newStatus })
+      .eq("id", id);
+    
+    if (error) throw error;
+    refetch();
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", id);
+    
+    if (error) throw error;
+    refetch();
+  };
+
   const handleDownload = () => {
-    // Get the current URL
     const currentUrl = window.location.href;
-    
-    // Extract the project URL (everything before /admin/products)
     const projectUrl = currentUrl.split('/admin/products')[0];
-    
-    // Open the project URL in a new tab
     window.open(projectUrl, '_blank');
   };
+
+  const filteredProducts = products?.filter((product) => {
+    const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
+    const isSaleProduct = product.sale_price && product.sale_price < product.price;
+    
+    if (!matchesSearch) return false;
+    if (isSaleProduct && !showSaleProducts) return false;
+    if (!isSaleProduct && !showNonSaleProducts) return false;
+    
+    return true;
+  });
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -48,11 +79,24 @@ const Products = () => {
         </div>
       </div>
 
-      <ProductFilters />
+      <ProductFilters
+        search={search}
+        setSearch={setSearch}
+        showSaleProducts={showSaleProducts}
+        setShowSaleProducts={setShowSaleProducts}
+        showNonSaleProducts={showNonSaleProducts}
+        setShowNonSaleProducts={setShowNonSaleProducts}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products?.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        {filteredProducts?.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            onStatusChange={handleStatusChange}
+            onDelete={handleDelete}
+            onSuccess={refetch}
+          />
         ))}
       </div>
     </div>
