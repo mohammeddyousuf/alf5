@@ -30,19 +30,20 @@ export function MediaFields({ form }: MediaFieldsProps) {
     try {
       const newImages = await Promise.all(
         Array.from(files).map(async (file) => {
-          const fileExt = file.name.split(".").pop();
-          const fileName = `${Math.random()}.${fileExt}`;
-          const filePath = `${fileName}`;
+          // Use the original filename, but ensure it's URL-safe
+          const fileName = encodeURIComponent(file.name);
 
           const { error: uploadError, data } = await supabase.storage
             .from("product-images")
-            .upload(filePath, file);
+            .upload(fileName, file, {
+              upsert: true // Allow overwriting if file exists
+            });
 
           if (uploadError) throw uploadError;
 
           const { data: { publicUrl } } = supabase.storage
             .from("product-images")
-            .getPublicUrl(filePath);
+            .getPublicUrl(fileName);
 
           return publicUrl;
         })
@@ -71,7 +72,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
       setIsDeleting(prev => ({ ...prev, [indexToRemove]: true }));
       
       // Extract the filename from the URL
-      const fileName = imageUrl.split("/").pop();
+      const fileName = decodeURIComponent(imageUrl.split("/").pop() || "");
       if (!fileName) throw new Error("Invalid file URL");
 
       // Delete from Supabase Storage
