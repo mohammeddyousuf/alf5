@@ -72,6 +72,10 @@ const Admin = () => {
     },
   });
 
+  const handleNavigation = (path: string) => {
+    navigate(`/admin/${path}`);
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
@@ -82,7 +86,7 @@ const Admin = () => {
           <p className="text-3xl font-bold mb-4">{categories?.length || 0}</p>
           <Button 
             className="w-full"
-            onClick={() => navigate("/admin/categories")}
+            onClick={() => handleNavigation("categories")}
           >
             Manage Categories
           </Button>
@@ -93,7 +97,7 @@ const Admin = () => {
           <p className="text-3xl font-bold mb-4">{subcategories?.length || 0}</p>
           <Button 
             className="w-full"
-            onClick={() => navigate("/admin/categories")}
+            onClick={() => handleNavigation("categories")}
           >
             Manage Subcategories
           </Button>
@@ -104,7 +108,7 @@ const Admin = () => {
           <p className="text-3xl font-bold mb-4">{collections?.length || 0}</p>
           <Button 
             className="w-full"
-            onClick={() => navigate("/admin/collections")}
+            onClick={() => handleNavigation("collections")}
           >
             Manage Collections
           </Button>
@@ -115,7 +119,7 @@ const Admin = () => {
           <p className="text-3xl font-bold mb-4">{products?.length || 0}</p>
           <Button 
             className="w-full"
-            onClick={() => navigate("/admin/products")}
+            onClick={() => handleNavigation("products")}
           >
             Manage Products
           </Button>
@@ -126,7 +130,7 @@ const Admin = () => {
           <p className="text-3xl font-bold mb-4">{sliders?.length || 0}</p>
           <Button 
             className="w-full"
-            onClick={() => navigate("/admin/sliders")}
+            onClick={() => handleNavigation("sliders")}
           >
             Manage Sliders
           </Button>
@@ -137,7 +141,7 @@ const Admin = () => {
           <p className="text-3xl font-bold mb-4">{newsTicker?.length || 0}</p>
           <Button 
             className="w-full"
-            onClick={() => navigate("/admin/news")}
+            onClick={() => handleNavigation("news")}
           >
             Manage News
           </Button>
@@ -148,7 +152,7 @@ const Admin = () => {
           <p className="text-3xl font-bold mb-4">{pages?.length || 0}</p>
           <Button 
             className="w-full"
-            onClick={() => navigate("/admin/pages")}
+            onClick={() => handleNavigation("pages")}
           >
             Manage Pages
           </Button>
