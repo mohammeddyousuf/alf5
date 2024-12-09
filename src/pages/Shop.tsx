@@ -43,6 +43,14 @@ const Shop = () => {
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["shop-products", selectedCategory, selectedSubcategory, showFeaturedOnly, showSaleOnly, showNewArrivalsOnly],
     queryFn: async () => {
+      console.log("Fetching products with filters:", {
+        category: selectedCategory,
+        subcategory: selectedSubcategory,
+        featured: showFeaturedOnly,
+        sale: showSaleOnly,
+        newArrivals: showNewArrivalsOnly
+      });
+
       let query = supabase
         .from("products")
         .select("*")
@@ -63,7 +71,7 @@ const Shop = () => {
       if (showNewArrivalsOnly) {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        query = query.gte('added_date', thirtyDaysAgo.toISOString());
+        query = query.gte('created_at', thirtyDaysAgo.toISOString());
       }
 
       const { data, error } = await query;
@@ -78,6 +86,7 @@ const Shop = () => {
         throw error;
       }
       
+      console.log("Fetched products:", data);
       return data || [];
     },
   });
@@ -92,8 +101,8 @@ const Shop = () => {
     const meetsSale = showSaleOnly ? product.sale_price !== null : true;
     const meetsBrand = selectedBrand ? product.brand === selectedBrand : true;
     
-    const isNewArrival = product.added_date 
-      ? new Date(product.added_date) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    const isNewArrival = product.created_at 
+      ? new Date(product.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
       : false;
     const meetsNewArrival = showNewArrivalsOnly ? isNewArrival : true;
 
