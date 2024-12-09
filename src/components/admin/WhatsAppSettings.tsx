@@ -12,6 +12,7 @@ export const WhatsAppSettings = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [whatsappGroupUrl, setWhatsappGroupUrl] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
   const { data: settings } = useQuery({
@@ -31,6 +32,9 @@ export const WhatsAppSettings = () => {
     if (settings?.whatsapp_number) {
       setWhatsappNumber(settings.whatsapp_number);
     }
+    if (settings?.whatsapp_group_url) {
+      setWhatsappGroupUrl(settings.whatsapp_group_url);
+    }
   }, [settings]);
 
   const handleUpdateWhatsApp = async () => {
@@ -38,7 +42,10 @@ export const WhatsAppSettings = () => {
     try {
       const { error } = await supabase
         .from("settings")
-        .update({ whatsapp_number: whatsappNumber })
+        .update({ 
+          whatsapp_number: whatsappNumber,
+          whatsapp_group_url: whatsappGroupUrl 
+        })
         .eq("id", settings?.id);
 
       if (error) throw error;
@@ -48,14 +55,14 @@ export const WhatsAppSettings = () => {
 
       toast({
         title: "Success",
-        description: "WhatsApp number updated successfully",
+        description: "WhatsApp settings updated successfully",
       });
     } catch (error) {
-      console.error("Error updating WhatsApp number:", error);
+      console.error("Error updating WhatsApp settings:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update WhatsApp number",
+        description: "Failed to update WhatsApp settings",
       });
     } finally {
       setIsUpdating(false);
@@ -73,6 +80,15 @@ export const WhatsAppSettings = () => {
             value={whatsappNumber}
             onChange={(e) => setWhatsappNumber(e.target.value)}
             placeholder="Enter WhatsApp number"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="whatsappGroup">WhatsApp Group Link</Label>
+          <Input
+            id="whatsappGroup"
+            value={whatsappGroupUrl}
+            onChange={(e) => setWhatsappGroupUrl(e.target.value)}
+            placeholder="Enter WhatsApp group invite link"
           />
         </div>
         <Button onClick={handleUpdateWhatsApp} disabled={isUpdating}>

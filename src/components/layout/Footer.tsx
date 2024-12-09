@@ -77,6 +77,16 @@ export const Footer = () => {
             >
               WhatsApp
             </a>
+            {settings?.whatsapp_group_url && (
+              <a 
+                href={settings.whatsapp_group_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Join WhatsApp Group
+              </a>
+            )}
             {settings?.instagram_url && (
               <a 
                 href={formatSocialLink(settings.instagram_url)}

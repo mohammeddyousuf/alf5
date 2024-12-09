@@ -236,6 +236,7 @@ export type Database = {
           secondary_color: string | null
           updated_at: string
           website_name: string | null
+          whatsapp_group_url: string | null
           whatsapp_number: string
         }
         Insert: {
@@ -254,6 +255,7 @@ export type Database = {
           secondary_color?: string | null
           updated_at?: string
           website_name?: string | null
+          whatsapp_group_url?: string | null
           whatsapp_number: string
         }
         Update: {
@@ -272,6 +274,7 @@ export type Database = {
           secondary_color?: string | null
           updated_at?: string
           website_name?: string | null
+          whatsapp_group_url?: string | null
           whatsapp_number?: string
         }
         Relationships: []
