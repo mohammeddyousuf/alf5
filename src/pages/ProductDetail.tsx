@@ -7,12 +7,18 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Link } from "react-router-dom";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -66,6 +72,13 @@ const ProductDetail = () => {
     });
   };
 
+  // Helper function to extract YouTube video ID
+  const getYouTubeVideoId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return match && match[2].length === 11 ? match[2] : null;
+  };
+
   if (isLoading) {
     return (
       <div className="container py-8 flex justify-center">
@@ -81,6 +94,12 @@ const ProductDetail = () => {
       </div>
     );
   }
+
+  // Combine images and videos for the carousel
+  const mediaItems = [
+    ...(product.images || []),
+    ...(product.video_urls || [])
+  ];
 
   return (
     <div className="container py-8">
@@ -106,28 +125,40 @@ const ProductDetail = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-4">
-          {product.images && product.images.length > 0 ? (
-            <img
-              src={product.images[0]}
-              alt={product.name}
-              className="w-full rounded-lg object-cover aspect-square"
-            />
+          {mediaItems.length > 0 ? (
+            <Carousel className="w-full">
+              <CarouselContent>
+                {mediaItems.map((item, index) => (
+                  <CarouselItem key={index}>
+                    {product.images?.includes(item) ? (
+                      <img
+                        src={item}
+                        alt={`${product.name} - ${index + 1}`}
+                        className="w-full rounded-lg object-cover aspect-square"
+                      />
+                    ) : (
+                      <div className="aspect-square w-full">
+                        <iframe
+                          src={`https://www.youtube.com/embed/${getYouTubeVideoId(item)}`}
+                          title={`${product.name} - Video ${index + 1}`}
+                          className="w-full h-full rounded-lg"
+                          allowFullScreen
+                        />
+                      </div>
+                    )}
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {mediaItems.length > 1 && (
+                <>
+                  <CarouselPrevious className="left-2" />
+                  <CarouselNext className="right-2" />
+                </>
+              )}
+            </Carousel>
           ) : (
             <div className="w-full rounded-lg bg-gray-100 aspect-square flex items-center justify-center">
-              <p className="text-gray-500">No image available</p>
-            </div>
-          )}
-          
-          {product.images && product.images.length > 1 && (
-            <div className="grid grid-cols-4 gap-2">
-              {product.images.slice(1).map((image, index) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`${product.name} - Image ${index + 2}`}
-                  className="w-full rounded-lg object-cover aspect-square"
-                />
-              ))}
+              <p className="text-gray-500">No media available</p>
             </div>
           )}
         </div>
@@ -158,24 +189,6 @@ const ProductDetail = () => {
             <MessageCircle className="mr-2 h-5 w-5" />
             Contact on WhatsApp
           </Button>
-
-          {product.video_urls && product.video_urls.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Product Videos</h2>
-              <div className="grid gap-4">
-                {product.video_urls.map((url, index) => (
-                  <div key={index} className="aspect-video">
-                    <iframe
-                      src={url}
-                      title={`${product.name} - Video ${index + 1}`}
-                      className="w-full h-full rounded-lg"
-                      allowFullScreen
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
