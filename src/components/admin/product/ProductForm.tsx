@@ -23,6 +23,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { PriceFields } from "./PriceFields";
 import { MediaFields } from "./MediaFields";
+import { CategoryFields } from "./CategoryFields";
 import { productFormSchema, type ProductFormData } from "./schema";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -45,6 +46,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
       images: product?.images ?? [],
       video_urls: product?.video_urls ?? [],
       status: product?.status ?? "draft",
+      category_id: product?.category_id ?? null,
+      subcategory_id: product?.subcategory_id ?? null,
     },
   });
 
@@ -62,6 +65,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         images: values.images,
         video_urls: values.video_urls,
         status: values.status,
+        category_id: values.category_id,
+        subcategory_id: values.subcategory_id,
       };
 
       if (product) {
@@ -124,6 +129,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
               </FormItem>
             )}
           />
+
+          <CategoryFields form={form} />
 
           <FormField
             control={form.control}

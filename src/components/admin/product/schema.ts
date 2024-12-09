@@ -8,6 +8,8 @@ export const productFormSchema = z.object({
   images: z.array(z.string()).default([]),
   video_urls: z.array(z.string()).default([]),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
+  category_id: z.string().optional().nullable(),
+  subcategory_id: z.string().optional().nullable(),
 });
 
 export type ProductFormData = z.infer<typeof productFormSchema>;
