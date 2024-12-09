@@ -184,6 +184,7 @@ Payment Mode: ${formData.paymentMode}`;
             description={product.description}
             price={product.price}
             salePrice={product.sale_price}
+            productId={product.id}
             onOrderSubmit={handleOrderSubmit}
           />
         </div>
