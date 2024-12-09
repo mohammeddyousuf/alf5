@@ -19,7 +19,7 @@ const ProductDetail = () => {
   const { toast } = useToast();
 
   // Extract the short ID from the slug (last part after the last dash)
-  const shortId = slug?.split('-').pop();
+  const shortId = slug?.split('-').pop()?.substring(0, 8);
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -43,15 +43,18 @@ const ProductDetail = () => {
     queryFn: async () => {
       if (!shortId) throw new Error("Product ID not found");
       
-      // Convert UUID to text before comparing the start of the string
+      // Get all products and filter in JS since Supabase is having issues with UUID text search
       const { data, error } = await supabase
         .from("products")
-        .select("*")
-        .filter('id::text', 'like', `${shortId}%`)
-        .single();
+        .select("*");
       
       if (error) throw error;
-      return data;
+      
+      // Find the product whose ID starts with our shortId
+      const matchingProduct = data?.find(p => p.id.startsWith(shortId));
+      if (!matchingProduct) throw new Error("Product not found");
+      
+      return matchingProduct;
     },
     enabled: !!shortId,
   });
