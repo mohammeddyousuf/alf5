@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 import { ProductForm } from "@/components/admin/product/ProductForm";
@@ -15,6 +17,8 @@ type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
 export default function Products() {
   const [search, setSearch] = useState("");
+  const [showSaleProducts, setShowSaleProducts] = useState(true);
+  const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
   const { toast } = useToast();
   
   const { data: products, refetch } = useQuery({
@@ -29,9 +33,16 @@ export default function Products() {
     },
   });
 
-  const filteredProducts = products?.filter(product =>
-    product.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredProducts = products?.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
+    const isSaleProduct = product.sale_price && product.sale_price < product.price;
+    
+    if (!showSaleProducts && !showNonSaleProducts) return false;
+    if (!showSaleProducts && isSaleProduct) return false;
+    if (!showNonSaleProducts && !isSaleProduct) return false;
+    
+    return matchesSearch;
+  });
 
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from("products").delete().eq("id", id);
@@ -103,12 +114,32 @@ export default function Products() {
         </Dialog>
       </div>
 
-      <Input
-        placeholder="Search products..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="max-w-sm"
-      />
+      <div className="flex items-center gap-6">
+        <Input
+          placeholder="Search products..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="max-w-sm"
+        />
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="sale-filter"
+              checked={showSaleProducts}
+              onCheckedChange={(checked) => setShowSaleProducts(checked as boolean)}
+            />
+            <Label htmlFor="sale-filter">Sale Products</Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="non-sale-filter"
+              checked={showNonSaleProducts}
+              onCheckedChange={(checked) => setShowNonSaleProducts(checked as boolean)}
+            />
+            <Label htmlFor="non-sale-filter">Non-Sale Products</Label>
+          </div>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProducts?.map((product) => (
