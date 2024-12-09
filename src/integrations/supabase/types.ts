@@ -310,7 +310,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
-          image_url?: string
+          image_url: string
           link_url?: string | null
           order_index?: number
           title?: string
@@ -353,6 +353,56 @@ export type Database = {
           },
         ]
       }
+      orders: {
+        Row: {
+          id: string
+          created_at: string
+          product_id: string
+          product_name: string
+          product_brand: string | null
+          product_price: number
+          customer_name: string
+          customer_email: string
+          customer_mobile: string
+          customer_address: string
+          payment_mode: string
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          product_id: string
+          product_name: string
+          product_brand?: string | null
+          product_price: number
+          customer_name: string
+          customer_email: string
+          customer_mobile: string
+          customer_address: string
+          payment_mode: string
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          product_id?: string
+          product_name?: string
+          product_brand?: string | null
+          product_price?: number
+          customer_name?: string
+          customer_email?: string
+          customer_mobile?: string
+          customer_address?: string
+          payment_mode?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -378,7 +428,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {

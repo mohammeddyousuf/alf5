@@ -8,6 +8,7 @@ interface ProductInfoProps {
   description: string | null;
   price: number;
   salePrice: number | null;
+  productId: string;
   onOrderSubmit: (formData: any) => void;
 }
 
@@ -17,6 +18,7 @@ export function ProductInfo({
   description, 
   price, 
   salePrice,
+  productId,
   onOrderSubmit 
 }: ProductInfoProps) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
@@ -52,6 +54,7 @@ export function ProductInfo({
         productName={name}
         productBrand={brand}
         productPrice={salePrice || price}
+        productId={productId}
         onSubmit={onOrderSubmit}
       />
     </div>
