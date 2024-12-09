@@ -98,7 +98,7 @@ const Shop = () => {
     return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
   });
 
-  const handleCategoryChange = (value: string) => {
+  const handleCategoryChange = (value: string | null) => {
     setSelectedCategory(value);
     setSelectedSubcategory(null); // Reset subcategory when category changes
   };
@@ -135,14 +135,14 @@ const Shop = () => {
             <div className="space-y-2">
               <Label>Category</Label>
               <Select
-                value={selectedCategory || ""}
-                onValueChange={handleCategoryChange}
+                value={selectedCategory || "all"}
+                onValueChange={(value) => handleCategoryChange(value === "all" ? null : value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {categories?.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
@@ -156,14 +156,14 @@ const Shop = () => {
               <div className="space-y-2">
                 <Label>Subcategory</Label>
                 <Select
-                  value={selectedSubcategory || ""}
-                  onValueChange={setSelectedSubcategory}
+                  value={selectedSubcategory || "all"}
+                  onValueChange={(value) => setSelectedSubcategory(value === "all" ? null : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select subcategory" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Subcategories</SelectItem>
+                    <SelectItem value="all">All Subcategories</SelectItem>
                     {subcategories?.map((subcategory) => (
                       <SelectItem key={subcategory.id} value={subcategory.id}>
                         {subcategory.name}
