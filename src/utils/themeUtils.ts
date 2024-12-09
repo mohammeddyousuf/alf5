@@ -39,7 +39,7 @@ const hexToHSL = (hex: string): string => {
   const lPct = Math.round(l * 100);
 
   return `${hDeg} ${sPct}% ${lPct}%`;
-}
+};
 
 export const updateThemeColor = (colorKey: string, value: string) => {
   const root = document.documentElement;
@@ -67,6 +67,8 @@ export const updateThemeColor = (colorKey: string, value: string) => {
 export const initializeThemeColors = (settings: any) => {
   if (!settings) return;
   
+  console.log('Initializing theme colors with settings:', settings);
+
   if (settings.primary_color) {
     updateThemeColor('primary', settings.primary_color);
   }
