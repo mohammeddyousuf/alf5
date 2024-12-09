@@ -1,98 +1,38 @@
-import { useEffect, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
-import { Toaster } from "@/components/ui/sonner";
-import { supabase } from "@/integrations/supabase/client";
-
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Admin from "./pages/Admin";
-import Products from "./pages/admin/Products";
-import Collections from "./pages/admin/Collections";
-import CollectionDetail from "./pages/CollectionDetail";
-import ProductDetail from "./pages/ProductDetail";
-
-const queryClient = new QueryClient();
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/react-query";
+import { ThemeProvider } from "@/components/ui/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import Layout from "@/components/layout";
+import Index from "@/pages/index";
+import CollectionDetail from "@/pages/collections/[id]";
+import ProductDetail from "@/pages/products/[id]";
+import Admin from "@/pages/Admin";
+import Collections from "@/pages/admin/Collections";
+import Products from "@/pages/admin/Products";
+import Sliders from "@/pages/admin/Sliders";
+import News from "@/pages/admin/News";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
-      setIsLoading(false);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  if (isLoading) {
-    return null;
-  }
-
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route
-            path="/auth"
-            element={
-              !isAuthenticated ? (
-                <Auth />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              isAuthenticated ? (
-                <Admin />
-              ) : (
-                <Navigate to="/auth" replace />
-              )
-            }
-          />
-          <Route
-            path="/admin/products"
-            element={
-              isAuthenticated ? (
-                <Products />
-              ) : (
-                <Navigate to="/auth" replace />
-              )
-            }
-          />
-          <Route
-            path="/admin/collections"
-            element={
-              isAuthenticated ? (
-                <Collections />
-              ) : (
-                <Navigate to="/auth" replace />
-              )
-            }
-          />
-          <Route
-            path="/collection/:id"
-            element={<CollectionDetail />}
-          />
-          <Route
-            path="/product/:id"
-            element={<ProductDetail />}
-          />
-        </Routes>
-      </BrowserRouter>
-      <Toaster />
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Index />} />
+              <Route path="collections/:id" element={<CollectionDetail />} />
+              <Route path="products/:id" element={<ProductDetail />} />
+              <Route path="admin" element={<Admin />} />
+              <Route path="admin/collections" element={<Collections />} />
+              <Route path="admin/products" element={<Products />} />
+              <Route path="admin/sliders" element={<Sliders />} />
+              <Route path="admin/news" element={<News />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+        <Toaster />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
