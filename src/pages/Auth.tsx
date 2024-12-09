@@ -5,9 +5,11 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   console.log("Rendering Auth page");
 
@@ -16,6 +18,13 @@ const AuthPage = () => {
     const logAuthState = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
       console.log('Current session:', session);
+      
+      // If there's already a valid session, redirect to admin
+      if (session) {
+        navigate('/admin');
+        return;
+      }
+      
       if (error) {
         console.error('Session error:', error);
         toast({
@@ -29,18 +38,19 @@ const AuthPage = () => {
 
     // Subscribe to auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
+      if (event === 'SIGNED_IN' && session) {
         toast({
           title: "Success",
           description: "Successfully signed in!",
         });
+        navigate('/admin');
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, [toast, navigate]);
 
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
