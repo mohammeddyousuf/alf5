@@ -72,7 +72,6 @@ const ProductDetail = () => {
     });
   };
 
-  // Helper function to extract YouTube video ID
   const getYouTubeVideoId = (url: string) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
@@ -95,7 +94,6 @@ const ProductDetail = () => {
     );
   }
 
-  // Combine images and videos for the carousel
   const mediaItems = [
     ...(product.images || []),
     ...(product.video_urls || [])
@@ -126,36 +124,38 @@ const ProductDetail = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-4">
           {mediaItems.length > 0 ? (
-            <Carousel className="w-full">
-              <CarouselContent>
-                {mediaItems.map((item, index) => (
-                  <CarouselItem key={index}>
-                    {product.images?.includes(item) ? (
-                      <img
-                        src={item}
-                        alt={`${product.name} - ${index + 1}`}
-                        className="w-full rounded-lg object-cover aspect-square"
-                      />
-                    ) : (
-                      <div className="aspect-square w-full">
-                        <iframe
-                          src={`https://www.youtube.com/embed/${getYouTubeVideoId(item)}`}
-                          title={`${product.name} - Video ${index + 1}`}
-                          className="w-full h-full rounded-lg"
-                          allowFullScreen
+            <div className="relative group">
+              <Carousel className="w-full">
+                <CarouselContent>
+                  {mediaItems.map((item, index) => (
+                    <CarouselItem key={index}>
+                      {product.images?.includes(item) ? (
+                        <img
+                          src={item}
+                          alt={`${product.name} - ${index + 1}`}
+                          className="w-full rounded-lg object-cover aspect-square"
                         />
-                      </div>
-                    )}
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              {mediaItems.length > 1 && (
-                <>
-                  <CarouselPrevious className="left-2" />
-                  <CarouselNext className="right-2" />
-                </>
-              )}
-            </Carousel>
+                      ) : (
+                        <div className="aspect-square w-full">
+                          <iframe
+                            src={`https://www.youtube.com/embed/${getYouTubeVideoId(item)}`}
+                            title={`${product.name} - Video ${index + 1}`}
+                            className="w-full h-full rounded-lg"
+                            allowFullScreen
+                          />
+                        </div>
+                      )}
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {mediaItems.length > 1 && (
+                  <>
+                    <CarouselPrevious className="absolute left-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <CarouselNext className="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </>
+                )}
+              </Carousel>
+            </div>
           ) : (
             <div className="w-full rounded-lg bg-gray-100 aspect-square flex items-center justify-center">
               <p className="text-gray-500">No media available</p>
