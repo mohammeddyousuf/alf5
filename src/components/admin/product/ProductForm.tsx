@@ -46,10 +46,16 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         throw new Error('Name and price are required');
       }
 
+      // Create the data object after validation to ensure correct types
       const data = {
-        ...values,
+        name: values.name,
+        description: values.description,
+        price: values.price,
+        sale_price: values.sale_price,
+        images: values.images,
+        video_urls: values.video_urls,
         status: product?.status ?? 'draft',
-      } as const;
+      };
 
       if (product) {
         const { error } = await supabase
