@@ -52,7 +52,25 @@ export const Header = () => {
           </SheetContent>
         </Sheet>
         
-        <div className="flex flex-1 items-center justify-between md:justify-start">
+        <nav className="hidden md:flex items-center gap-6 text-sm mr-8">
+          <Link to="/" className="font-medium transition-colors hover:text-whatsapp-primary">
+            Home
+          </Link>
+          <Link to="/shop" className="font-medium transition-colors hover:text-whatsapp-primary">
+            Shop
+          </Link>
+          <Link to="/about" className="font-medium transition-colors hover:text-whatsapp-primary">
+            About
+          </Link>
+          <Link to="/contact" className="font-medium transition-colors hover:text-whatsapp-primary">
+            Contact
+          </Link>
+          <Link to="/faq" className="font-medium transition-colors hover:text-whatsapp-primary">
+            FAQ
+          </Link>
+        </nav>
+
+        <div className="flex flex-1 items-center justify-between">
           <Link 
             to="/" 
             className="flex items-center gap-2 mx-auto md:mx-0"
@@ -68,24 +86,6 @@ export const Header = () => {
               {settings?.website_name || "WhatsApp Store"}
             </span>
           </Link>
-          
-          <nav className="hidden md:flex items-center gap-6 text-sm ml-8">
-            <Link to="/" className="font-medium transition-colors hover:text-whatsapp-primary">
-              Home
-            </Link>
-            <Link to="/shop" className="font-medium transition-colors hover:text-whatsapp-primary">
-              Shop
-            </Link>
-            <Link to="/about" className="font-medium transition-colors hover:text-whatsapp-primary">
-              About
-            </Link>
-            <Link to="/contact" className="font-medium transition-colors hover:text-whatsapp-primary">
-              Contact
-            </Link>
-            <Link to="/faq" className="font-medium transition-colors hover:text-whatsapp-primary">
-              FAQ
-            </Link>
-          </nav>
           
           <div className="flex items-center">
             <Button variant="ghost" size="icon">
