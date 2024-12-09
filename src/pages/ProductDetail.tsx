@@ -15,14 +15,15 @@ const ProductDetail = () => {
       const { data, error } = await supabase
         .from("settings")
         .select("*")
-        .limit(1)
-        .single();
+        .limit(1);
       
       if (error) {
         console.error("Error fetching settings:", error);
         return null;
       }
-      return data;
+      
+      // Return the first settings object or null if none exists
+      return data && data.length > 0 ? data[0] : null;
     },
   });
 
