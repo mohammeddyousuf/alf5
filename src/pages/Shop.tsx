@@ -68,7 +68,7 @@ const Shop = () => {
         query = query.eq("subcategory_id", selectedSubcategory);
       }
 
-      const { data, error } = await query.order("created_at", { ascending: false });
+      const { data, error } = await query;
       
       if (error) {
         console.error("Error fetching products:", error);
@@ -80,6 +80,7 @@ const Shop = () => {
         throw error;
       }
       
+      console.log("Fetched products:", data); // Debug log
       return data || [];
     },
   });
