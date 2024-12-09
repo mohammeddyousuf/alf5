@@ -29,7 +29,7 @@ const subcategoryFormSchema = z.object({
   category_id: z.string().min(1, "Category is required"),
 });
 
-type SubcategoryFormData = z.infer<typeof subcategoryFormSchema>;
+type SubcategoryFormValues = z.infer<typeof subcategoryFormSchema>;
 
 interface SubcategoryFormProps {
   onSuccess?: () => void;
@@ -37,7 +37,7 @@ interface SubcategoryFormProps {
 
 export function SubcategoryForm({ onSuccess }: SubcategoryFormProps) {
   const { toast } = useToast();
-  const form = useForm<SubcategoryFormData>({
+  const form = useForm<SubcategoryFormValues>({
     resolver: zodResolver(subcategoryFormSchema),
     defaultValues: {
       name: "",
@@ -58,9 +58,14 @@ export function SubcategoryForm({ onSuccess }: SubcategoryFormProps) {
     },
   });
 
-  const onSubmit = async (values: SubcategoryFormData) => {
+  const onSubmit = async (values: SubcategoryFormValues) => {
     try {
-      const { error } = await supabase.from("subcategories").insert(values);
+      const { error } = await supabase.from("subcategories").insert({
+        name: values.name,
+        description: values.description || null,
+        category_id: values.category_id,
+      });
+      
       if (error) throw error;
       
       toast({

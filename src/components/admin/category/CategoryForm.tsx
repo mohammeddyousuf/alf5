@@ -20,7 +20,7 @@ const categoryFormSchema = z.object({
   description: z.string().optional(),
 });
 
-type CategoryFormData = z.infer<typeof categoryFormSchema>;
+type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 
 interface CategoryFormProps {
   onSuccess?: () => void;
@@ -28,7 +28,7 @@ interface CategoryFormProps {
 
 export function CategoryForm({ onSuccess }: CategoryFormProps) {
   const { toast } = useToast();
-  const form = useForm<CategoryFormData>({
+  const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categoryFormSchema),
     defaultValues: {
       name: "",
@@ -36,9 +36,13 @@ export function CategoryForm({ onSuccess }: CategoryFormProps) {
     },
   });
 
-  const onSubmit = async (values: CategoryFormData) => {
+  const onSubmit = async (values: CategoryFormValues) => {
     try {
-      const { error } = await supabase.from("categories").insert(values);
+      const { error } = await supabase.from("categories").insert({
+        name: values.name,
+        description: values.description || null,
+      });
+      
       if (error) throw error;
       
       toast({
