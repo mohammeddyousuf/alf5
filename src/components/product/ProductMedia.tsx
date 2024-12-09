@@ -6,7 +6,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import { Link } from "lucide-react";
+import { Share2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface ProductMediaProps {
@@ -49,10 +49,10 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
       <Button
         variant="secondary"
         size="icon"
-        className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur-sm opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:shadow-md"
         onClick={handleCopyLink}
       >
-        <Link className="h-4 w-4" />
+        <Share2 className="h-4 w-4" />
       </Button>
       <Carousel className="w-full">
         <CarouselContent>
