@@ -2,9 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductCard } from "@/components/home/ProductCard";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const Shop = () => {
-  const { data: products, isLoading } = useQuery({
+  const { toast } = useToast();
+  
+  const { data: products, isLoading, error } = useQuery({
     queryKey: ["shop-products"],
     queryFn: async () => {
       console.log("Fetching products...");
@@ -16,12 +19,28 @@ const Shop = () => {
       
       if (error) {
         console.error("Error fetching products:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load products. Please try again later.",
+        });
         throw error;
       }
+
       console.log("Fetched products:", data);
       return data;
     },
   });
+
+  if (error) {
+    return (
+      <div className="container py-12">
+        <p className="text-center text-destructive">
+          Failed to load products. Please try again later.
+        </p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
