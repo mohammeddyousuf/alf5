@@ -49,7 +49,7 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
       <Button
         variant="secondary"
         size="icon"
-        className="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur-sm transition-transform hover:scale-105 shadow-sm hover:shadow-md"
+        className="absolute top-4 right-4 z-10 bg-black/20 hover:bg-black/40 backdrop-blur-sm transition-all hover:scale-105 text-white"
         onClick={handleCopyLink}
       >
         <Share2 className="h-4 w-4" />
