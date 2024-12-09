@@ -11,9 +11,14 @@ const Admin = () => {
   const navigate = useNavigate();
 
   const handleDownload = () => {
-    const currentUrl = window.location.href;
-    const projectUrl = currentUrl.split('/admin')[0];
-    window.open(projectUrl, '_blank');
+    // Download the project directly instead of opening in a new tab
+    const downloadUrl = 'https://github.com/your-username/your-repo/archive/main.zip';
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = 'project.zip';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const { data: collections } = useQuery({
