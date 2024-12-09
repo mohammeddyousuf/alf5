@@ -88,7 +88,12 @@ export function MediaFields({ form }: MediaFieldsProps) {
 
   const removeVideoUrl = (indexToRemove: number) => {
     const currentUrls = form.getValues("video_urls") || [];
+    console.log("Removing video URL at index:", indexToRemove);
+    console.log("Current video URLs:", currentUrls);
+    
     const updatedUrls = currentUrls.filter((_, index) => index !== indexToRemove);
+    console.log("Updated video URLs after removal:", updatedUrls);
+    
     form.setValue("video_urls", updatedUrls, { shouldDirty: true });
   };
 

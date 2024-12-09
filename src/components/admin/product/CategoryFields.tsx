@@ -28,6 +28,7 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
         .select("*")
         .order("name");
       if (error) throw error;
+      console.log("Fetched categories:", data);
       return data;
     },
   });
@@ -37,6 +38,8 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
     queryFn: async () => {
       const categoryId = form.watch("category_id");
       if (!categoryId) return [];
+      
+      console.log("Fetching subcategories for category:", categoryId);
       
       const { data, error } = await supabase
         .from("subcategories")
@@ -54,9 +57,11 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
   // Reset subcategory when category changes
   useEffect(() => {
     const categoryId = form.watch("category_id");
+    console.log("Category changed to:", categoryId);
+    
     if (categoryId) {
-      // Always reset subcategory when category changes
-      form.setValue("subcategory_id", null, { shouldDirty: true });
+      console.log("Resetting subcategory");
+      form.setValue("subcategory_id", null);
     }
   }, [form.watch("category_id")]);
 
@@ -70,9 +75,8 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
             <FormLabel>Category</FormLabel>
             <Select
               onValueChange={(value) => {
+                console.log("Category selected:", value);
                 field.onChange(value);
-                // Ensure form knows this field was changed
-                form.setValue("category_id", value, { shouldDirty: true });
               }}
               value={field.value || undefined}
             >
@@ -102,9 +106,8 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
             <FormLabel>Subcategory</FormLabel>
             <Select
               onValueChange={(value) => {
+                console.log("Subcategory selected:", value);
                 field.onChange(value);
-                // Ensure form knows this field was changed
-                form.setValue("subcategory_id", value, { shouldDirty: true });
               }}
               value={field.value || undefined}
               disabled={!form.watch("category_id")}

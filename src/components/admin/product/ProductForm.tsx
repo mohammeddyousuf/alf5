@@ -58,7 +58,6 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   useEffect(() => {
     if (product && !isInitialized) {
       console.log("Loading product data:", product);
-      console.log("Current form values before reset:", form.getValues());
       
       const formData = {
         name: product.name,
@@ -75,18 +74,13 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
       console.log("Setting form data to:", formData);
       form.reset(formData);
       setIsInitialized(true);
-      
-      console.log("Form values after reset:", form.getValues());
     }
   }, [product, form, isInitialized]);
 
   const onSubmit = async (values: ProductFormData) => {
     try {
-      if (!values.name || typeof values.price !== 'number') {
-        throw new Error('Name and price are required');
-      }
-
-      console.log("Submitting form values:", values);
+      console.log("Form values before submission:", values);
+      console.log("Current form state:", form.getValues());
 
       const data = {
         name: values.name,
@@ -100,29 +94,42 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         subcategory_id: values.subcategory_id || null,
       };
 
-      console.log("Submitting product data:", data);
+      console.log("Submitting to Supabase:", data);
 
       if (product?.id) {
-        const { error } = await supabase
+        const { error, data: updatedData } = await supabase
           .from("products")
           .update(data)
-          .eq("id", product.id);
+          .eq("id", product.id)
+          .select();
+        
+        console.log("Supabase update response:", { error, data: updatedData });
+        
         if (error) throw error;
+        
         toast({
           title: "Success",
           description: "Product updated successfully",
         });
       } else {
-        const { error } = await supabase.from("products").insert(data);
+        const { error, data: insertedData } = await supabase
+          .from("products")
+          .insert(data)
+          .select();
+        
+        console.log("Supabase insert response:", { error, data: insertedData });
+        
         if (error) throw error;
+        
         toast({
           title: "Success",
           description: "Product created successfully",
         });
       }
+      
       onSuccess?.();
       if (!product) {
-        form.reset(); // Only reset form for new products
+        form.reset();
         setIsInitialized(false);
       }
     } catch (error: any) {
