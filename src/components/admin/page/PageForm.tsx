@@ -61,7 +61,7 @@ export const PageForm = ({ initialData }: PageFormProps) => {
       } else {
         const { error } = await supabase
           .from("pages")
-          .insert([values]);
+          .insert(values); // Changed from [values] to values
 
         if (error) throw error;
       }

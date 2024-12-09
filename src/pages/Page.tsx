@@ -6,14 +6,14 @@ import { Loader2 } from "lucide-react";
 const Page = () => {
   const { slug } = useParams();
 
-  const { data: page, isLoading } = useQuery({
+  const { data: page, isLoading, error } = useQuery({
     queryKey: ["page", slug],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pages")
         .select("*")
         .eq("slug", slug)
-        .single();
+        .maybeSingle(); // Changed from single() to maybeSingle()
       
       if (error) throw error;
       return data;
@@ -31,7 +31,10 @@ const Page = () => {
   if (!page) {
     return (
       <div className="container py-12">
-        <p className="text-center text-muted-foreground">Page not found</p>
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-bold text-muted-foreground">Page Not Found</h1>
+          <p className="text-muted-foreground">The page you're looking for doesn't exist yet.</p>
+        </div>
       </div>
     );
   }
