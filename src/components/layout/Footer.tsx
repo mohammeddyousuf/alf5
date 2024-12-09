@@ -71,7 +71,7 @@ export const Footer = () => {
             </a>
             {settings?.instagram_url && (
               <a 
-                href={settings.instagram_url}
+                href={settings.instagram_url.startsWith('http') ? settings.instagram_url : `https://${settings.instagram_url}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
@@ -81,7 +81,7 @@ export const Footer = () => {
             )}
             {settings?.facebook_url && (
               <a 
-                href={settings.facebook_url}
+                href={settings.facebook_url.startsWith('http') ? settings.facebook_url : `https://${settings.facebook_url}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
