@@ -34,7 +34,7 @@ const Shop = () => {
       setSelectedCategory(null);
       setSelectedSubcategory(null);
       setSelectedBrand(null);
-      setPriceRange([0, 1000]);
+      setPriceRange([0, 5000]);
       setSortOrder("default");
     }
   }, [location.state]);
@@ -211,3 +211,5 @@ const Shop = () => {
     </div>
   );
 };
+
+export default Shop;
