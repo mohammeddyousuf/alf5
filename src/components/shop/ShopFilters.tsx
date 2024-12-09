@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -12,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PriceRangeFilter } from "./filters/PriceRangeFilter";
 
 interface ShopFiltersProps {
   priceRange: number[];
@@ -90,7 +90,6 @@ export function ShopFilters({
       
       if (error) throw error;
       
-      // Get unique brands
       const uniqueBrands = Array.from(new Set(data.map(p => p.brand))).filter(Boolean);
       return uniqueBrands;
     },
@@ -173,20 +172,7 @@ export function ShopFilters({
 
         <Separator />
         
-        <div className="space-y-2">
-          <Label>Price Range</Label>
-          <div className="text-sm text-muted-foreground mb-2">
-            ${priceRange[0]} - ${priceRange[1]}
-          </div>
-          <Slider
-            defaultValue={[0, 5000]}
-            max={5000}
-            step={100}
-            value={priceRange}
-            onValueChange={setPriceRange}
-            className="w-full"
-          />
-        </div>
+        <PriceRangeFilter priceRange={priceRange} setPriceRange={setPriceRange} />
 
         <Separator />
 
