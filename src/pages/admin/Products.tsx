@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Download } from "lucide-react";
 import { ProductCard } from "@/components/admin/product/ProductCard";
 import { ProductFilters } from "@/components/admin/product/ProductFilters";
 import { useState } from "react";
@@ -43,12 +42,6 @@ const Products = () => {
     refetch();
   };
 
-  const handleDownload = () => {
-    const currentUrl = window.location.href;
-    const projectUrl = currentUrl.split('/admin/products')[0];
-    window.open(projectUrl, '_blank');
-  };
-
   const filteredProducts = products?.filter((product) => {
     const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
     const isSaleProduct = product.sale_price && product.sale_price < product.price;
@@ -64,19 +57,9 @@ const Products = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Products</h1>
-        <div className="flex gap-4">
-          <Button
-            onClick={handleDownload}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Download className="w-4 h-4" />
-            Download Project
-          </Button>
-          <Button onClick={() => navigate("/admin/products/new")}>
-            Add Product
-          </Button>
-        </div>
+        <Button onClick={() => navigate("/admin/products/new")}>
+          Add Product
+        </Button>
       </div>
 
       <ProductFilters
