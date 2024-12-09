@@ -21,17 +21,16 @@ export const Footer = () => {
     return `https://wa.me/${cleanNumber}`;
   };
 
-  const getSocialMediaUrl = (username: string | null, platform: 'instagram' | 'facebook') => {
-    if (!username) return "#";
-    
-    // Remove any @ symbol if present
-    username = username.replace('@', '');
-    
-    // Return the appropriate social media URL
-    if (platform === 'instagram') {
-      return `https://instagram.com/${username}`;
+  const getSocialMediaUrl = (url: string | null) => {
+    if (!url) return "#";
+    // Ensure we're using the correct URL format for social media
+    if (url.includes('instagram.com')) {
+      return `https://instagram.com/${url.split('instagram.com/')[1] || ''}`;
     }
-    return `https://facebook.com/${username}`;
+    if (url.includes('facebook.com')) {
+      return `https://facebook.com/${url.split('facebook.com/')[1] || ''}`;
+    }
+    return `https://${url}`;
   };
 
   return (
@@ -83,7 +82,7 @@ export const Footer = () => {
             </a>
             {settings?.instagram_url && (
               <a 
-                href={getSocialMediaUrl(settings.instagram_url, 'instagram')}
+                href={getSocialMediaUrl(settings.instagram_url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
@@ -93,7 +92,7 @@ export const Footer = () => {
             )}
             {settings?.facebook_url && (
               <a 
-                href={getSocialMediaUrl(settings.facebook_url, 'facebook')}
+                href={getSocialMediaUrl(settings.facebook_url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
