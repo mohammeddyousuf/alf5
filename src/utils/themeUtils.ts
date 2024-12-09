@@ -37,20 +37,31 @@ export const updateThemeColor = (colorKey: string, value: string) => {
   const sPct = Math.round(s * 100);
   const lPct = Math.round(l * 100);
 
-  // Update the CSS variable
-  if (colorKey === 'primary') {
-    root.style.setProperty('--primary', `${hDeg} ${sPct}% ${lPct}%`);
-    root.style.setProperty('--primary-foreground', '0 0% 98%');
-  } else if (colorKey === 'secondary') {
-    root.style.setProperty('--secondary', `${hDeg} ${sPct}% ${lPct}%`);
-    root.style.setProperty('--secondary-foreground', '0 0% 9%');
-  } else if (colorKey === 'accent') {
-    root.style.setProperty('--accent', `${hDeg} ${sPct}% ${lPct}%`);
-    root.style.setProperty('--accent-foreground', '0 0% 9%');
-  } else if (colorKey === 'background') {
-    root.style.setProperty('--background', `${hDeg} ${sPct}% ${lPct}%`);
-    root.style.setProperty('--foreground', '0 0% 9%');
-  } else if (colorKey === 'foreground') {
-    root.style.setProperty('--foreground', `${hDeg} ${sPct}% ${lPct}%`);
+  // Update the CSS variables based on color key
+  switch (colorKey) {
+    case 'primary':
+      root.style.setProperty('--primary', `${hDeg} ${sPct}% ${lPct}%`);
+      root.style.setProperty('--primary-foreground', '0 0% 98%');
+      break;
+    case 'secondary':
+      root.style.setProperty('--secondary', `${hDeg} ${sPct}% ${lPct}%`);
+      root.style.setProperty('--secondary-foreground', '222.2 47.4% 11.2%');
+      break;
+    case 'accent':
+      root.style.setProperty('--accent', `${hDeg} ${sPct}% ${lPct}%`);
+      root.style.setProperty('--accent-foreground', '222.2 47.4% 11.2%');
+      break;
+    case 'background':
+      root.style.setProperty('--background', `${hDeg} ${sPct}% ${lPct}%`);
+      // Update card, popover, and other background-related variables
+      root.style.setProperty('--card', `${hDeg} ${sPct}% ${lPct}%`);
+      root.style.setProperty('--popover', `${hDeg} ${sPct}% ${lPct}%`);
+      break;
+    case 'foreground':
+      root.style.setProperty('--foreground', `${hDeg} ${sPct}% ${lPct}%`);
+      // Update card-foreground, popover-foreground, and other text-related variables
+      root.style.setProperty('--card-foreground', `${hDeg} ${sPct}% ${lPct}%`);
+      root.style.setProperty('--popover-foreground', `${hDeg} ${sPct}% ${lPct}%`);
+      break;
   }
 };
