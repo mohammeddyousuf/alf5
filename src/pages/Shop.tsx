@@ -14,7 +14,7 @@ const Shop = () => {
   const location = useLocation();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [priceRange, setPriceRange] = useState([0, 5000]); // Updated to 5000
   const [showSaleOnly, setShowSaleOnly] = useState(false);
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(false);
@@ -24,7 +24,6 @@ const Shop = () => {
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  // Handle state from footer navigation
   useEffect(() => {
     if (location.state) {
       const { showFeaturedOnly: featured, showNewArrivalsOnly: newArrivals } = location.state;
@@ -39,7 +38,7 @@ const Shop = () => {
       setSortOrder("default");
     }
   }, [location.state]);
-  
+
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["shop-products", selectedCategory, selectedSubcategory, showFeaturedOnly, showSaleOnly, showNewArrivalsOnly],
     queryFn: async () => {
@@ -48,7 +47,8 @@ const Shop = () => {
         subcategory: selectedSubcategory,
         featured: showFeaturedOnly,
         sale: showSaleOnly,
-        newArrivals: showNewArrivalsOnly
+        newArrivals: showNewArrivalsOnly,
+        priceRange
       });
 
       let query = supabase
@@ -92,6 +92,14 @@ const Shop = () => {
   });
 
   const filteredProducts = products?.filter((product) => {
+    console.log("Filtering product:", {
+      name: product.name,
+      price: product.price,
+      priceRange,
+      meetsPrice: (product.sale_price || product.price) >= priceRange[0] && 
+                  (product.sale_price || product.price) <= priceRange[1]
+    });
+
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (product.description?.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (product.brand?.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -203,5 +211,3 @@ const Shop = () => {
     </div>
   );
 };
-
-export default Shop;

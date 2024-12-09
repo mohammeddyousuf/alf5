@@ -179,9 +179,9 @@ export function ShopFilters({
             ${priceRange[0]} - ${priceRange[1]}
           </div>
           <Slider
-            defaultValue={[0, 1000]}
-            max={1000}
-            step={10}
+            defaultValue={[0, 5000]}
+            max={5000}
+            step={100}
             value={priceRange}
             onValueChange={setPriceRange}
             className="w-full"
