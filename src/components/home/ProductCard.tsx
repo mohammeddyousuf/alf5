@@ -18,7 +18,7 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl }: ProductCar
   };
 
   return (
-    <Link to={`/product/${id}`}>
+    <Link to={`/products/${id}`}>
       <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
         <div className="aspect-square overflow-hidden">
           {imageUrl ? (
