@@ -22,6 +22,7 @@ const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   image_url: z.string().optional(),
+  link_url: z.string().optional(),
 });
 
 type CollectionRow = Database["public"]["Tables"]["collections"]["Row"];
@@ -41,6 +42,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
       name: collection?.name ?? "",
       description: collection?.description ?? "",
       image_url: collection?.image_url ?? "",
+      link_url: collection?.link_url ?? "",
     },
   });
 
@@ -53,6 +55,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
             name: values.name,
             description: values.description,
             image_url: values.image_url,
+            link_url: values.link_url,
           })
           .eq("id", collection.id);
         if (error) throw error;
@@ -65,6 +68,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
           name: values.name,
           description: values.description,
           image_url: values.image_url,
+          link_url: values.link_url,
         });
         if (error) throw error;
         toast({
@@ -108,6 +112,23 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
               <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="link_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Link URL</FormLabel>
+              <FormControl>
+                <Input 
+                  {...field} 
+                  placeholder="/shop?category=example"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
