@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { productFormSchema, type ProductFormData } from "../schema";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { Database } from "@/integrations/supabase/types";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
@@ -15,7 +15,6 @@ interface UseProductFormProps {
 
 export function useProductForm({ product, onSuccess }: UseProductFormProps) {
   const { toast } = useToast();
-  const [isInitialized, setIsInitialized] = useState(false);
   
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema),
@@ -34,7 +33,7 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
 
   // Load product data into form when available
   useEffect(() => {
-    if (product && !isInitialized) {
+    if (product) {
       console.log("[useProductForm] Loading existing product:", product);
       
       const formData = {
@@ -51,9 +50,8 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
       
       console.log("[useProductForm] Setting form data:", formData);
       form.reset(formData);
-      setIsInitialized(true);
     }
-  }, [product, form, isInitialized]);
+  }, [product, form]);
 
   const onSubmit = async (values: ProductFormData) => {
     try {
@@ -106,8 +104,17 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
         });
 
         // Only reset form for new products
-        form.reset();
-        setIsInitialized(false);
+        form.reset({
+          name: "",
+          description: "",
+          price: 0,
+          sale_price: null,
+          images: [],
+          video_urls: [],
+          status: "draft",
+          category_id: null,
+          subcategory_id: null,
+        });
       }
       
       onSuccess?.();

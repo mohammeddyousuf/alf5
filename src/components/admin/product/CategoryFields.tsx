@@ -11,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect } from "react";
 
 type FormData = z.infer<typeof productFormSchema>;
 
@@ -50,21 +49,16 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
     enabled: Boolean(form.watch("category_id")),
   });
 
-  // Reset subcategory only when category changes and subcategory doesn't belong to new category
-  useEffect(() => {
-    const categoryId = form.watch("category_id");
-    const currentSubcategoryId = form.watch("subcategory_id");
-    
-    if (categoryId && currentSubcategoryId) {
-      const subcategoryBelongsToCategory = subcategories?.some(
-        sub => sub.id === currentSubcategoryId && sub.category_id === categoryId
-      );
-      
-      if (!subcategoryBelongsToCategory) {
-        form.setValue("subcategory_id", null);
-      }
+  const handleCategoryChange = (categoryId: string) => {
+    form.setValue("category_id", categoryId);
+    // Only reset subcategory if the new category has no subcategories
+    const hasValidSubcategory = subcategories?.some(
+      sub => sub.category_id === categoryId && sub.id === form.watch("subcategory_id")
+    );
+    if (!hasValidSubcategory) {
+      form.setValue("subcategory_id", null);
     }
-  }, [form.watch("category_id"), subcategories]);
+  };
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -75,7 +69,7 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
           <FormItem>
             <FormLabel>Category</FormLabel>
             <Select
-              onValueChange={field.onChange}
+              onValueChange={handleCategoryChange}
               value={field.value || undefined}
             >
               <FormControl>
