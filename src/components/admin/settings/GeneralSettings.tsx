@@ -51,12 +51,11 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
     }
   };
 
-  const ensureValidUrl = (url: string) => {
-    if (!url) return url;
-    // Remove any existing protocol
+  const formatSocialUrl = (url: string) => {
+    if (!url) return "";
+    // Remove any existing protocol and www.
     url = url.replace(/^(https?:\/\/)?(www\.)?/, '');
-    // Add https:// protocol
-    return `https://${url}`;
+    return url;
   };
 
   const handleSocialMediaUpdate = async () => {
@@ -64,8 +63,8 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       const { error } = await supabase
         .from('settings')
         .update({
-          instagram_url: ensureValidUrl(instagramUrl),
-          facebook_url: ensureValidUrl(facebookUrl),
+          instagram_url: formatSocialUrl(instagramUrl),
+          facebook_url: formatSocialUrl(facebookUrl),
         })
         .eq('id', settings?.id);
 

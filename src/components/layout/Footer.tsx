@@ -17,9 +17,13 @@ export const Footer = () => {
 
   const getWhatsAppLink = () => {
     if (!settings?.whatsapp_number) return "#";
-    // Remove any non-numeric characters from the WhatsApp number
     const cleanNumber = settings.whatsapp_number.replace(/\D/g, '');
     return `https://wa.me/${cleanNumber}`;
+  };
+
+  const getSocialMediaUrl = (url: string | null) => {
+    if (!url) return "#";
+    return `https://www.${url}`;
   };
 
   return (
@@ -71,7 +75,7 @@ export const Footer = () => {
             </a>
             {settings?.instagram_url && (
               <a 
-                href={settings.instagram_url.startsWith('http') ? settings.instagram_url : `https://${settings.instagram_url}`}
+                href={getSocialMediaUrl(settings.instagram_url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
@@ -81,7 +85,7 @@ export const Footer = () => {
             )}
             {settings?.facebook_url && (
               <a 
-                href={settings.facebook_url.startsWith('http') ? settings.facebook_url : `https://${settings.facebook_url}`}
+                href={getSocialMediaUrl(settings.facebook_url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
