@@ -31,6 +31,27 @@ export function MediaFields({ form }: MediaFieldsProps) {
   const [isDeleting, setIsDeleting] = useState<Record<number, boolean>>({});
   const [imageToDelete, setImageToDelete] = useState<{ index: number; url: string } | null>(null);
 
+  const generateUniqueFileName = async (originalFileName: string): Promise<string> => {
+    const extension = originalFileName.split('.').pop() || '';
+    const baseName = originalFileName.slice(0, -(extension.length + 1));
+    let fileName = `${baseName}.${extension}`;
+    let counter = 1;
+
+    // Check if file exists
+    const { data } = await supabase.storage
+      .from("product-images")
+      .list();
+
+    const existingFiles = data?.map(file => file.name) || [];
+
+    while (existingFiles.includes(fileName)) {
+      fileName = `${baseName}_${counter}.${extension}`;
+      counter++;
+    }
+
+    return fileName;
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
@@ -41,13 +62,13 @@ export function MediaFields({ form }: MediaFieldsProps) {
     try {
       const newImages = await Promise.all(
         Array.from(files).map(async (file) => {
-          // Use the original filename, but ensure it's URL-safe
-          const fileName = encodeURIComponent(file.name);
+          const fileName = await generateUniqueFileName(file.name);
+          console.log("Generated unique filename:", fileName);
 
           const { error: uploadError, data } = await supabase.storage
             .from("product-images")
             .upload(fileName, file, {
-              upsert: true // Allow overwriting if file exists
+              upsert: false // Changed to false since we're handling duplicates
             });
 
           if (uploadError) throw uploadError;
