@@ -53,8 +53,18 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
 
   const formatSocialUrl = (url: string) => {
     if (!url) return "";
-    // Remove any existing protocol and www.
-    url = url.replace(/^(https?:\/\/)?(www\.)?/, '');
+    
+    // Remove any existing protocol, www, and trailing slashes
+    url = url.trim().replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/$/, '');
+    
+    // Extract username/handle if it exists
+    if (url.includes('instagram.com/')) {
+      return url.split('instagram.com/')[1];
+    }
+    if (url.includes('facebook.com/')) {
+      return url.split('facebook.com/')[1];
+    }
+    
     return url;
   };
 
@@ -141,21 +151,21 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Social Media Links</h3>
         <div className="space-y-2">
-          <Label htmlFor="instagramUrl">Instagram URL</Label>
+          <Label htmlFor="instagramUrl">Instagram Username</Label>
           <Input
             id="instagramUrl"
             value={instagramUrl}
             onChange={(e) => setInstagramUrl(e.target.value)}
-            placeholder="instagram.com/your-profile"
+            placeholder="your.username (without @)"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="facebookUrl">Facebook URL</Label>
+          <Label htmlFor="facebookUrl">Facebook Username</Label>
           <Input
             id="facebookUrl"
             value={facebookUrl}
             onChange={(e) => setFacebookUrl(e.target.value)}
-            placeholder="facebook.com/your-profile"
+            placeholder="your.username"
           />
         </div>
         <Button onClick={handleSocialMediaUpdate}>Save Social Media Links</Button>

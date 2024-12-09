@@ -23,7 +23,14 @@ export const Footer = () => {
 
   const getSocialMediaUrl = (url: string | null) => {
     if (!url) return "#";
-    return `https://www.${url}`;
+    // Ensure we're using the correct URL format for social media
+    if (url.includes('instagram.com')) {
+      return `https://instagram.com/${url.split('instagram.com/')[1] || ''}`;
+    }
+    if (url.includes('facebook.com')) {
+      return `https://facebook.com/${url.split('facebook.com/')[1] || ''}`;
+    }
+    return `https://${url}`;
   };
 
   return (
