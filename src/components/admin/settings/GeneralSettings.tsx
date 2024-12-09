@@ -54,18 +54,8 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
   const formatSocialUrl = (url: string) => {
     if (!url) return "";
     
-    // Remove any existing protocol, www, and trailing slashes
-    url = url.trim().replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/$/, '');
-    
-    // Extract username/handle if it exists
-    if (url.includes('instagram.com/')) {
-      return url.split('instagram.com/')[1];
-    }
-    if (url.includes('facebook.com/')) {
-      return url.split('facebook.com/')[1];
-    }
-    
-    return url;
+    // Remove any @ symbol, spaces, and other unnecessary characters
+    return url.trim().replace('@', '').replace(/^(https?:\/\/)?(www\.)?([^\/]+)\//, '');
   };
 
   const handleSocialMediaUpdate = async () => {
@@ -156,7 +146,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
             id="instagramUrl"
             value={instagramUrl}
             onChange={(e) => setInstagramUrl(e.target.value)}
-            placeholder="your.username (without @)"
+            placeholder="username (without @)"
           />
         </div>
         <div className="space-y-2">
@@ -165,7 +155,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
             id="facebookUrl"
             value={facebookUrl}
             onChange={(e) => setFacebookUrl(e.target.value)}
-            placeholder="your.username"
+            placeholder="username"
           />
         </div>
         <Button onClick={handleSocialMediaUpdate}>Save Social Media Links</Button>
