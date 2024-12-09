@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tables } from "@/integrations/supabase/types";
+import { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -25,8 +25,10 @@ const formSchema = z.object({
   video_urls: z.array(z.string()).optional(),
 });
 
+type ProductRow = Database["public"]["Tables"]["products"]["Row"];
+
 interface ProductFormProps {
-  product?: Tables["products"]["Row"];
+  product?: ProductRow;
   onSuccess?: () => void;
 }
 
@@ -46,10 +48,19 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      const submitData = {
+        name: values.name,
+        description: values.description,
+        price: values.price,
+        sale_price: values.sale_price,
+        images: values.images,
+        video_urls: values.video_urls,
+      };
+
       if (product) {
         const { error } = await supabase
           .from("products")
-          .update(values)
+          .update(submitData)
           .eq("id", product.id);
         if (error) throw error;
         toast({
@@ -57,7 +68,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
           description: "Product updated successfully",
         });
       } else {
-        const { error } = await supabase.from("products").insert(values);
+        const { error } = await supabase.from("products").insert(submitData);
         if (error) throw error;
         toast({
           title: "Success",

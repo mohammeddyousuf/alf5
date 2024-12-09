@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { Tables } from "@/integrations/supabase/types";
+import { Database } from "@/integrations/supabase/types";
 import { CollectionForm } from "@/components/admin/CollectionForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+
+type CollectionRow = Database["public"]["Tables"]["collections"]["Row"];
 
 export default function Collections() {
   const [search, setSearch] = useState("");
@@ -21,7 +23,7 @@ export default function Collections() {
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as Tables["collections"]["Row"][];
+      return data as CollectionRow[];
     },
   });
 

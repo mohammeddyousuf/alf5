@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Tables } from "@/integrations/supabase/types";
+import { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -22,8 +22,10 @@ const formSchema = z.object({
   image_url: z.string().optional(),
 });
 
+type CollectionRow = Database["public"]["Tables"]["collections"]["Row"];
+
 interface CollectionFormProps {
-  collection?: Tables["collections"]["Row"];
+  collection?: CollectionRow;
   onSuccess?: () => void;
 }
 
@@ -43,7 +45,11 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
       if (collection) {
         const { error } = await supabase
           .from("collections")
-          .update(values)
+          .update({
+            name: values.name,
+            description: values.description,
+            image_url: values.image_url,
+          })
           .eq("id", collection.id);
         if (error) throw error;
         toast({
@@ -51,7 +57,11 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
           description: "Collection updated successfully",
         });
       } else {
-        const { error } = await supabase.from("collections").insert(values);
+        const { error } = await supabase.from("collections").insert({
+          name: values.name,
+          description: values.description,
+          image_url: values.image_url,
+        });
         if (error) throw error;
         toast({
           title: "Success",
