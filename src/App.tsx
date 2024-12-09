@@ -9,6 +9,7 @@ import Page from "@/pages/Page";
 import Admin from "@/pages/Admin";
 import Collections from "@/pages/admin/Collections";
 import Products from "@/pages/admin/Products";
+import NewProduct from "@/pages/admin/products/New";
 import Sliders from "@/pages/admin/Sliders";
 import News from "@/pages/admin/News";
 import Pages from "@/pages/admin/Pages";
@@ -67,6 +68,7 @@ function App() {
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/collections" element={<Collections />} />
             <Route path="/admin/products" element={<Products />} />
+            <Route path="/admin/products/new" element={<NewProduct />} />
             <Route path="/admin/sliders" element={<Sliders />} />
             <Route path="/admin/news" element={<News />} />
             <Route path="/admin/pages" element={<Pages />} />
