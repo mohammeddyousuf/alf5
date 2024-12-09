@@ -23,8 +23,8 @@ export const Footer = () => {
 
   const getSocialMediaUrl = (platform: 'instagram' | 'facebook', username: string | null) => {
     if (!username) return "#";
-    // Remove any @ symbol and clean the username
-    const cleanUsername = username.replace('@', '').replace(/^(https?:\/\/)?(www\.)?(instagram\.com|facebook\.com)?\//, '');
+    // Remove any @ symbol if present
+    const cleanUsername = username.replace('@', '');
     
     switch (platform) {
       case 'instagram':
