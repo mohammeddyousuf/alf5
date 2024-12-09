@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { ImagePlus, Loader2 } from "lucide-react";
 
 interface SliderFormProps {
   slider?: any;
@@ -15,6 +16,7 @@ interface SliderFormProps {
 
 export const SliderForm = ({ slider, onSuccess }: SliderFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -26,6 +28,42 @@ export const SliderForm = ({ slider, onSuccess }: SliderFormProps) => {
     active: slider?.active ?? true,
     order_index: slider?.order_index || 0,
   });
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const fileName = `${crypto.randomUUID()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(fileName, file, {
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(fileName);
+
+      setFormData(prev => ({ ...prev, image_url: publicUrl }));
+      
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        description: error.message,
+      });
+    } finally {
+      setIsUploading(false);
+      event.target.value = "";
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,13 +121,35 @@ export const SliderForm = ({ slider, onSuccess }: SliderFormProps) => {
       </div>
 
       <div>
-        <Label htmlFor="image_url">Image URL</Label>
-        <Input
-          id="image_url"
-          value={formData.image_url}
-          onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-          required
-        />
+        <Label>Image</Label>
+        <div className="space-y-4">
+          {formData.image_url && (
+            <img
+              src={formData.image_url}
+              alt="Slider preview"
+              className="w-40 h-40 object-cover rounded-lg"
+            />
+          )}
+          <div className="relative">
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              disabled={isUploading}
+            />
+            <div className="h-10 w-full border-2 border-dashed rounded-lg flex items-center justify-center">
+              {isUploading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <div className="flex items-center gap-2">
+                  <ImagePlus className="h-5 w-5" />
+                  <span>Upload Image</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       <div>
