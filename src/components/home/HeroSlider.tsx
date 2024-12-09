@@ -34,7 +34,7 @@ export const HeroSlider = () => {
 
   if (isLoading) {
     return (
-      <div className="h-[300px] md:h-[500px] flex items-center justify-center bg-gray-100">
+      <div className="h-[300px] md:h-[500px] flex items-center justify-center bg-gray-100 w-full">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
@@ -43,9 +43,9 @@ export const HeroSlider = () => {
   if (!slides?.length) return null;
 
   return (
-    <div className="relative h-[300px] md:h-[500px] overflow-hidden">
+    <div className="relative h-[300px] md:h-[500px] overflow-hidden w-full">
       <div
-        className="flex h-full transition-transform duration-500 ease-out"
+        className="flex h-full transition-transform duration-500 ease-out w-full"
         style={{ transform: `translateX(-${currentSlide * 100}%)` }}
       >
         {slides.map((slide) => (
@@ -59,7 +59,7 @@ export const HeroSlider = () => {
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-center">
-              <div className="text-white">
+              <div className="text-white px-4">
                 <h2 className="text-4xl md:text-6xl font-bold mb-4">{slide.title}</h2>
                 {slide.description && (
                   <p className="text-xl md:text-2xl mb-6">{slide.description}</p>
