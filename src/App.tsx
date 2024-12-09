@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import CollectionDetail from "./pages/CollectionDetail";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,16 @@ const App = () => {
                   element={
                     isAuthenticated ? (
                       <Index />
+                    ) : (
+                      <Navigate to="/auth" replace />
+                    )
+                  }
+                />
+                <Route
+                  path="/collection/:id"
+                  element={
+                    isAuthenticated ? (
+                      <CollectionDetail />
                     ) : (
                       <Navigate to="/auth" replace />
                     )
