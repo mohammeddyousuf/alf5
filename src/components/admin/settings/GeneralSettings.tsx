@@ -54,8 +54,8 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
   const formatSocialUrl = (url: string) => {
     if (!url) return "";
     
-    // Remove any @ symbol, spaces, and other unnecessary characters
-    return url.trim().replace('@', '').replace(/^(https?:\/\/)?(www\.)?([^\/]+)\//, '');
+    // Remove any @ symbol, spaces, and clean up the input
+    return url.trim().replace('@', '').replace(/\s+/g, '');
   };
 
   const handleSocialMediaUpdate = async () => {
