@@ -47,10 +47,9 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
       if (error) throw error;
       return data;
     },
-    enabled: Boolean(form.watch("category_id")), // Only run query when category_id exists and is not empty
+    enabled: Boolean(form.watch("category_id")),
   });
 
-  // Reset subcategory when category changes
   useEffect(() => {
     form.setValue("subcategory_id", null);
   }, [form.watch("category_id")]);
@@ -68,7 +67,7 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
               value={field.value || undefined}
             >
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger className="w-full bg-white">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
               </FormControl>
@@ -97,7 +96,7 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
               disabled={!form.watch("category_id")}
             >
               <FormControl>
-                <SelectTrigger>
+                <SelectTrigger className="w-full bg-white">
                   <SelectValue placeholder="Select subcategory" />
                 </SelectTrigger>
               </FormControl>
