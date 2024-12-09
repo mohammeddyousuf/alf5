@@ -31,10 +31,10 @@ export const Footer = () => {
           </div>
           <div className="flex flex-col gap-2">
             <h3 className="text-lg font-semibold">Legal</h3>
-            <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground">
+            <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground">
               Privacy Policy
             </Link>
-            <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground">
+            <Link to="/terms-of-service" className="text-sm text-muted-foreground hover:text-foreground">
               Terms of Service
             </Link>
           </div>
