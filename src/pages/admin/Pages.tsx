@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Pages = () => {
@@ -34,7 +34,7 @@ const Pages = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Pages</h1>
         <Button onClick={() => navigate("/admin/pages/new")}>
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4" />
           New Page
         </Button>
       </div>
@@ -47,7 +47,11 @@ const Pages = () => {
                 <h2 className="text-xl font-semibold">{page.title}</h2>
                 <p className="text-sm text-muted-foreground">/{page.slug}</p>
               </div>
-              <Button variant="outline" onClick={() => navigate(`/admin/pages/${page.id}`)}>
+              <Button 
+                variant="default" 
+                onClick={() => navigate(`/admin/pages/${page.id}`)}
+              >
+                <Pencil className="h-4 w-4 mr-2" />
                 Edit
               </Button>
             </div>
