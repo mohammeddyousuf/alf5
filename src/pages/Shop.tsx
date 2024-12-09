@@ -21,12 +21,14 @@ const Shop = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   
   const { data: products, isLoading, error } = useQuery({
-    queryKey: ["shop-products", selectedCategory, selectedSubcategory, showFeaturedOnly],
+    queryKey: ["shop-products", selectedCategory, selectedSubcategory, showFeaturedOnly, showSaleOnly, showNewArrivalsOnly],
     queryFn: async () => {
       console.log("Fetching products with filters:", {
         selectedCategory,
         selectedSubcategory,
-        showFeaturedOnly
+        showFeaturedOnly,
+        showSaleOnly,
+        showNewArrivalsOnly
       });
 
       let query = supabase
@@ -44,7 +46,7 @@ const Shop = () => {
         query = query.eq("subcategory_id", selectedSubcategory);
       }
 
-      // Apply featured filter - make sure it's a boolean comparison
+      // Apply featured filter
       if (showFeaturedOnly) {
         query = query.eq("featured", true);
       }
