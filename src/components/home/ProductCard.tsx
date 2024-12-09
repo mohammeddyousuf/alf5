@@ -18,8 +18,12 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
     }).format(amount);
   };
 
+  const formatUrlSlug = (name: string) => {
+    return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  };
+
   return (
-    <Link to={`/products/${id}`}>
+    <Link to={`/products/${formatUrlSlug(name)}-${id}`}>
       <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
         <div className="aspect-square overflow-hidden relative">
           {imageUrl ? (

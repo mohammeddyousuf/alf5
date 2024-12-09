@@ -15,8 +15,11 @@ import { ProductMedia } from "@/components/product/ProductMedia";
 import { ProductInfo } from "@/components/product/ProductInfo";
 
 const ProductDetail = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const { toast } = useToast();
+
+  // Extract the ID from the slug (last part after the last dash)
+  const id = slug?.split('-').pop();
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -38,6 +41,8 @@ const ProductDetail = () => {
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
+      if (!id) throw new Error("Product ID not found");
+      
       const { data, error } = await supabase
         .from("products")
         .select("*")
@@ -47,6 +52,7 @@ const ProductDetail = () => {
       if (error) throw error;
       return data;
     },
+    enabled: !!id,
   });
 
   const handleOrderSubmit = (formData: any) => {
