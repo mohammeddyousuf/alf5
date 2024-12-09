@@ -49,10 +49,32 @@ export default function Products() {
     }
   };
 
+  const handleStatusChange = async (id: string, currentStatus: string | null) => {
+    const newStatus = currentStatus === "draft" ? "published" : "draft";
+    const { error } = await supabase
+      .from("products")
+      .update({ status: newStatus })
+      .eq("id", id);
+    
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: `Product ${newStatus === "published" ? "published" : "moved to draft"}`,
+      });
+      refetch();
+    }
+  };
+
   const getStatusColor = (status: string | null) => {
     switch (status) {
       case "published":
-        return "success";
+        return "default";
       case "draft":
         return "secondary";
       case "archived":
@@ -104,7 +126,15 @@ export default function Products() {
             </div>
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-semibold">{product.name}</h3>
-              <Badge variant={getStatusColor(product.status)}>{product.status || 'draft'}</Badge>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => handleStatusChange(product.id, product.status)}
+              >
+                <Badge variant={getStatusColor(product.status)}>
+                  {product.status || 'draft'}
+                </Badge>
+              </Button>
             </div>
             <p className="text-sm text-muted-foreground mb-4">
               ${product.price}
