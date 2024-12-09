@@ -63,13 +63,16 @@ export const PageForm = ({ initialData }: PageFormProps) => {
 
         if (error) throw error;
       } else {
-        // Generate a new UUID for the page
+        const newPage = {
+          ...values,
+          id: crypto.randomUUID(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
         const { error } = await supabase
           .from("pages")
-          .insert({
-            ...values,
-            id: crypto.randomUUID(),
-          });
+          .insert(newPage);
 
         if (error) throw error;
       }
