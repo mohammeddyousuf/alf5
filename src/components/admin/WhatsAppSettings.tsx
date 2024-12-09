@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -22,12 +22,16 @@ export const WhatsAppSettings = () => {
         .select("*")
         .single();
       if (error) throw error;
-      if (data) {
-        setWhatsappNumber(data.whatsapp_number);
-      }
       return data;
     },
   });
+
+  // Update state when settings change
+  useEffect(() => {
+    if (settings?.whatsapp_number) {
+      setWhatsappNumber(settings.whatsapp_number);
+    }
+  }, [settings]);
 
   const handleUpdateWhatsApp = async () => {
     setIsUpdating(true);
