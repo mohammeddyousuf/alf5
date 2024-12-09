@@ -65,7 +65,6 @@ export function OrderDialog({
   });
 
   const handleSubmit = (data: OrderFormData) => {
-    // Format the message with line breaks
     const formattedData = {
       ...data,
       productName,
@@ -78,7 +77,7 @@ export function OrderDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Place Order</DialogTitle>
+          <DialogTitle>Contact on WhatsApp</DialogTitle>
         </DialogHeader>
 
         <div className="mb-4">
@@ -168,7 +167,7 @@ export function OrderDialog({
             />
 
             <Button type="submit" className="w-full">
-              Place Order
+              Contact on WhatsApp
             </Button>
           </form>
         </Form>
