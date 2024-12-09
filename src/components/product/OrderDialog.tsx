@@ -41,6 +41,13 @@ const formSchema = z.object({
 
 type OrderFormData = z.infer<typeof formSchema>;
 
+// Extended type for the onSubmit callback
+interface ExtendedOrderFormData extends OrderFormData {
+  productName: string;
+  productBrand?: string | null;
+  productPrice: string;
+}
+
 interface OrderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -48,7 +55,7 @@ interface OrderDialogProps {
   productBrand: string | null;
   productPrice: number;
   productId: string;
-  onSubmit: (data: OrderFormData) => void;
+  onSubmit: (data: ExtendedOrderFormData) => void;
 }
 
 export function OrderDialog({
