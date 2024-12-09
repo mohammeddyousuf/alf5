@@ -11,6 +11,7 @@ export const Footer = () => {
         .select("*")
         .single();
       if (error) throw error;
+      console.log("Footer settings:", data); // Added for debugging
       return data;
     },
   });
