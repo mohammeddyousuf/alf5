@@ -41,10 +41,15 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
   const onSubmit = async (values: ProductFormData) => {
     try {
+      // Ensure required fields are present
+      if (!values.name || typeof values.price !== 'number') {
+        throw new Error('Name and price are required');
+      }
+
       const data = {
         ...values,
         status: product?.status ?? 'draft',
-      };
+      } as const;
 
       if (product) {
         const { error } = await supabase
