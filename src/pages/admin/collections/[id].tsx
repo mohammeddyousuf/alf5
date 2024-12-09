@@ -40,7 +40,7 @@ const EditCollection = () => {
   return (
     <div className="container py-12">
       <h1 className="text-3xl font-bold mb-8">Edit Collection</h1>
-      <CollectionForm initialData={collection} />
+      <CollectionForm collection={collection} />
     </div>
   );
 };

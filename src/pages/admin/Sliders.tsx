@@ -55,7 +55,7 @@ const Sliders = () => {
               <DialogTitle>{selectedSlider ? "Edit Slider" : "Add New Slider"}</DialogTitle>
             </DialogHeader>
             <SliderForm 
-              slider={selectedSlider} 
+              initialData={selectedSlider} 
               onSuccess={() => setOpen(false)} 
             />
           </DialogContent>

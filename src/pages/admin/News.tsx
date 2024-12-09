@@ -55,7 +55,7 @@ const News = () => {
               <DialogTitle>{selectedNews ? "Edit News" : "Add News Item"}</DialogTitle>
             </DialogHeader>
             <NewsForm 
-              news={selectedNews} 
+              initialData={selectedNews} 
               onSuccess={() => setOpen(false)} 
             />
           </DialogContent>
