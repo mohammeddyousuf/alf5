@@ -14,9 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { ImagePlus, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { ImageUploadField } from "./shared/ImageUploadField";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -43,45 +43,6 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
       image_url: collection?.image_url ?? "",
     },
   });
-
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    try {
-      // Keep the original filename but ensure it's URL-safe
-      const fileName = encodeURIComponent(file.name);
-
-      const { error: uploadError } = await supabase.storage
-        .from("product-images")
-        .upload(fileName, file, {
-          upsert: true,
-        });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from("product-images")
-        .getPublicUrl(fileName);
-
-      form.setValue("image_url", publicUrl);
-      
-      toast({
-        title: "Success",
-        description: "Image uploaded successfully",
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    } finally {
-      setIsUploading(false);
-      event.target.value = "";
-    }
-  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
@@ -159,34 +120,12 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Image</FormLabel>
-              <div className="space-y-4">
-                {field.value && (
-                  <img
-                    src={field.value}
-                    alt="Collection preview"
-                    className="w-40 h-40 object-cover rounded-lg"
-                  />
-                )}
-                <div className="relative">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    disabled={isUploading}
-                  />
-                  <div className="h-10 w-full border-2 border-dashed rounded-lg flex items-center justify-center">
-                    {isUploading ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <ImagePlus className="h-5 w-5" />
-                        <span>Upload Image</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <ImageUploadField
+                imageUrl={field.value}
+                onImageChange={(url) => form.setValue("image_url", url || "")}
+                isUploading={isUploading}
+                setIsUploading={setIsUploading}
+              />
               <FormMessage />
             </FormItem>
           )}

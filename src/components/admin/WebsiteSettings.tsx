@@ -5,8 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { ImageUploadField } from "./shared/ImageUploadField";
 
 export const WebsiteSettings = () => {
   const { toast } = useToast();
@@ -28,92 +28,6 @@ export const WebsiteSettings = () => {
       return data;
     },
   });
-
-  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      setIsUploading(true);
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      const fileExt = file.name.split('.').pop();
-      const filePath = `${Date.now()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-      const { error: updateError } = await supabase
-        .from('settings')
-        .update({ logo_url: publicUrl })
-        .eq('id', settings?.id);
-
-      if (updateError) throw updateError;
-
-      await refetch();
-      toast({
-        title: "Success",
-        description: "Logo uploaded successfully",
-      });
-    } catch (error) {
-      console.error('Error uploading logo:', error);
-      toast({
-        title: "Error",
-        description: "Failed to upload logo",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleFaviconUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      setIsUploading(true);
-      const file = event.target.files?.[0];
-      if (!file) return;
-
-      const fileExt = file.name.split('.').pop();
-      const filePath = `favicon-${Date.now()}.${fileExt}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('product-images')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('product-images')
-        .getPublicUrl(filePath);
-
-      const { error: updateError } = await supabase
-        .from('settings')
-        .update({ favicon_url: publicUrl })
-        .eq('id', settings?.id);
-
-      if (updateError) throw updateError;
-
-      await refetch();
-      toast({
-        title: "Success",
-        description: "Favicon uploaded successfully",
-      });
-    } catch (error) {
-      console.error('Error uploading favicon:', error);
-      toast({
-        title: "Error",
-        description: "Failed to upload favicon",
-        variant: "destructive",
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
 
   const handleWebsiteNameUpdate = async () => {
     try {
@@ -139,6 +53,44 @@ export const WebsiteSettings = () => {
     }
   };
 
+  const handleLogoChange = async (url: string | null) => {
+    try {
+      const { error } = await supabase
+        .from('settings')
+        .update({ logo_url: url })
+        .eq('id', settings?.id);
+
+      if (error) throw error;
+      await refetch();
+    } catch (error) {
+      console.error('Error updating logo:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update logo",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleFaviconChange = async (url: string | null) => {
+    try {
+      const { error } = await supabase
+        .from('settings')
+        .update({ favicon_url: url })
+        .eq('id', settings?.id);
+
+      if (error) throw error;
+      await refetch();
+    } catch (error) {
+      console.error('Error updating favicon:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update favicon",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card className="p-6">
       <h2 className="text-xl font-semibold mb-4">Website Settings</h2>
@@ -159,42 +111,23 @@ export const WebsiteSettings = () => {
 
         <div className="space-y-2">
           <Label htmlFor="logo">Logo</Label>
-          <div className="flex items-center gap-4">
-            {settings?.logo_url && (
-              <img src={settings.logo_url} alt="Current logo" className="h-8 w-auto" />
-            )}
-            <Input
-              id="logo"
-              type="file"
-              accept="image/*"
-              onChange={handleLogoUpload}
-              disabled={isUploading}
-            />
-          </div>
+          <ImageUploadField
+            imageUrl={settings?.logo_url}
+            onImageChange={handleLogoChange}
+            isUploading={isUploading}
+            setIsUploading={setIsUploading}
+          />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="favicon">Favicon (ICO)</Label>
-          <div className="flex items-center gap-4">
-            {settings?.favicon_url && (
-              <img src={settings.favicon_url} alt="Current favicon" className="h-8 w-auto" />
-            )}
-            <Input
-              id="favicon"
-              type="file"
-              accept=".ico,image/*"
-              onChange={handleFaviconUpload}
-              disabled={isUploading}
-            />
-          </div>
+          <ImageUploadField
+            imageUrl={settings?.favicon_url}
+            onImageChange={handleFaviconChange}
+            isUploading={isUploading}
+            setIsUploading={setIsUploading}
+          />
         </div>
-
-        {isUploading && (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Uploading...</span>
-          </div>
-        )}
       </div>
     </Card>
   );
