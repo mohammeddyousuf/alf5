@@ -18,8 +18,8 @@ const ProductDetail = () => {
   const { slug } = useParams();
   const { toast } = useToast();
 
-  // Extract the ID from the slug (last part after the last dash)
-  const id = slug?.split('-').pop();
+  // Extract the UUID from the slug (matches the full UUID pattern)
+  const id = slug?.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i)?.[0];
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
