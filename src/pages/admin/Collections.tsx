@@ -7,7 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 import { CollectionForm } from "@/components/admin/CollectionForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+import { Pencil } from "lucide-react";
 
 type CollectionRow = Database["public"]["Tables"]["collections"]["Row"];
 
@@ -97,7 +98,10 @@ export default function Collections() {
             <div className="flex gap-2">
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="flex-1">Edit</Button>
+                  <Button variant="default" className="flex-1">
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
                 </DialogTrigger>
                 <DialogContent className="max-h-[90vh] overflow-y-auto p-6">
                   <DialogHeader>
