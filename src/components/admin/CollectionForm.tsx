@@ -44,7 +44,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
       description: collection?.description ?? "",
       image_url: collection?.image_url ?? "",
       link_url: collection?.link_url ?? "",
-      button_text: collection?.button_text ?? "",
+      button_text: collection?.button_text ?? "View Collection", // Default text
     },
   });
 
@@ -58,7 +58,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
             description: values.description,
             image_url: values.image_url,
             link_url: values.link_url,
-            button_text: values.button_text,
+            button_text: values.button_text || "View Collection", // Ensure default if empty
           })
           .eq("id", collection.id);
         if (error) throw error;
@@ -72,7 +72,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
           description: values.description,
           image_url: values.image_url,
           link_url: values.link_url,
-          button_text: values.button_text,
+          button_text: values.button_text || "View Collection", // Ensure default if empty
         });
         if (error) throw error;
         toast({
@@ -144,7 +144,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
           name="button_text"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Button Text</FormLabel>
+              <FormLabel>Button Label</FormLabel>
               <FormControl>
                 <Input 
                   {...field} 
