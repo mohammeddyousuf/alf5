@@ -132,6 +132,7 @@ export default function Orders() {
               <TableHead>Product</TableHead>
               <TableHead>Customer</TableHead>
               <TableHead>Contact</TableHead>
+              <TableHead>Address</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Payment</TableHead>
             </TableRow>
@@ -157,6 +158,11 @@ export default function Orders() {
                   <div className="text-sm">
                     <div>{order.customer_email}</div>
                     <div>{order.customer_mobile}</div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm max-w-[200px] break-words">
+                    {order.customer_address}
                   </div>
                 </TableCell>
                 <TableCell>${order.product_price}</TableCell>
