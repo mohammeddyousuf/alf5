@@ -41,7 +41,6 @@ const AuthPage = () => {
             }
           },
         }}
-        disableSignUp={true}
       />
     </div>
   );
