@@ -18,8 +18,8 @@ const ProductDetail = () => {
   const { slug } = useParams();
   const { toast } = useToast();
 
-  // Extract the UUID from the slug (matches the full UUID pattern)
-  const id = slug?.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i)?.[0];
+  // Extract the short ID from the slug (last part after the last dash)
+  const shortId = slug?.split('-').pop();
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -39,20 +39,21 @@ const ProductDetail = () => {
   });
 
   const { data: product, isLoading } = useQuery({
-    queryKey: ["product", id],
+    queryKey: ["product", shortId],
     queryFn: async () => {
-      if (!id) throw new Error("Product ID not found");
+      if (!shortId) throw new Error("Product ID not found");
       
+      // Use ilike to match the first part of the UUID
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .eq("id", id)
+        .ilike('id', `${shortId}%`)
         .single();
       
       if (error) throw error;
       return data;
     },
-    enabled: !!id,
+    enabled: !!shortId,
   });
 
   const handleOrderSubmit = (formData: any) => {

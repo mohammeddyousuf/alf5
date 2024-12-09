@@ -22,8 +22,11 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   };
 
+  // Only use the first 8 characters of the UUID
+  const shortId = id.split('-')[0];
+
   return (
-    <Link to={`/products/${formatUrlSlug(name)}-${id}`}>
+    <Link to={`/products/${formatUrlSlug(name)}-${shortId}`}>
       <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
         <div className="aspect-square overflow-hidden relative">
           {imageUrl ? (
