@@ -51,35 +51,13 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
     }
   };
 
-  const formatSocialUrl = (url: string, platform: 'instagram' | 'facebook') => {
-    if (!url) return "";
-    
-    // Remove any @ symbol and spaces
-    let username = url.trim().replace('@', '');
-    
-    // Remove http://, https://, and www. if present
-    username = username.replace(/^(https?:\/\/)?(www\.)?/, '');
-    
-    // Remove platform domain if present
-    username = username.replace(`${platform}.com/`, '').replace(`${platform}.com`, '');
-    
-    // Remove any trailing slashes
-    username = username.replace(/\/$/, '');
-    
-    // Construct the full URL
-    return `https://${platform}.com/${username}`;
-  };
-
   const handleSocialMediaUpdate = async () => {
     try {
-      const formattedInstagramUrl = formatSocialUrl(instagramUrl, 'instagram');
-      const formattedFacebookUrl = formatSocialUrl(facebookUrl, 'facebook');
-
       const { error } = await supabase
         .from('settings')
         .update({
-          instagram_url: formattedInstagramUrl,
-          facebook_url: formattedFacebookUrl,
+          instagram_url: instagramUrl,
+          facebook_url: facebookUrl,
         })
         .eq('id', settings?.id);
 
@@ -156,21 +134,21 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Social Media Links</h3>
         <div className="space-y-2">
-          <Label htmlFor="instagramUrl">Instagram Profile URL or Username</Label>
+          <Label htmlFor="instagramUrl">Instagram URL</Label>
           <Input
             id="instagramUrl"
             value={instagramUrl}
             onChange={(e) => setInstagramUrl(e.target.value)}
-            placeholder="e.g., username or https://instagram.com/username"
+            placeholder="Enter full Instagram URL"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="facebookUrl">Facebook Profile URL or Username</Label>
+          <Label htmlFor="facebookUrl">Facebook URL</Label>
           <Input
             id="facebookUrl"
             value={facebookUrl}
             onChange={(e) => setFacebookUrl(e.target.value)}
-            placeholder="e.g., username or https://facebook.com/username"
+            placeholder="Enter full Facebook URL"
           />
         </div>
         <Button onClick={handleSocialMediaUpdate}>Save Social Media Links</Button>
