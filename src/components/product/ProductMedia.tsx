@@ -5,6 +5,9 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
+import { Link } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ProductMediaProps {
   images?: string[];
@@ -14,7 +17,24 @@ interface ProductMediaProps {
 }
 
 export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId }: ProductMediaProps) {
+  const { toast } = useToast();
   const mediaItems = [...(images || []), ...(videoUrls || [])];
+
+  const handleCopyLink = () => {
+    const currentUrl = window.location.href;
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      toast({
+        title: "Link Copied!",
+        description: "Product link has been copied to clipboard",
+      });
+    }).catch(() => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to copy link",
+      });
+    });
+  };
 
   if (mediaItems.length === 0) {
     return (
@@ -26,6 +46,14 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
 
   return (
     <div className="relative group">
+      <Button
+        variant="secondary"
+        size="icon"
+        className="absolute top-4 right-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity"
+        onClick={handleCopyLink}
+      >
+        <Link className="h-4 w-4" />
+      </Button>
       <Carousel className="w-full">
         <CarouselContent>
           {mediaItems.map((item, index) => (
