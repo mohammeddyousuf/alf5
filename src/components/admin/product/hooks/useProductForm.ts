@@ -58,6 +58,8 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
         subcategory_id: values.subcategory_id || null,
       };
 
+      console.log("[useProductForm] Prepared data for submission:", data);
+
       if (product?.id) {
         const { error } = await supabase
           .from("products")

@@ -48,7 +48,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
         })
       );
 
-      form.setValue("images", [...currentImages, ...newImages], { shouldDirty: true });
+      form.setValue("images", [...currentImages, ...newImages]);
       
       toast({
         title: "Success",
@@ -69,11 +69,12 @@ export function MediaFields({ form }: MediaFieldsProps) {
   const removeImage = (indexToRemove: number) => {
     const currentImages = form.getValues("images") || [];
     const updatedImages = currentImages.filter((_, index) => index !== indexToRemove);
-    form.setValue("images", updatedImages, { shouldDirty: true });
+    form.setValue("images", updatedImages);
   };
 
-  const addVideoUrl = () => {
-    if (!newVideoUrl.trim()) {
+  const handleAddVideoUrl = () => {
+    const url = newVideoUrl.trim();
+    if (!url) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -81,21 +82,27 @@ export function MediaFields({ form }: MediaFieldsProps) {
       });
       return;
     }
-    
+
     const currentUrls = form.getValues("video_urls") || [];
-    form.setValue("video_urls", [...currentUrls, newVideoUrl.trim()], { shouldDirty: true });
+    form.setValue("video_urls", [...currentUrls, url], { shouldDirty: true });
     setNewVideoUrl("");
-    
+
+    console.log("Added video URL:", url);
+    console.log("Current video URLs:", [...currentUrls, url]);
+
     toast({
       title: "Success",
       description: "Video URL added successfully",
     });
   };
 
-  const removeVideoUrl = (indexToRemove: number) => {
+  const handleRemoveVideoUrl = (indexToRemove: number) => {
     const currentUrls = form.getValues("video_urls") || [];
     const updatedUrls = currentUrls.filter((_, index) => index !== indexToRemove);
     form.setValue("video_urls", updatedUrls, { shouldDirty: true });
+    
+    console.log("Removed video URL at index:", indexToRemove);
+    console.log("Updated video URLs:", updatedUrls);
   };
 
   return (
@@ -154,13 +161,13 @@ export function MediaFields({ form }: MediaFieldsProps) {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
-                      addVideoUrl();
+                      handleAddVideoUrl();
                     }
                   }}
                 />
                 <Button 
                   type="button" 
-                  onClick={addVideoUrl} 
+                  onClick={handleAddVideoUrl}
                   variant="outline"
                 >
                   <Plus className="h-4 w-4" />
@@ -174,7 +181,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
                       type="button"
                       variant="ghost"
                       size="icon"
-                      onClick={() => removeVideoUrl(index)}
+                      onClick={() => handleRemoveVideoUrl(index)}
                       className="shrink-0"
                     >
                       <X className="h-4 w-4" />
