@@ -14,9 +14,10 @@ interface ProductMediaProps {
   videoUrls?: string[];
   productName: string;
   getYouTubeVideoId: (url: string) => string | null;
+  salePrice?: number | null;
 }
 
-export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId }: ProductMediaProps) {
+export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId, salePrice }: ProductMediaProps) {
   const { toast } = useToast();
   const mediaItems = [...(images || []), ...(videoUrls || [])];
 
@@ -54,6 +55,11 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
       >
         <Share2 className="h-4 w-4" />
       </Button>
+      {salePrice && (
+        <div className="absolute top-4 left-4 z-10 bg-destructive text-destructive-foreground px-3 py-1 rounded-md">
+          <span className="font-semibold text-sm">SALE</span>
+        </div>
+      )}
       <Carousel className="w-full">
         <CarouselContent>
           {mediaItems.map((item, index) => (
