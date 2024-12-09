@@ -85,7 +85,7 @@ export const HeroSlider = () => {
           <Button
             variant="outline"
             size="icon"
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 border-white hover:bg-black/70 text-white"
+            className="absolute left-4 top-1/2 -translate-y-1/2 border-white hover:bg-black/20 text-white"
             onClick={prevSlide}
           >
             <ChevronLeft className="h-6 w-6" />
@@ -94,7 +94,7 @@ export const HeroSlider = () => {
           <Button
             variant="outline"
             size="icon"
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 border-white hover:bg-black/70 text-white"
+            className="absolute right-4 top-1/2 -translate-y-1/2 border-white hover:bg-black/20 text-white"
             onClick={nextSlide}
           >
             <ChevronRight className="h-6 w-6" />
