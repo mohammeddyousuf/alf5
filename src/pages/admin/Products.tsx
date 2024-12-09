@@ -33,20 +33,26 @@ export default function Products() {
     },
   });
 
-  const filteredProducts = products?.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
-    const isSaleProduct = product.sale_price && product.sale_price < product.price;
-    
-    if (!showSaleProducts && !showNonSaleProducts) return false;
-    if (!showSaleProducts && isSaleProduct) return false;
-    if (!showNonSaleProducts && !isSaleProduct) return false;
-    
-    return matchesSearch;
-  });
-
   const handleDelete = async (id: string) => {
     try {
-      // First, get the product's images
+      // First, check if the product has any orders
+      const { data: orders, error: ordersError } = await supabase
+        .from("orders")
+        .select("id")
+        .eq("product_id", id);
+
+      if (ordersError) throw ordersError;
+
+      if (orders && orders.length > 0) {
+        toast({
+          variant: "destructive",
+          title: "Cannot Delete Product",
+          description: "This product has existing orders and cannot be deleted. Consider archiving it instead.",
+        });
+        return;
+      }
+
+      // If no orders exist, proceed with image deletion
       const { data: product } = await supabase
         .from("products")
         .select("images")
@@ -94,28 +100,16 @@ export default function Products() {
     }
   };
 
-  const handleStatusChange = async (id: string, currentStatus: string | null) => {
-    const newStatus = currentStatus === "published" ? "draft" : "published";
+  const filteredProducts = products?.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
+    const isSaleProduct = product.sale_price && product.sale_price < product.price;
     
-    const { error } = await supabase
-      .from("products")
-      .update({ status: newStatus })
-      .eq("id", id);
+    if (!showSaleProducts && !showNonSaleProducts) return false;
+    if (!showSaleProducts && isSaleProduct) return false;
+    if (!showNonSaleProducts && !isSaleProduct) return false;
     
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    } else {
-      toast({
-        title: "Success",
-        description: `Product ${newStatus === "published" ? "published" : "moved to draft"}`,
-      });
-      refetch();
-    }
-  };
+    return matchesSearch;
+  });
 
   const getStatusBadgeVariant = (status: string | null) => {
     switch (status) {
