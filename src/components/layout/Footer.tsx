@@ -21,21 +21,6 @@ export const Footer = () => {
     return `https://wa.me/${cleanNumber}`;
   };
 
-  const getSocialMediaUrl = (platform: 'instagram' | 'facebook', username: string | null) => {
-    if (!username) return "#";
-    // Remove any @ symbol if present
-    const cleanUsername = username.replace('@', '');
-    
-    switch (platform) {
-      case 'instagram':
-        return `https://instagram.com/${cleanUsername}`;
-      case 'facebook':
-        return `https://facebook.com/${cleanUsername}`;
-      default:
-        return "#";
-    }
-  };
-
   return (
     <footer className="border-t bg-background">
       <div className="container py-8 md:py-12">
@@ -85,7 +70,7 @@ export const Footer = () => {
             </a>
             {settings?.instagram_url && (
               <a 
-                href={getSocialMediaUrl('instagram', settings.instagram_url)}
+                href={settings.instagram_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
@@ -95,7 +80,7 @@ export const Footer = () => {
             )}
             {settings?.facebook_url && (
               <a 
-                href={getSocialMediaUrl('facebook', settings.facebook_url)}
+                href={settings.facebook_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
