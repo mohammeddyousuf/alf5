@@ -5,9 +5,16 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { WhatsAppSettings } from "@/components/admin/WhatsAppSettings";
 import { WebsiteSettings } from "@/components/admin/WebsiteSettings";
+import { Download } from "lucide-react";
 
 const Admin = () => {
   const navigate = useNavigate();
+
+  const handleDownload = () => {
+    const currentUrl = window.location.href;
+    const projectUrl = currentUrl.split('/admin')[0];
+    window.open(projectUrl, '_blank');
+  };
 
   const { data: collections } = useQuery({
     queryKey: ["collections"],
@@ -98,7 +105,17 @@ const Admin = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <Button
+          onClick={handleDownload}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <Download className="w-4 h-4" />
+          Download Project
+        </Button>
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="p-6">
