@@ -48,8 +48,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
         })
       );
 
-      const updatedImages = [...currentImages, ...newImages];
-      form.setValue("images", updatedImages, { shouldDirty: true });
+      form.setValue("images", [...currentImages, ...newImages], { shouldDirty: true });
       
       toast({
         title: "Success",
@@ -74,13 +73,23 @@ export function MediaFields({ form }: MediaFieldsProps) {
   };
 
   const addVideoUrl = () => {
-    if (!newVideoUrl) return;
+    if (!newVideoUrl.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please enter a valid video URL",
+      });
+      return;
+    }
     
     const currentUrls = form.getValues("video_urls") || [];
-    const updatedUrls = [...currentUrls, newVideoUrl];
-    
-    form.setValue("video_urls", updatedUrls, { shouldDirty: true });
+    form.setValue("video_urls", [...currentUrls, newVideoUrl.trim()], { shouldDirty: true });
     setNewVideoUrl("");
+    
+    toast({
+      title: "Success",
+      description: "Video URL added successfully",
+    });
   };
 
   const removeVideoUrl = (indexToRemove: number) => {
@@ -142,8 +151,18 @@ export function MediaFields({ form }: MediaFieldsProps) {
                   value={newVideoUrl}
                   onChange={(e) => setNewVideoUrl(e.target.value)}
                   placeholder="Enter video URL"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addVideoUrl();
+                    }
+                  }}
                 />
-                <Button type="button" onClick={addVideoUrl} variant="outline">
+                <Button 
+                  type="button" 
+                  onClick={addVideoUrl} 
+                  variant="outline"
+                >
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
