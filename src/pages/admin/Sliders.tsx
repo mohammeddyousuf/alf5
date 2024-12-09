@@ -1,43 +1,43 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Loader2, Plus } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { SliderForm } from "@/components/admin/slider/SliderForm";
 
 const Sliders = () => {
   const [open, setOpen] = useState(false);
-  const [selectedSlider, setSelectedSlider] = useState<any>(null);
+  const [selectedSlider, setSelectedSlider] = useState(null);
+  const queryClient = useQueryClient();
 
-  const { data: sliders, isLoading } = useQuery({
+  const { data: sliders } = useQuery({
     queryKey: ["sliders"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sliders")
         .select("*")
-        .order("order_index", { ascending: true });
-      
+        .order("order_index");
       if (error) throw error;
       return data;
     },
   });
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-48">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
+  const handleEdit = (slider: any) => {
+    setSelectedSlider(slider);
+    setOpen(true);
+  };
+
+  const handleSuccess = () => {
+    setOpen(false);
+    setSelectedSlider(null);
+    queryClient.invalidateQueries({ queryKey: ["sliders"] });
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -45,10 +45,7 @@ const Sliders = () => {
         <h1 className="text-3xl font-bold">Sliders</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => setSelectedSlider(null)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Slider
-            </Button>
+            <Button onClick={() => setSelectedSlider(null)}>Add New Slider</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -56,44 +53,30 @@ const Sliders = () => {
             </DialogHeader>
             <SliderForm 
               initialData={selectedSlider} 
-              onSuccess={() => setOpen(false)} 
+              onSuccess={handleSuccess} 
             />
           </DialogContent>
         </Dialog>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Title</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Order</TableHead>
-            <TableHead>Active</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sliders?.map((slider) => (
-            <TableRow key={slider.id}>
-              <TableCell>{slider.title}</TableCell>
-              <TableCell>{slider.description}</TableCell>
-              <TableCell>{slider.order_index}</TableCell>
-              <TableCell>{slider.active ? "Yes" : "No"}</TableCell>
-              <TableCell>
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setSelectedSlider(slider);
-                    setOpen(true);
-                  }}
-                >
-                  Edit
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <div className="space-y-4">
+        {sliders?.map((slider: any) => (
+          <div
+            key={slider.id}
+            className="flex items-center justify-between p-4 bg-card rounded-lg shadow"
+          >
+            <div>
+              <p className="font-medium">{slider.title}</p>
+              <p className="text-sm text-muted-foreground">
+                Order: {slider.order_index}
+              </p>
+            </div>
+            <Button variant="outline" onClick={() => handleEdit(slider)}>
+              Edit
+            </Button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
