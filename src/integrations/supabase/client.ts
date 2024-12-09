@@ -24,14 +24,7 @@ supabase.auth.onAuthStateChange((event, session) => {
     console.log('Sign out successful');
   } else if (event === 'USER_UPDATED') {
     console.log('User updated');
-  } else if (event === 'USER_DELETED') {
-    console.log('User deleted');
   } else if (event === 'PASSWORD_RECOVERY') {
     console.log('Password recovery initiated');
   }
-});
-
-// Add error logging for auth operations
-supabase.auth.onError((error) => {
-  console.error('Auth error:', error);
 });

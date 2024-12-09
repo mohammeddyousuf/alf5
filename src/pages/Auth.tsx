@@ -16,10 +16,31 @@ const AuthPage = () => {
     const logAuthState = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
       console.log('Current session:', session);
-      if (error) console.error('Session error:', error);
+      if (error) {
+        console.error('Session error:', error);
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     };
     logAuthState();
-  }, []);
+
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        toast({
+          title: "Success",
+          description: "Successfully signed in!",
+        });
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [toast]);
 
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
@@ -49,14 +70,6 @@ const AuthPage = () => {
         redirectTo={window.location.origin}
         showLinks={false}
         view="sign_in"
-        onError={(error) => {
-          console.error('Auth UI error:', error);
-          toast({
-            title: "Error",
-            description: error.message,
-            variant: "destructive",
-          });
-        }}
         localization={{
           variables: {
             sign_in: {
