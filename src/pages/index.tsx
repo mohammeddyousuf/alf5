@@ -63,6 +63,7 @@ const Index = () => {
                 imageUrl={collection.image_url}
                 description={collection.description}
                 linkUrl={collection.link_url}
+                buttonText={collection.link_url ? "Shop Now" : "View Collection"}
               />
             ))}
           </div>
