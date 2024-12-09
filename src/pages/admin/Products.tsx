@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { Database } from "@/integrations/supabase/types";
 import { ProductForm } from "@/components/admin/product/ProductForm";
@@ -48,6 +49,19 @@ export default function Products() {
     }
   };
 
+  const getStatusColor = (status: string | null) => {
+    switch (status) {
+      case "published":
+        return "success";
+      case "draft":
+        return "secondary";
+      case "archived":
+        return "destructive";
+      default:
+        return "secondary";
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -88,7 +102,10 @@ export default function Products() {
                 </div>
               )}
             </div>
-            <h3 className="font-semibold mb-2">{product.name}</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-semibold">{product.name}</h3>
+              <Badge variant={getStatusColor(product.status)}>{product.status || 'draft'}</Badge>
+            </div>
             <p className="text-sm text-muted-foreground mb-4">
               ${product.price}
             </p>
