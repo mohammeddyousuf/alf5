@@ -209,24 +209,33 @@ export type Database = {
           clearance_sale_active: boolean | null
           clearance_sale_end_date: string | null
           created_at: string
+          favicon_url: string | null
           id: string
+          logo_url: string | null
           updated_at: string
+          website_name: string | null
           whatsapp_number: string
         }
         Insert: {
           clearance_sale_active?: boolean | null
           clearance_sale_end_date?: string | null
           created_at?: string
+          favicon_url?: string | null
           id?: string
+          logo_url?: string | null
           updated_at?: string
+          website_name?: string | null
           whatsapp_number: string
         }
         Update: {
           clearance_sale_active?: boolean | null
           clearance_sale_end_date?: string | null
           created_at?: string
+          favicon_url?: string | null
           id?: string
+          logo_url?: string | null
           updated_at?: string
+          website_name?: string | null
           whatsapp_number?: string
         }
         Relationships: []

@@ -3,9 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -38,8 +53,17 @@ export const Header = () => {
         </Sheet>
         
         <div className="flex flex-1 items-center justify-between md:justify-end">
-          <Link to="/" className="md:mr-6 text-2xl font-bold text-whatsapp-dark">
-            WhatsApp Store
+          <Link to="/" className="md:mr-6 flex items-center gap-2">
+            {settings?.logo_url && (
+              <img 
+                src={settings.logo_url} 
+                alt="Logo" 
+                className="h-8 w-auto"
+              />
+            )}
+            <span className="text-2xl font-bold text-whatsapp-dark">
+              {settings?.website_name || "WhatsApp Store"}
+            </span>
           </Link>
           
           <nav className="hidden md:flex items-center gap-6 text-sm">

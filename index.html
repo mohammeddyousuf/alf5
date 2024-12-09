@@ -7,11 +7,31 @@
     <meta name="description" content="Lovable Generated Project" />
     <meta name="author" content="Lovable" />
     <meta property="og:image" content="/og-image.png" />
+    <link rel="icon" id="favicon" href="/favicon.ico" />
   </head>
 
   <body>
     <div id="root"></div>
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Update favicon dynamically
+      async function updateFavicon() {
+        try {
+          const response = await fetch('https://hoytbffldsdeywkyuuza.supabase.co/rest/v1/settings?select=favicon_url', {
+            headers: {
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhveXRiZmZsZHNkZXl3a3l1dXphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDk4MzE0NjAsImV4cCI6MjAyNTQwNzQ2MH0.0e9RjZs1xS40qkxh8jHJ8C9ymDJwZqRAdzJJwwbXqwE'
+            }
+          });
+          const data = await response.json();
+          if (data[0]?.favicon_url) {
+            document.getElementById('favicon').href = data[0].favicon_url;
+          }
+        } catch (error) {
+          console.error('Error updating favicon:', error);
+        }
+      }
+      updateFavicon();
+    </script>
   </body>
 </html>

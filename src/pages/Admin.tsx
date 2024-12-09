@@ -1,22 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
-import { useState } from "react";
 import { WhatsAppSettings } from "@/components/admin/WhatsAppSettings";
+import { WebsiteSettings } from "@/components/admin/WebsiteSettings";
 
 const Admin = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [whatsappNumber, setWhatsappNumber] = useState("");
-  const [isUpdating, setIsUpdating] = useState(false);
 
-  const { data: collections, ...collectionsQuery } = useQuery({
+  const { data: collections } = useQuery({
     queryKey: ["collections"],
     queryFn: async () => {
       const { data, error } = await supabase.from("collections").select("*");
@@ -140,8 +133,11 @@ const Admin = () => {
           <p className="text-3xl font-bold mb-4">{pages?.length || 0}</p>
           <Button onClick={() => navigate("/admin/pages")}>Manage Pages</Button>
         </Card>
+      </div>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <WhatsAppSettings />
+        <WebsiteSettings />
       </div>
     </div>
   );
