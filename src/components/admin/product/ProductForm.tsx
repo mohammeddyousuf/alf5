@@ -24,13 +24,15 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   if (!form) return null;
 
   return (
-    <ScrollArea className="h-[80vh] pr-4">
+    <ScrollArea className="h-[calc(100vh-12rem)]">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <BasicFields form={form} />
-          <CategoryFields form={form} />
-          <PriceFields form={form} />
-          <MediaFields form={form} />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-6">
+            <BasicFields form={form} />
+            <CategoryFields form={form} />
+            <PriceFields form={form} />
+            <MediaFields form={form} />
+          </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {product ? "Update Product" : "Create Product"}
