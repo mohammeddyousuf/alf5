@@ -6,9 +6,29 @@ import { supabase } from "@/integrations/supabase/client";
 import { WhatsAppSettings } from "@/components/admin/WhatsAppSettings";
 import { WebsiteSettings } from "@/components/admin/WebsiteSettings";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { LogOut } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Admin = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out",
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({
+      title: "Success",
+      description: "Successfully signed out!",
+    });
+    navigate("/auth");
+  };
 
   const { data: collections } = useQuery({
     queryKey: ["collections"],
@@ -102,6 +122,14 @@ const Admin = () => {
       <div className="container mx-auto p-6 space-y-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <Button 
+            variant="outline" 
+            onClick={handleLogout}
+            className="gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
