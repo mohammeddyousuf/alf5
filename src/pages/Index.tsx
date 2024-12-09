@@ -1,8 +1,11 @@
+import { useQuery } from "@tanstack/react-query";
 import { HeroSlider } from "@/components/home/HeroSlider";
 import { CollectionCard } from "@/components/home/CollectionCard";
 import { NewsTickerBanner } from "@/components/home/NewsTickerBanner";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2 } from "lucide-react";
 
-// Temporary data - will be replaced with admin-controlled content
+// Temporary data for collections
 const collections = [
   {
     id: 1,
@@ -25,6 +28,19 @@ const collections = [
 ];
 
 const Index = () => {
+  const { data: products, isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("status", "published");
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <div className="min-h-screen">
       <NewsTickerBanner />
@@ -42,6 +58,31 @@ const Index = () => {
             />
           ))}
         </div>
+      </section>
+
+      <section className="container py-12">
+        <h2 className="text-3xl font-bold text-center mb-8">Latest Products</h2>
+        {isLoading ? (
+          <div className="flex justify-center">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {products?.map((product) => (
+              <div key={product.id} className="border rounded-lg p-4">
+                {product.images?.[0] && (
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    className="w-full h-48 object-cover rounded-md mb-4"
+                  />
+                )}
+                <h3 className="font-semibold mb-2">{product.name}</h3>
+                <p className="text-gray-600">${product.price}</p>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );
