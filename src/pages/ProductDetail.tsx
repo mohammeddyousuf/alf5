@@ -19,10 +19,13 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { OrderDialog } from "@/components/product/OrderDialog";
+import { useState } from "react";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { toast } = useToast();
+  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -55,20 +58,28 @@ const ProductDetail = () => {
     },
   });
 
-  const handleWhatsAppClick = () => {
+  const handleOrderSubmit = (formData: any) => {
     const whatsappNumber = settings?.whatsapp_number || "+1234567890";
     
     if (!product) return;
     
-    const message = `Hi! I'm interested in ${product.name}`;
+    const message = `Product Name: ${product.name}
+Price: $${product.sale_price || product.price}
+Name: ${formData.name}
+Email: ${formData.email}
+Mobile: ${formData.mobile}
+Address: ${formData.address}
+Payment Mode: ${formData.paymentMode}`;
+
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
     
     window.open(whatsappUrl, "_blank");
+    setOrderDialogOpen(false);
     
     toast({
-      title: "Opening WhatsApp",
-      description: "You will be redirected to WhatsApp to continue the conversation.",
+      title: "Order Placed",
+      description: "You will be redirected to WhatsApp to complete your order.",
     });
   };
 
@@ -184,11 +195,19 @@ const ProductDetail = () => {
           <Button
             size="lg"
             className="w-full md:w-auto bg-whatsapp-primary hover:bg-whatsapp-secondary"
-            onClick={handleWhatsAppClick}
+            onClick={() => setOrderDialogOpen(true)}
           >
             <MessageCircle className="mr-2 h-5 w-5" />
             Contact on WhatsApp
           </Button>
+
+          <OrderDialog
+            open={orderDialogOpen}
+            onOpenChange={setOrderDialogOpen}
+            productName={product.name}
+            productPrice={product.sale_price || product.price}
+            onSubmit={handleOrderSubmit}
+          />
         </div>
       </div>
     </div>
