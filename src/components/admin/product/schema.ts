@@ -9,6 +9,7 @@ export const productFormSchema = z.object({
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   category_id: z.string().nullable().optional(),
   subcategory_id: z.string().nullable().optional(),
+  featured: z.boolean().default(false),
 });
 
 export type ProductFormData = z.infer<typeof productFormSchema>;

@@ -1,6 +1,7 @@
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { productFormSchema } from "./schema";
@@ -21,6 +22,29 @@ interface BasicFieldsProps {
 export function BasicFields({ form }: BasicFieldsProps) {
   return (
     <>
+      <div className="flex justify-between items-center">
+        <FormField
+          control={form.control}
+          name="featured"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Featured Product</FormLabel>
+                <div className="text-sm text-muted-foreground">
+                  This product will be displayed in featured sections
+                </div>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      </div>
+
       <FormField
         control={form.control}
         name="status"
