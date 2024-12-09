@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import Layout from "@/components/layout";
 import Index from "@/pages/index";
+import Shop from "@/pages/Shop";
 import CollectionDetail from "@/pages/collections/[id]";
 import ProductDetail from "@/pages/products/[id]";
 import Admin from "@/pages/Admin";
@@ -21,6 +22,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Index />} />
+              <Route path="shop" element={<Shop />} />
               <Route path="collections/:id" element={<CollectionDetail />} />
               <Route path="products/:id" element={<ProductDetail />} />
               <Route path="admin" element={<Admin />} />
