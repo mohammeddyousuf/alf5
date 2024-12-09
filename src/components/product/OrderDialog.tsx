@@ -64,6 +64,16 @@ export function OrderDialog({
     },
   });
 
+  const handleSubmit = (data: OrderFormData) => {
+    // Format the message with line breaks
+    const formattedData = {
+      ...data,
+      productName,
+      productPrice,
+    };
+    onSubmit(formattedData);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
@@ -77,7 +87,7 @@ export function OrderDialog({
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="name"

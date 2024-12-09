@@ -63,8 +63,8 @@ const ProductDetail = () => {
     
     if (!product) return;
     
-    const message = `Product Name: ${product.name}
-Price: $${product.sale_price || product.price}
+    const message = `Product Name: ${formData.productName}
+Price: $${formData.productPrice}
 Name: ${formData.name}
 Email: ${formData.email}
 Mobile: ${formData.mobile}
@@ -204,8 +204,8 @@ Payment Mode: ${formData.paymentMode}`;
           <OrderDialog
             open={orderDialogOpen}
             onOpenChange={setOrderDialogOpen}
-            productName={product.name}
-            productPrice={product.sale_price || product.price}
+            productName={product?.name || ""}
+            productPrice={product?.sale_price || product?.price || 0}
             onSubmit={handleOrderSubmit}
           />
         </div>
