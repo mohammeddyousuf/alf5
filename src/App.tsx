@@ -12,6 +12,8 @@ import Products from "@/pages/admin/Products";
 import Sliders from "@/pages/admin/Sliders";
 import News from "@/pages/admin/News";
 import Pages from "@/pages/admin/Pages";
+import NewPage from "@/pages/admin/pages/New";
+import EditPage from "@/pages/admin/pages/[id]";
 import Categories from "@/pages/admin/Categories";
 import ProductDetail from "@/pages/ProductDetail";
 import { useQuery } from "@tanstack/react-query";
@@ -60,6 +62,8 @@ function App() {
             <Route path="/admin/sliders" element={<Sliders />} />
             <Route path="/admin/news" element={<News />} />
             <Route path="/admin/pages" element={<Pages />} />
+            <Route path="/admin/pages/new" element={<NewPage />} />
+            <Route path="/admin/pages/:id" element={<EditPage />} />
             <Route path="/admin/categories" element={<Categories />} />
           </Routes>
         </Layout>
