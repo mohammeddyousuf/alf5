@@ -26,6 +26,7 @@ import { MediaFields } from "./MediaFields";
 import { CategoryFields } from "./CategoryFields";
 import { productFormSchema, type ProductFormData } from "./schema";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useEffect } from "react";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
@@ -39,17 +40,35 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema),
     defaultValues: {
-      name: product?.name ?? "",
-      description: product?.description ?? "",
-      price: product?.price ?? 0,
-      sale_price: product?.sale_price ?? null,
-      images: product?.images ?? [],
-      video_urls: product?.video_urls ?? [],
-      status: product?.status ?? "draft",
-      category_id: product?.category_id ?? null,
-      subcategory_id: product?.subcategory_id ?? null,
+      name: "",
+      description: "",
+      price: 0,
+      sale_price: null,
+      images: [],
+      video_urls: [],
+      status: "draft",
+      category_id: null,
+      subcategory_id: null,
     },
   });
+
+  // Load product data into form when available
+  useEffect(() => {
+    if (product) {
+      console.log("Loading product data:", product);
+      form.reset({
+        name: product.name,
+        description: product.description ?? "",
+        price: product.price,
+        sale_price: product.sale_price,
+        images: product.images ?? [],
+        video_urls: product.video_urls ?? [],
+        status: product.status ?? "draft",
+        category_id: product.category_id,
+        subcategory_id: product.subcategory_id,
+      });
+    }
+  }, [product, form]);
 
   const onSubmit = async (values: ProductFormData) => {
     try {
@@ -65,11 +84,13 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         images: values.images,
         video_urls: values.video_urls,
         status: values.status,
-        category_id: values.category_id,
-        subcategory_id: values.subcategory_id,
+        category_id: values.category_id || null,
+        subcategory_id: values.subcategory_id || null,
       };
 
-      if (product) {
+      console.log("Submitting product data:", data);
+
+      if (product?.id) {
         const { error } = await supabase
           .from("products")
           .update(data)
@@ -88,8 +109,11 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         });
       }
       onSuccess?.();
-      form.reset();
+      if (!product) {
+        form.reset(); // Only reset form for new products
+      }
     } catch (error: any) {
+      console.error("Error submitting product:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -140,7 +164,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
                 <FormLabel>Status</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  value={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
