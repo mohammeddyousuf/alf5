@@ -11,7 +11,7 @@ export const Footer = () => {
         .select("*")
         .single();
       if (error) throw error;
-      console.log("Footer settings:", data); // For debugging
+      console.log("Footer settings:", data);
       return data;
     },
   });
@@ -20,6 +20,14 @@ export const Footer = () => {
     if (!settings?.whatsapp_number) return "#";
     const cleanNumber = settings.whatsapp_number.replace(/\D/g, '');
     return `https://wa.me/${cleanNumber}`;
+  };
+
+  const formatSocialLink = (url: string | null) => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+    return `https://${url}`;
   };
 
   return (
@@ -71,7 +79,7 @@ export const Footer = () => {
             </a>
             {settings?.instagram_url && (
               <a 
-                href={settings.instagram_url}
+                href={formatSocialLink(settings.instagram_url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
@@ -81,7 +89,7 @@ export const Footer = () => {
             )}
             {settings?.facebook_url && (
               <a 
-                href={settings.facebook_url}
+                href={formatSocialLink(settings.facebook_url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
