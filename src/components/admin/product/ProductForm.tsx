@@ -11,12 +11,20 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { PriceFields } from "./PriceFields";
 import { MediaFields } from "./MediaFields";
 import { productFormSchema, type ProductFormData } from "./schema";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
@@ -36,17 +44,16 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
       sale_price: product?.sale_price ?? null,
       images: product?.images ?? [],
       video_urls: product?.video_urls ?? [],
+      status: product?.status ?? "draft",
     },
   });
 
   const onSubmit = async (values: ProductFormData) => {
     try {
-      // Ensure required fields are present
       if (!values.name || typeof values.price !== 'number') {
         throw new Error('Name and price are required');
       }
 
-      // Create the data object after validation to ensure correct types
       const data = {
         name: values.name,
         description: values.description,
@@ -54,7 +61,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         sale_price: values.sale_price,
         images: values.images,
         video_urls: values.video_urls,
-        status: product?.status ?? 'draft',
+        status: values.status,
       };
 
       if (product) {
@@ -87,43 +94,70 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <ScrollArea className="h-[80vh] pr-4">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <PriceFields form={form} />
-        <MediaFields form={form} />
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="draft">Draft</SelectItem>
+                    <SelectItem value="published">Published</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Button type="submit">
-          {product ? "Update Product" : "Create Product"}
-        </Button>
-      </form>
-    </Form>
+          <PriceFields form={form} />
+          <MediaFields form={form} />
+
+          <Button type="submit" className="w-full">
+            {product ? "Update Product" : "Create Product"}
+          </Button>
+        </form>
+      </Form>
+    </ScrollArea>
   );
 }
