@@ -56,23 +56,26 @@ export const PageForm = ({ initialData }: PageFormProps) => {
       setIsLoading(true);
 
       if (initialData) {
+        // For updates, we need to include the id
         const { error } = await supabase
           .from("pages")
-          .update(values)
+          .update({
+            ...values,
+            updated_at: new Date().toISOString(),
+          })
           .eq("id", initialData.id);
 
         if (error) throw error;
       } else {
-        const newPage = {
-          ...values, // This spreads required fields: title, slug, content
-          id: crypto.randomUUID(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-
+        // For new pages, we create a complete record
         const { error } = await supabase
           .from("pages")
-          .insert(newPage);
+          .insert({
+            ...values,
+            id: crypto.randomUUID(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
 
         if (error) throw error;
       }
