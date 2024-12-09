@@ -10,7 +10,7 @@ const Shop = () => {
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["shop-products"],
     queryFn: async () => {
-      console.log("Fetching products...");
+      console.log("Starting to fetch products...");
       const { data, error } = await supabase
         .from("products")
         .select("*")
@@ -26,10 +26,13 @@ const Shop = () => {
         throw error;
       }
 
+      console.log("Raw products data:", data);
+      console.log("Number of products found:", data?.length || 0);
+      
       if (!data || data.length === 0) {
         console.log("No products found or empty data array returned");
       } else {
-        console.log("Successfully fetched products:", data);
+        console.log("Products retrieved successfully:", data.map(p => ({ id: p.id, name: p.name })));
       }
       
       return data || [];
@@ -37,6 +40,10 @@ const Shop = () => {
     retry: 1,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
+
+  console.log("Render phase - products:", products);
+  console.log("Render phase - isLoading:", isLoading);
+  console.log("Render phase - error:", error);
 
   if (error) {
     console.error("Query error:", error);
@@ -62,16 +69,19 @@ const Shop = () => {
       <h1 className="text-4xl font-bold text-center mb-8">Our Products</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products?.map((product) => (
-          <ProductCard
-            key={product.id}
-            id={product.id}
-            name={product.name}
-            price={product.price}
-            salePrice={product.sale_price}
-            imageUrl={product.images?.[0]}
-          />
-        ))}
+        {products?.map((product) => {
+          console.log("Rendering product:", product);
+          return (
+            <ProductCard
+              key={product.id}
+              id={product.id}
+              name={product.name}
+              price={product.price}
+              salePrice={product.sale_price}
+              imageUrl={product.images?.[0]}
+            />
+          );
+        })}
       </div>
 
       {(!products || products.length === 0) && (
