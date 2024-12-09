@@ -16,11 +16,18 @@ export default function Orders() {
   const { data: orders } = useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
+      console.log("Fetching orders...");
       const { data, error } = await supabase
         .from("orders")
         .select("*")
         .order("created_at", { ascending: false });
-      if (error) throw error;
+      
+      if (error) {
+        console.error("Error fetching orders:", error);
+        throw error;
+      }
+      
+      console.log("Orders fetched successfully:", data);
       return data;
     },
   });
