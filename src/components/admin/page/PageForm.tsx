@@ -18,11 +18,19 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
+// Define the schema to match Supabase table requirements
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   slug: z.string().min(1, "Slug is required"),
   content: z.string().min(1, "Content is required"),
 });
+
+// Define the type for our form values to match Supabase table
+type FormValues = {
+  title: string;
+  slug: string;
+  content: string;
+};
 
 interface PageFormProps {
   initialData?: {
@@ -38,7 +46,7 @@ export const PageForm = ({ initialData }: PageFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
       title: "",
@@ -47,7 +55,7 @@ export const PageForm = ({ initialData }: PageFormProps) => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: FormValues) => {
     try {
       setIsLoading(true);
 
@@ -61,7 +69,7 @@ export const PageForm = ({ initialData }: PageFormProps) => {
       } else {
         const { error } = await supabase
           .from("pages")
-          .insert(values); // Changed from [values] to values
+          .insert(values);
 
         if (error) throw error;
       }
