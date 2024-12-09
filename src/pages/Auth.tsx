@@ -35,7 +35,7 @@ const AuthPage = () => {
         redirectTo={window.location.origin}
         showLinks={false}
         view="sign_in"
-        onAuthError={(error) => {
+        onError={(error) => {
           console.error("Auth error:", error);
           toast({
             variant: "destructive",
