@@ -161,10 +161,10 @@ export function OrderDialog({
                         <SelectValue placeholder="Select payment mode" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="cash">Cash</SelectItem>
-                      <SelectItem value="upi">UPI</SelectItem>
-                      <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                    <SelectContent className="bg-popover text-popover-foreground">
+                      <SelectItem value="cash" className="hover:bg-accent hover:text-accent-foreground">Cash</SelectItem>
+                      <SelectItem value="upi" className="hover:bg-accent hover:text-accent-foreground">UPI</SelectItem>
+                      <SelectItem value="bank_transfer" className="hover:bg-accent hover:text-accent-foreground">Bank Transfer</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -172,7 +172,7 @@ export function OrderDialog({
               )}
             />
 
-            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button type="submit" className="w-full bg-whatsapp-primary text-white hover:bg-whatsapp-primary/90">
               Contact on WhatsApp
             </Button>
           </form>
