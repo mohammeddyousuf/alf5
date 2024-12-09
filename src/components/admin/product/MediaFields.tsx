@@ -4,7 +4,7 @@ import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { productFormSchema } from "./schema";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, Loader2, Plus, X } from "lucide-react";
+import { ImagePlus, Loader2, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
@@ -18,9 +18,7 @@ interface MediaFieldsProps {
 export function MediaFields({ form }: MediaFieldsProps) {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
-  const [newVideoUrl, setNewVideoUrl] = useState("");
 
-  // Image handling functions
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
@@ -73,55 +71,6 @@ export function MediaFields({ form }: MediaFieldsProps) {
     form.setValue("images", updatedImages);
   };
 
-  // Video URL handling functions
-  const addVideoUrl = () => {
-    const url = newVideoUrl.trim();
-    if (!url) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please enter a valid video URL",
-      });
-      return;
-    }
-
-    console.log("[MediaFields] Current form values:", form.getValues());
-    console.log("[MediaFields] Adding video URL:", url);
-
-    const currentUrls = form.getValues("video_urls") || [];
-    const updatedUrls = [...currentUrls, url];
-
-    console.log("[MediaFields] Updated video URLs:", updatedUrls);
-
-    form.setValue("video_urls", updatedUrls, { 
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true 
-    });
-
-    setNewVideoUrl("");
-
-    toast({
-      title: "Success",
-      description: "Video URL added successfully",
-    });
-  };
-
-  const removeVideoUrl = (indexToRemove: number) => {
-    console.log("[MediaFields] Removing video URL at index:", indexToRemove);
-    
-    const currentUrls = form.getValues("video_urls") || [];
-    const updatedUrls = currentUrls.filter((_, index) => index !== indexToRemove);
-    
-    console.log("[MediaFields] Updated video URLs after removal:", updatedUrls);
-    
-    form.setValue("video_urls", updatedUrls, { 
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true 
-    });
-  };
-
   return (
     <div className="space-y-4">
       <div>
@@ -162,55 +111,6 @@ export function MediaFields({ form }: MediaFieldsProps) {
           </div>
         </div>
       </div>
-
-      <FormField
-        control={form.control}
-        name="video_urls"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Video URLs</FormLabel>
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <Input
-                  value={newVideoUrl}
-                  onChange={(e) => setNewVideoUrl(e.target.value)}
-                  placeholder="Enter video URL"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addVideoUrl();
-                    }
-                  }}
-                />
-                <Button 
-                  type="button" 
-                  onClick={addVideoUrl}
-                  variant="outline"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="space-y-2">
-                {field.value?.map((url, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Input value={url} readOnly />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeVideoUrl(index)}
-                      className="shrink-0"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
     </div>
   );
 }

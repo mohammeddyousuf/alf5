@@ -18,7 +18,6 @@ const defaultValues: ProductFormData = {
   price: 0,
   sale_price: null,
   images: [],
-  video_urls: [],
   status: "draft",
   category_id: null,
   subcategory_id: null,
@@ -35,7 +34,6 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
       price: product.price,
       sale_price: product.sale_price,
       images: product.images ?? [],
-      video_urls: product.video_urls ?? [],
       status: product.status ?? "draft",
       category_id: product.category_id,
       subcategory_id: product.subcategory_id,
@@ -44,21 +42,16 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
 
   const onSubmit = async (values: ProductFormData) => {
     try {
-      console.log("[useProductForm] Submitting form with values:", values);
-
       const data = {
         name: values.name,
         description: values.description || null,
         price: values.price,
         sale_price: values.sale_price,
         images: values.images,
-        video_urls: values.video_urls,
         status: values.status,
         category_id: values.category_id || null,
         subcategory_id: values.subcategory_id || null,
       };
-
-      console.log("[useProductForm] Prepared data for submission:", data);
 
       if (product?.id) {
         const { error } = await supabase
