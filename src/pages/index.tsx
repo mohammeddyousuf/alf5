@@ -62,6 +62,7 @@ const Index = () => {
                 name={collection.name}
                 imageUrl={collection.image_url}
                 description={collection.description}
+                linkUrl={collection.link_url}
               />
             ))}
           </div>
