@@ -1,22 +1,32 @@
 import { Link } from "react-router-dom";
 
 interface CollectionCardProps {
-  title: string;
-  image: string;
-  link: string;
+  id: string;
+  name: string;
+  imageUrl: string | null;
+  description: string | null;
 }
 
-export const CollectionCard = ({ title, image, link }: CollectionCardProps) => {
+export const CollectionCard = ({ id, name, imageUrl, description }: CollectionCardProps) => {
   return (
-    <Link to={link} className="group relative overflow-hidden rounded-lg">
+    <Link to={`/collection/${id}`} className="group relative overflow-hidden rounded-lg">
       <div className="aspect-square w-full overflow-hidden">
-        <img
-          src={image}
-          alt={title}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-          <h3 className="text-2xl font-bold text-white">{title}</h3>
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={name}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <div className="h-full w-full bg-muted flex items-center justify-center">
+            <span className="text-muted-foreground">No image</span>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center p-4 text-center">
+          <h3 className="text-2xl font-bold text-white mb-2">{name}</h3>
+          {description && (
+            <p className="text-sm text-white/80 line-clamp-2">{description}</p>
+          )}
         </div>
       </div>
     </Link>
