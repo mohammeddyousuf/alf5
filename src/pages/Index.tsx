@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { HeroSlider } from "@/components/home/HeroSlider";
 import { CollectionCard } from "@/components/home/CollectionCard";
 import { NewsTickerBanner } from "@/components/home/NewsTickerBanner";
+import { ProductCard } from "@/components/home/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
@@ -34,7 +35,9 @@ const Index = () => {
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .eq("status", "published");
+        .eq("status", "published")
+        .order("created_at", { ascending: false })
+        .limit(8);
       
       if (error) throw error;
       return data;
@@ -69,17 +72,14 @@ const Index = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products?.map((product) => (
-              <div key={product.id} className="border rounded-lg p-4">
-                {product.images?.[0] && (
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="w-full h-48 object-cover rounded-md mb-4"
-                  />
-                )}
-                <h3 className="font-semibold mb-2">{product.name}</h3>
-                <p className="text-gray-600">${product.price}</p>
-              </div>
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                price={product.price}
+                salePrice={product.sale_price}
+                imageUrl={product.images?.[0]}
+              />
             ))}
           </div>
         )}
