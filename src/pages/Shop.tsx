@@ -6,12 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ShopFilters } from "@/components/shop/ShopFilters";
 import { ProductGrid } from "@/components/shop/ProductGrid";
+import { SearchBar } from "@/components/shop/SearchBar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Shop = () => {
   const location = useLocation();
   const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [showSaleOnly, setShowSaleOnly] = useState(false);
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
@@ -41,14 +43,6 @@ const Shop = () => {
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["shop-products", selectedCategory, selectedSubcategory, showFeaturedOnly, showSaleOnly, showNewArrivalsOnly],
     queryFn: async () => {
-      console.log("Fetching products with filters:", {
-        selectedCategory,
-        selectedSubcategory,
-        showFeaturedOnly,
-        showSaleOnly,
-        showNewArrivalsOnly
-      });
-
       let query = supabase
         .from("products")
         .select("*")
@@ -67,7 +61,6 @@ const Shop = () => {
       }
 
       if (showNewArrivalsOnly) {
-        // Filter for products added in the last 30 days
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         query = query.gte('added_date', thirtyDaysAgo.toISOString());
@@ -85,12 +78,15 @@ const Shop = () => {
         throw error;
       }
       
-      console.log("Fetched products:", data);
       return data || [];
     },
   });
 
   const filteredProducts = products?.filter((product) => {
+    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.description?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (product.brand?.toLowerCase().includes(searchQuery.toLowerCase()));
+    
     const price = product.sale_price || product.price;
     const meetsPrice = price >= priceRange[0] && price <= priceRange[1];
     const meetsSale = showSaleOnly ? product.sale_price !== null : true;
@@ -101,7 +97,7 @@ const Shop = () => {
       : false;
     const meetsNewArrival = showNewArrivalsOnly ? isNewArrival : true;
 
-    return meetsPrice && meetsSale && meetsNewArrival && meetsBrand;
+    return matchesSearch && meetsPrice && meetsSale && meetsNewArrival && meetsBrand;
   });
 
   const sortedProducts = [...(filteredProducts || [])].sort((a, b) => {
@@ -169,7 +165,7 @@ const Shop = () => {
         </div>
 
         {/* Desktop Filters */}
-        <div className="hidden md:block">
+        <div className="hidden md:block w-64">
           <ShopFilters
             priceRange={priceRange}
             setPriceRange={setPriceRange}
@@ -191,6 +187,7 @@ const Shop = () => {
         </div>
 
         <div className="flex-1">
+          <SearchBar value={searchQuery} onChange={setSearchQuery} />
           <ProductGrid products={sortedProducts} />
         </div>
       </div>
