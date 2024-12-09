@@ -4,7 +4,7 @@ import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { productFormSchema } from "./schema";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, Loader2, X } from "lucide-react";
+import { ImagePlus, Loader2, Plus, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
@@ -18,6 +18,7 @@ interface MediaFieldsProps {
 export function MediaFields({ form }: MediaFieldsProps) {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
+  const [newVideoUrl, setNewVideoUrl] = useState("");
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -73,6 +74,21 @@ export function MediaFields({ form }: MediaFieldsProps) {
     );
   };
 
+  const addVideoUrl = () => {
+    if (!newVideoUrl) return;
+    const currentUrls = form.getValues("video_urls") || [];
+    form.setValue("video_urls", [...currentUrls, newVideoUrl]);
+    setNewVideoUrl("");
+  };
+
+  const removeVideoUrl = (indexToRemove: number) => {
+    const currentUrls = form.getValues("video_urls") || [];
+    form.setValue(
+      "video_urls",
+      currentUrls.filter((_, index) => index !== indexToRemove)
+    );
+  };
+
   return (
     <div className="space-y-4">
       <div>
@@ -114,19 +130,35 @@ export function MediaFields({ form }: MediaFieldsProps) {
         </div>
       </div>
 
-      <FormField
-        control={form.control}
-        name="video_urls"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Video URLs</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <div className="space-y-2">
+        <FormLabel>Video URLs</FormLabel>
+        <div className="flex gap-2">
+          <Input
+            value={newVideoUrl}
+            onChange={(e) => setNewVideoUrl(e.target.value)}
+            placeholder="Enter video URL"
+          />
+          <Button type="button" onClick={addVideoUrl} variant="outline">
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="space-y-2">
+          {form.watch("video_urls")?.map((url, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <Input value={url} readOnly />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={() => removeVideoUrl(index)}
+                className="shrink-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
