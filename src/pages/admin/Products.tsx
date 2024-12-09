@@ -113,13 +113,20 @@ export default function Products() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProducts?.map((product) => (
           <Card key={product.id} className="p-4">
-            <div className="aspect-square mb-4 overflow-hidden rounded-lg">
+            <div className="aspect-square mb-4 overflow-hidden rounded-lg relative">
               {product.images?.[0] ? (
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  className="h-full w-full object-cover"
-                />
+                <>
+                  <img
+                    src={product.images[0]}
+                    alt={product.name}
+                    className="h-full w-full object-cover"
+                  />
+                  {product.sale_price && product.sale_price < product.price && (
+                    <div className="absolute top-2 right-2">
+                      <Badge variant="destructive">Sale</Badge>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="h-full w-full bg-muted flex items-center justify-center">
                   No image
@@ -144,6 +151,11 @@ export default function Products() {
             </div>
             <p className="text-sm text-muted-foreground mb-4">
               ${product.price}
+              {product.sale_price && product.sale_price < product.price && (
+                <span className="ml-2 text-destructive line-through">
+                  ${product.sale_price}
+                </span>
+              )}
             </p>
             <div className="flex gap-2">
               <Dialog>
