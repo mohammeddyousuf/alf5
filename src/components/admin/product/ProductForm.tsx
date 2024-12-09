@@ -64,8 +64,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         images: product.images ?? [],
         video_urls: product.video_urls ?? [],
         status: product.status ?? "draft",
-        category_id: product.category_id ?? null,
-        subcategory_id: product.subcategory_id ?? null,
+        category_id: product.category_id,
+        subcategory_id: product.subcategory_id,
       });
     }
   }, [product, form]);
@@ -78,6 +78,10 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
 
       console.log("Submitting form values:", values);
 
+      // Convert empty strings to null for IDs
+      const category_id = values.category_id || null;
+      const subcategory_id = values.subcategory_id || null;
+
       const data = {
         name: values.name,
         description: values.description || null,
@@ -86,8 +90,8 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
         images: values.images,
         video_urls: values.video_urls || [],
         status: values.status,
-        category_id: values.category_id || null,
-        subcategory_id: values.subcategory_id || null,
+        category_id,
+        subcategory_id,
       };
 
       console.log("Submitting product data:", data);
