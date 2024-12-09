@@ -25,6 +25,24 @@ const Admin = () => {
     },
   });
 
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("categories").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: subcategories } = useQuery({
+    queryKey: ["subcategories"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("subcategories").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const { data: sliders } = useQuery({
     queryKey: ["sliders"],
     queryFn: async () => {
@@ -57,6 +75,18 @@ const Admin = () => {
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-2">Categories</h2>
+          <p className="text-3xl font-bold mb-4">{categories?.length || 0}</p>
+          <Button onClick={() => navigate("/admin/categories")}>Manage Categories</Button>
+        </Card>
+
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-2">Subcategories</h2>
+          <p className="text-3xl font-bold mb-4">{subcategories?.length || 0}</p>
+          <Button onClick={() => navigate("/admin/categories")}>Manage Subcategories</Button>
+        </Card>
+
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-2">Collections</h2>
           <p className="text-3xl font-bold mb-4">{collections?.length || 0}</p>
