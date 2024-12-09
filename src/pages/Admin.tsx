@@ -12,10 +12,10 @@ const Admin = () => {
 
   const handleDownload = () => {
     // Download the project directly instead of opening in a new tab
-    const downloadUrl = 'https://github.com/your-username/your-repo/archive/main.zip';
+    const downloadUrl = 'https://github.com/lovable-labs/whappy-commerce/archive/refs/heads/main.zip';
     const link = document.createElement('a');
     link.href = downloadUrl;
-    link.download = 'project.zip';
+    link.download = 'whappy-commerce.zip';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
