@@ -58,6 +58,9 @@ function App() {
             <Route path="/page/:slug" element={<Page />} />
             <Route path="/about" element={<Page />} />
             <Route path="/faq" element={<Page />} />
+            <Route path="/contact" element={<Page />} />
+            <Route path="/privacy-policy" element={<Page />} />
+            <Route path="/terms-of-service" element={<Page />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/collections" element={<Collections />} />
             <Route path="/admin/products" element={<Products />} />
