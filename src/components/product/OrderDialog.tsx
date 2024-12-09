@@ -82,21 +82,36 @@ export function OrderDialog({
         ...data
       });
 
-      const { error } = await supabase.from("orders").insert({
-        product_id: productId,
-        product_name: productName,
-        product_brand: productBrand,
-        product_price: productPrice,
-        customer_name: data.name,
-        customer_email: data.email,
-        customer_mobile: data.mobile,
-        customer_address: data.address,
-        payment_mode: data.paymentMode,
-      });
+      const { error } = await supabase
+        .from("orders")
+        .insert({
+          product_id: productId,
+          product_name: productName,
+          product_brand: productBrand,
+          product_price: productPrice,
+          customer_name: data.name,
+          customer_email: data.email,
+          customer_mobile: data.mobile,
+          customer_address: data.address,
+          payment_mode: data.paymentMode,
+        })
+        .single();
 
       if (error) {
         console.error("Error saving order:", error);
-        throw error;
+        let errorMessage = "Failed to save order. Please try again.";
+        
+        // Handle specific error cases
+        if (error.code === '42501') {
+          errorMessage = "Authorization error. Please try again or contact support.";
+        }
+        
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: errorMessage,
+        });
+        return;
       }
 
       console.log("Order saved successfully");
