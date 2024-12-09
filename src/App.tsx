@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import Layout from "@/components/layout";
@@ -33,7 +33,7 @@ function App() {
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <Toaster />
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route element={<Layout><Outlet /></Layout>}>
           <Route index element={<Home />} />
           <Route path="shop" element={<Shop />} />
           <Route path="products/:id" element={<ProductDetail />} />
