@@ -11,9 +11,12 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { Download } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Orders() {
-  const { data: orders } = useQuery({
+  const { toast } = useToast();
+  
+  const { data: orders, error } = useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
       console.log("Fetching orders...");
@@ -24,6 +27,11 @@ export default function Orders() {
       
       if (error) {
         console.error("Error fetching orders:", error);
+        toast({
+          variant: "destructive",
+          title: "Error fetching orders",
+          description: "Please make sure the orders table exists in your database",
+        });
         throw error;
       }
       
@@ -72,6 +80,18 @@ export default function Orders() {
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   };
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <h1 className="text-3xl font-bold mb-6">Orders</h1>
+        <div className="bg-destructive/15 text-destructive p-4 rounded-md">
+          <p className="font-medium">Error loading orders</p>
+          <p className="text-sm mt-1">Please make sure the orders table exists in your database</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
