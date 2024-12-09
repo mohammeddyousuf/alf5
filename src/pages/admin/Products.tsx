@@ -9,6 +9,7 @@ import { Database } from "@/integrations/supabase/types";
 import { ProductForm } from "@/components/admin/product/ProductForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+import { Pencil } from "lucide-react";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
@@ -147,7 +148,10 @@ export default function Products() {
             <div className="flex gap-2">
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline" className="flex-1">Edit</Button>
+                  <Button variant="default" className="flex-1">
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-3xl">
                   <DialogHeader>
