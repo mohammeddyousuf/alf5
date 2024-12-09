@@ -13,6 +13,7 @@ import Sliders from "@/pages/admin/Sliders";
 import News from "@/pages/admin/News";
 import Pages from "@/pages/admin/Pages";
 import Categories from "@/pages/admin/Categories";
+import ProductDetail from "@/pages/ProductDetail";
 import "./App.css";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
+            <Route path="/products/:id" element={<ProductDetail />} />
             <Route path="/page/:slug" element={<Page />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/admin/collections" element={<Collections />} />
