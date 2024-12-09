@@ -1,175 +1,178 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { ImageUploadField } from "../shared/ImageUploadField";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { Database } from "@/integrations/supabase/types";
-
-type Settings = Database["public"]["Tables"]["settings"]["Row"];
-
-const formSchema = z.object({
-  website_name: z.string().min(1, "Website name is required"),
-  whatsapp_number: z.string().min(1, "WhatsApp number is required"),
-  whatsapp_group_url: z.string().nullable().optional(),
-  facebook_url: z.string().nullable().optional(),
-  instagram_url: z.string().nullable().optional(),
-  currency_symbol: z.string().min(1, "Currency symbol is required").default("$"),
-});
 
 interface GeneralSettingsProps {
-  settings: Settings | null;
-  refetch: () => void;
+  settings: any;
+  refetch: () => Promise<any>;
 }
 
-export function GeneralSettings({ settings, refetch }: GeneralSettingsProps) {
+export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => {
   const { toast } = useToast();
+  const [isUploading, setIsUploading] = useState(false);
+  const [websiteName, setWebsiteName] = useState(settings?.website_name || "");
+  const [instagramUrl, setInstagramUrl] = useState(settings?.instagram_url || "");
+  const [facebookUrl, setFacebookUrl] = useState(settings?.facebook_url || "");
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      website_name: settings?.website_name || "",
-      whatsapp_number: settings?.whatsapp_number || "",
-      whatsapp_group_url: settings?.whatsapp_group_url || "",
-      facebook_url: settings?.facebook_url || "",
-      instagram_url: settings?.instagram_url || "",
-      currency_symbol: settings?.currency_symbol || "$",
-    },
-  });
+  // Update state when settings change
+  useEffect(() => {
+    if (settings) {
+      setWebsiteName(settings.website_name || "");
+      setInstagramUrl(settings.instagram_url || "");
+      setFacebookUrl(settings.facebook_url || "");
+    }
+  }, [settings]);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const handleWebsiteNameUpdate = async () => {
     try {
       const { error } = await supabase
-        .from("settings")
-        .update({
-          website_name: values.website_name,
-          whatsapp_number: values.whatsapp_number,
-          whatsapp_group_url: values.whatsapp_group_url,
-          facebook_url: values.facebook_url,
-          instagram_url: values.instagram_url,
-          currency_symbol: values.currency_symbol,
-        })
-        .eq("id", settings?.id);
+        .from('settings')
+        .update({ website_name: websiteName })
+        .eq('id', settings?.id);
 
       if (error) throw error;
 
+      await refetch();
       toast({
         title: "Success",
-        description: "Settings updated successfully",
+        description: "Website name updated successfully",
       });
-
-      refetch();
-    } catch (error: any) {
+    } catch (error) {
+      console.error('Error updating website name:', error);
       toast({
-        variant: "destructive",
         title: "Error",
-        description: error.message,
+        description: "Failed to update website name",
+        variant: "destructive",
       });
     }
-  }
+  };
+
+  const handleSocialMediaUpdate = async () => {
+    try {
+      const { error } = await supabase
+        .from('settings')
+        .update({
+          instagram_url: instagramUrl,
+          facebook_url: facebookUrl,
+        })
+        .eq('id', settings?.id);
+
+      if (error) throw error;
+
+      await refetch();
+      toast({
+        title: "Success",
+        description: "Social media links updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating social media links:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update social media links",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleLogoChange = async (url: string | null) => {
+    try {
+      const { error } = await supabase
+        .from('settings')
+        .update({ logo_url: url })
+        .eq('id', settings?.id);
+
+      if (error) throw error;
+      await refetch();
+    } catch (error) {
+      console.error('Error updating logo:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update logo",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleFaviconChange = async (url: string | null) => {
+    try {
+      const { error } = await supabase
+        .from('settings')
+        .update({ favicon_url: url })
+        .eq('id', settings?.id);
+
+      if (error) throw error;
+      await refetch();
+    } catch (error) {
+      console.error('Error updating favicon:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update favicon",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="website_name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Website Name</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="websiteName">Website Name</Label>
+        <div className="flex gap-2">
+          <Input
+            id="websiteName"
+            value={websiteName}
+            onChange={(e) => setWebsiteName(e.target.value)}
+            placeholder="Enter website name"
+          />
+          <Button onClick={handleWebsiteNameUpdate}>Save</Button>
+        </div>
+      </div>
 
-        <FormField
-          control={form.control}
-          name="currency_symbol"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Currency Symbol</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="$" />
-              </FormControl>
-              <FormDescription>
-                This symbol will be used for all product prices across the website
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Social Media Links</h3>
+        <div className="space-y-2">
+          <Label htmlFor="instagramUrl">Instagram URL</Label>
+          <Input
+            id="instagramUrl"
+            value={instagramUrl}
+            onChange={(e) => setInstagramUrl(e.target.value)}
+            placeholder="Enter full Instagram URL"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="facebookUrl">Facebook URL</Label>
+          <Input
+            id="facebookUrl"
+            value={facebookUrl}
+            onChange={(e) => setFacebookUrl(e.target.value)}
+            placeholder="Enter full Facebook URL"
+          />
+        </div>
+        <Button onClick={handleSocialMediaUpdate}>Save Social Media Links</Button>
+      </div>
 
-        <FormField
-          control={form.control}
-          name="whatsapp_number"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>WhatsApp Number</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      <div className="space-y-2">
+        <Label htmlFor="logo">Logo</Label>
+        <ImageUploadField
+          imageUrl={settings?.logo_url}
+          onImageChange={handleLogoChange}
+          isUploading={isUploading}
+          setIsUploading={setIsUploading}
         />
+      </div>
 
-        <FormField
-          control={form.control}
-          name="whatsapp_group_url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>WhatsApp Group URL (Optional)</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      <div className="space-y-2">
+        <Label htmlFor="favicon">Favicon (ICO)</Label>
+        <ImageUploadField
+          imageUrl={settings?.favicon_url}
+          onImageChange={handleFaviconChange}
+          isUploading={isUploading}
+          setIsUploading={setIsUploading}
         />
-
-        <FormField
-          control={form.control}
-          name="facebook_url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Facebook URL (Optional)</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="instagram_url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Instagram URL (Optional)</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button type="submit">Save Changes</Button>
-      </form>
-    </Form>
+      </div>
+    </div>
   );
-}
+};

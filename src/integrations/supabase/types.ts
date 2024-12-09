@@ -105,7 +105,7 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
-          id: string
+          id?: string
           slug: string
           title: string
           updated_at?: string
@@ -113,7 +113,7 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
-          id: string
+          id?: string
           slug?: string
           title?: string
           updated_at?: string
@@ -226,7 +226,6 @@ export type Database = {
           clearance_sale_active: boolean | null
           clearance_sale_end_date: string | null
           created_at: string
-          currency_symbol: string | null
           facebook_url: string | null
           favicon_url: string | null
           foreground_color: string | null
@@ -246,7 +245,6 @@ export type Database = {
           clearance_sale_active?: boolean | null
           clearance_sale_end_date?: string | null
           created_at?: string
-          currency_symbol?: string | null
           facebook_url?: string | null
           favicon_url?: string | null
           foreground_color?: string | null
@@ -266,7 +264,6 @@ export type Database = {
           clearance_sale_active?: boolean | null
           clearance_sale_end_date?: string | null
           created_at?: string
-          currency_symbol?: string | null
           facebook_url?: string | null
           favicon_url?: string | null
           foreground_color?: string | null
@@ -316,7 +313,7 @@ export type Database = {
           image_url: string
           link_url?: string | null
           order_index?: number
-          title: string
+          title?: string
           updated_at?: string
         }
         Relationships: []
@@ -396,7 +393,7 @@ export type Database = {
           customer_address?: string
           payment_mode?: string
         }
-        Relationships: []
+        Relationships: [] // Removed the foreign key relationship
       }
     }
     Views: {
@@ -435,10 +432,10 @@ export type Tables<
         PublicSchema["Views"])
     ? (PublicSchema["Tables"] &
         PublicSchema["Views"])[PublicTableNameOrOptions] extends {
-      Row: infer R
-    }
-    ? R
-    : never
+        Row: infer R
+      }
+      ? R
+      : never
     : never
 
 export type TablesInsert<

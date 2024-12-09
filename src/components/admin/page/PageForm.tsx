@@ -26,7 +26,11 @@ const formSchema = z.object({
 });
 
 // Define the type for our form values to match Supabase table
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = {
+  title: string;
+  slug: string;
+  content: string;
+};
 
 interface PageFormProps {
   initialData?: {
@@ -56,26 +60,16 @@ export const PageForm = ({ initialData }: PageFormProps) => {
       setIsLoading(true);
 
       if (initialData) {
-        // For updates, we need to include the id
         const { error } = await supabase
           .from("pages")
-          .update({
-            ...values,
-            updated_at: new Date().toISOString(),
-          })
+          .update(values)
           .eq("id", initialData.id);
 
         if (error) throw error;
       } else {
-        // For new pages, we create a complete record
         const { error } = await supabase
           .from("pages")
-          .insert({
-            ...values,
-            id: crypto.randomUUID(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
+          .insert(values);
 
         if (error) throw error;
       }
