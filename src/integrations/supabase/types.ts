@@ -105,7 +105,7 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
-          id?: string
+          id: string
           slug: string
           title: string
           updated_at?: string
@@ -316,7 +316,7 @@ export type Database = {
           image_url: string
           link_url?: string | null
           order_index?: number
-          title?: string
+          title: string
           updated_at?: string
         }
         Relationships: []
@@ -396,7 +396,7 @@ export type Database = {
           customer_address?: string
           payment_mode?: string
         }
-        Relationships: [] // Removed the foreign key relationship
+        Relationships: []
       }
     }
     Views: {
