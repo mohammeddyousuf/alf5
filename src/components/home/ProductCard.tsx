@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
@@ -25,10 +26,11 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
 
   // Only use the first 8 characters of the UUID
   const shortId = id.split('-')[0];
+  const productUrl = `/products/${formatUrlSlug(name)}-${shortId}`;
 
   return (
-    <Link to={`/products/${formatUrlSlug(name)}-${shortId}`}>
-      <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
+    <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
+      <Link to={productUrl}>
         <div className="aspect-square overflow-hidden relative">
           {imageUrl ? (
             <>
@@ -55,25 +57,30 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
             <p className="text-sm text-muted-foreground mt-1">{brand}</p>
           )}
         </CardContent>
-        <CardFooter className="p-4 pt-0">
-          <div className="flex flex-col">
-            {salePrice ? (
-              <>
-                <span className="text-sm text-muted-foreground line-through">
-                  {formatPrice(price)}
-                </span>
-                <span className="text-lg font-bold text-destructive">
-                  {formatPrice(salePrice)}
-                </span>
-              </>
-            ) : (
-              <span className="text-lg font-semibold">
+      </Link>
+      <CardFooter className="p-4 pt-0 flex flex-col gap-3">
+        <div className="flex flex-col">
+          {salePrice ? (
+            <>
+              <span className="text-sm text-muted-foreground line-through">
                 {formatPrice(price)}
               </span>
-            )}
-          </div>
-        </CardFooter>
-      </Card>
-    </Link>
+              <span className="text-lg font-bold text-destructive">
+                {formatPrice(salePrice)}
+              </span>
+            </>
+          ) : (
+            <span className="text-lg font-semibold">
+              {formatPrice(price)}
+            </span>
+          )}
+        </div>
+        <Link to={productUrl} className="w-full">
+          <Button className="w-full" variant="default">
+            Order Now
+          </Button>
+        </Link>
+      </CardFooter>
+    </Card>
   );
 };
