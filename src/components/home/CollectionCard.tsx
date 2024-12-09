@@ -7,7 +7,7 @@ interface CollectionCardProps {
   imageUrl: string | null;
   description: string | null;
   linkUrl: string | null;
-  buttonText?: string; // New optional prop for button text
+  buttonText?: string;
 }
 
 export const CollectionCard = ({ 
