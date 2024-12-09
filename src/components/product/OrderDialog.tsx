@@ -25,6 +25,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Textarea } from "@/components/ui/textarea";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -44,6 +46,7 @@ interface OrderDialogProps {
   productName: string;
   productBrand: string | null;
   productPrice: number;
+  productId: string;
   onSubmit: (data: OrderFormData) => void;
 }
 
@@ -53,8 +56,10 @@ export function OrderDialog({
   productName,
   productBrand,
   productPrice,
+  productId,
   onSubmit,
 }: OrderDialogProps) {
+  const { toast } = useToast();
   const form = useForm<OrderFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -66,14 +71,37 @@ export function OrderDialog({
     },
   });
 
-  const handleSubmit = (data: OrderFormData) => {
-    const formattedData = {
-      ...data,
-      productName,
-      productBrand,
-      productPrice,
-    };
-    onSubmit(formattedData);
+  const handleSubmit = async (data: OrderFormData) => {
+    try {
+      // Save order to database
+      const { error } = await supabase.from("orders").insert({
+        product_id: productId,
+        product_name: productName,
+        product_brand: productBrand,
+        product_price: productPrice,
+        customer_name: data.name,
+        customer_email: data.email,
+        customer_mobile: data.mobile,
+        customer_address: data.address,
+        payment_mode: data.paymentMode,
+      });
+
+      if (error) throw error;
+
+      // Call the original onSubmit to handle WhatsApp redirection
+      onSubmit(data);
+      
+      toast({
+        title: "Order Saved",
+        description: "Your order has been saved successfully",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save order. Please try again.",
+      });
+    }
   };
 
   return (
