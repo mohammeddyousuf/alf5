@@ -29,7 +29,7 @@ const AuthPage = () => {
         providers={[]}
         redirectTo={window.location.origin}
         view="sign_in"
-        showLinks={false}
+        showLinks={true}
         localization={{
           variables: {
             sign_in: {
