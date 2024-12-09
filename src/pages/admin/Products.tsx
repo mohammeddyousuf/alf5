@@ -50,7 +50,8 @@ export default function Products() {
   };
 
   const handleStatusChange = async (id: string, currentStatus: string | null) => {
-    const newStatus = currentStatus === "draft" ? "published" : "draft";
+    const newStatus = currentStatus === "published" ? "draft" : "published";
+    
     const { error } = await supabase
       .from("products")
       .update({ status: newStatus })
@@ -71,7 +72,7 @@ export default function Products() {
     }
   };
 
-  const getStatusColor = (status: string | null) => {
+  const getStatusBadgeVariant = (status: string | null) => {
     switch (status) {
       case "published":
         return "default";
@@ -130,8 +131,12 @@ export default function Products() {
                 variant="ghost" 
                 size="sm"
                 onClick={() => handleStatusChange(product.id, product.status)}
+                className="hover:bg-transparent"
               >
-                <Badge variant={getStatusColor(product.status)}>
+                <Badge 
+                  variant={getStatusBadgeVariant(product.status)}
+                  className="cursor-pointer"
+                >
                   {product.status || 'draft'}
                 </Badge>
               </Button>
