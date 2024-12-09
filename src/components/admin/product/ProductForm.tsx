@@ -143,6 +143,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
                   <SelectContent>
                     <SelectItem value="draft">Draft</SelectItem>
                     <SelectItem value="published">Published</SelectItem>
+                    <SelectItem value="archived">Archived</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
