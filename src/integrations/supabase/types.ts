@@ -123,6 +123,7 @@ export type Database = {
       products: {
         Row: {
           added_date: string | null
+          brand: string | null
           category_id: string | null
           created_at: string
           description: string | null
@@ -139,6 +140,7 @@ export type Database = {
         }
         Insert: {
           added_date?: string | null
+          brand?: string | null
           category_id?: string | null
           created_at?: string
           description?: string | null
@@ -155,6 +157,7 @@ export type Database = {
         }
         Update: {
           added_date?: string | null
+          brand?: string | null
           category_id?: string | null
           created_at?: string
           description?: string | null

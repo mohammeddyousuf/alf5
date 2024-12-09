@@ -87,6 +87,20 @@ export function BasicFields({ form }: BasicFieldsProps) {
 
       <FormField
         control={form.control}
+        name="brand"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Brand</FormLabel>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="description"
         render={({ field }) => (
           <FormItem>

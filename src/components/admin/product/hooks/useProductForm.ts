@@ -22,6 +22,7 @@ const defaultValues: ProductFormData = {
   category_id: null,
   subcategory_id: null,
   featured: false,
+  brand: null,
 };
 
 export function useProductForm({ product, onSuccess }: UseProductFormProps) {
@@ -39,6 +40,7 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
       category_id: product.category_id,
       subcategory_id: product.subcategory_id,
       featured: product.featured ?? false,
+      brand: product.brand ?? null,
     } : defaultValues,
   });
 
@@ -54,6 +56,7 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
         category_id: values.category_id || null,
         subcategory_id: values.subcategory_id || null,
         featured: values.featured,
+        brand: values.brand || null,
       };
 
       if (product?.id) {

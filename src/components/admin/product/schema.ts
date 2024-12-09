@@ -10,6 +10,7 @@ export const productFormSchema = z.object({
   category_id: z.string().nullable().optional(),
   subcategory_id: z.string().nullable().optional(),
   featured: z.boolean().default(false),
+  brand: z.string().nullable().optional(),
 });
 
 export type ProductFormData = z.infer<typeof productFormSchema>;
