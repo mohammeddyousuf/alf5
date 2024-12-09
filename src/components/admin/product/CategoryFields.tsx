@@ -50,15 +50,14 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
     enabled: Boolean(form.watch("category_id")),
   });
 
-  // Only reset subcategory when category changes and it's a different category
+  // Only reset subcategory when category changes and subcategory doesn't belong to new category
   useEffect(() => {
     const categoryId = form.watch("category_id");
     const currentSubcategoryId = form.watch("subcategory_id");
     
     if (categoryId && currentSubcategoryId) {
-      // Check if current subcategory belongs to selected category
       const subcategoryBelongsToCategory = subcategories?.some(
-        sub => sub.id === currentSubcategoryId
+        sub => sub.id === currentSubcategoryId && sub.category_id === categoryId
       );
       
       if (!subcategoryBelongsToCategory) {
