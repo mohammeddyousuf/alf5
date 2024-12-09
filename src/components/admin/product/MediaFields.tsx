@@ -86,14 +86,21 @@ export function MediaFields({ form }: MediaFieldsProps) {
       const fileName = decodeURIComponent(imageUrl.split("/").pop() || "");
       if (!fileName) throw new Error("Invalid file URL");
 
+      console.log("Attempting to delete file:", fileName);
+
       // Delete from Supabase Storage
-      const { error: deleteError } = await supabase.storage
+      const { error: deleteError, data } = await supabase.storage
         .from("product-images")
         .remove([fileName]);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error("Error deleting from storage:", deleteError);
+        throw deleteError;
+      }
 
-      // Update form state
+      console.log("Storage deletion response:", data);
+
+      // Update form state only after successful storage deletion
       const currentImages = form.getValues("images") || [];
       const updatedImages = currentImages.filter((_, index) => index !== indexToRemove);
       form.setValue("images", updatedImages);
