@@ -51,13 +51,21 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
     }
   };
 
+  const ensureHttps = (url: string) => {
+    if (!url) return url;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return `https://${url}`;
+    }
+    return url;
+  };
+
   const handleSocialMediaUpdate = async () => {
     try {
       const { error } = await supabase
         .from('settings')
         .update({
-          instagram_url: instagramUrl,
-          facebook_url: facebookUrl,
+          instagram_url: ensureHttps(instagramUrl),
+          facebook_url: ensureHttps(facebookUrl),
         })
         .eq('id', settings?.id);
 
@@ -139,7 +147,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
             id="instagramUrl"
             value={instagramUrl}
             onChange={(e) => setInstagramUrl(e.target.value)}
-            placeholder="Enter Instagram URL"
+            placeholder="Enter Instagram URL (e.g., www.instagram.com/your-profile)"
           />
         </div>
         <div className="space-y-2">
@@ -148,7 +156,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
             id="facebookUrl"
             value={facebookUrl}
             onChange={(e) => setFacebookUrl(e.target.value)}
-            placeholder="Enter Facebook URL"
+            placeholder="Enter Facebook URL (e.g., www.facebook.com/your-profile)"
           />
         </div>
         <Button onClick={handleSocialMediaUpdate}>Save Social Media Links</Button>
