@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { updateThemeColor } from "@/utils/themeUtils";
+import { updateThemeColor, initializeThemeColors } from "@/utils/themeUtils";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ThemeSettingsProps {
@@ -14,12 +14,17 @@ interface ThemeSettingsProps {
 export const ThemeSettings = ({ settings, refetch }: ThemeSettingsProps) => {
   const { toast } = useToast();
   const [colors, setColors] = useState({
-    primary: "#9b87f5",
-    secondary: "#7E69AB",
-    accent: "#6E59A5",
-    background: "#FFFFFF",
-    foreground: "#000000",
+    primary: settings?.primary_color || "#9b87f5",
+    secondary: settings?.secondary_color || "#7E69AB",
+    accent: settings?.accent_color || "#6E59A5",
+    background: settings?.background_color || "#FFFFFF",
+    foreground: settings?.foreground_color || "#000000",
   });
+
+  useEffect(() => {
+    // Initialize theme colors when settings are loaded
+    initializeThemeColors(settings);
+  }, [settings]);
 
   const handleColorChange = async (colorKey: keyof typeof colors, value: string) => {
     setColors(prev => ({ ...prev, [colorKey]: value }));

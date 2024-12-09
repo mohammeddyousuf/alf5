@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { GeneralSettings } from "./settings/GeneralSettings";
 import { ThemeSettings } from "./settings/ThemeSettings";
+import { initializeThemeColors } from "@/utils/themeUtils";
 
 export const WebsiteSettings = () => {
   const { data: settings, refetch } = useQuery({
@@ -15,6 +16,12 @@ export const WebsiteSettings = () => {
         .single();
       
       if (error) throw error;
+      
+      // Initialize theme colors when settings are loaded
+      if (data) {
+        initializeThemeColors(data);
+      }
+      
       return data;
     },
   });

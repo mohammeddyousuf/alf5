@@ -212,34 +212,49 @@ export type Database = {
       }
       settings: {
         Row: {
+          accent_color: string | null
+          background_color: string | null
           clearance_sale_active: boolean | null
           clearance_sale_end_date: string | null
           created_at: string
           favicon_url: string | null
+          foreground_color: string | null
           id: string
           logo_url: string | null
+          primary_color: string | null
+          secondary_color: string | null
           updated_at: string
           website_name: string | null
           whatsapp_number: string
         }
         Insert: {
+          accent_color?: string | null
+          background_color?: string | null
           clearance_sale_active?: boolean | null
           clearance_sale_end_date?: string | null
           created_at?: string
           favicon_url?: string | null
+          foreground_color?: string | null
           id?: string
           logo_url?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
           updated_at?: string
           website_name?: string | null
           whatsapp_number: string
         }
         Update: {
+          accent_color?: string | null
+          background_color?: string | null
           clearance_sale_active?: boolean | null
           clearance_sale_end_date?: string | null
           created_at?: string
           favicon_url?: string | null
+          foreground_color?: string | null
           id?: string
           logo_url?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
           updated_at?: string
           website_name?: string | null
           whatsapp_number?: string
