@@ -37,7 +37,7 @@ const AuthPage = () => {
               password_label: 'Password',
               button_label: 'Sign In',
               loading_button_label: 'Signing in...',
-              password_label_link: 'Forgot your password?',
+              link_text: 'Forgot your password?'
             }
           },
         }}
