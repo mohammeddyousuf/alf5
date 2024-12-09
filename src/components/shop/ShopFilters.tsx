@@ -28,6 +28,8 @@ interface ShopFiltersProps {
   setShowFeaturedOnly: (show: boolean) => void;
   showNewArrivalsOnly: boolean;
   setShowNewArrivalsOnly: (show: boolean) => void;
+  selectedBrand: string | null;
+  setSelectedBrand: (brand: string | null) => void;
 }
 
 export function ShopFilters({
@@ -45,6 +47,8 @@ export function ShopFilters({
   setShowFeaturedOnly,
   showNewArrivalsOnly,
   setShowNewArrivalsOnly,
+  selectedBrand,
+  setSelectedBrand,
 }: ShopFiltersProps) {
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -75,15 +79,54 @@ export function ShopFilters({
     enabled: !!selectedCategory,
   });
 
+  const { data: brands } = useQuery({
+    queryKey: ["brands"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("brand")
+        .not("brand", "is", null)
+        .order("brand");
+      
+      if (error) throw error;
+      
+      // Get unique brands
+      const uniqueBrands = Array.from(new Set(data.map(p => p.brand))).filter(Boolean);
+      return uniqueBrands;
+    },
+  });
+
   const handleCategoryChange = (value: string | null) => {
     setSelectedCategory(value);
-    setSelectedSubcategory(null); // Reset subcategory when category changes
+    setSelectedSubcategory(null);
   };
 
   return (
     <div className="w-64 shrink-0 space-y-6">
       <div className="space-y-4">
         <h2 className="font-semibold text-lg">Filters</h2>
+        <Separator />
+
+        <div className="space-y-2">
+          <Label>Brand</Label>
+          <Select
+            value={selectedBrand || "all"}
+            onValueChange={(value) => setSelectedBrand(value === "all" ? null : value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select brand" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Brands</SelectItem>
+              {brands?.map((brand) => (
+                <SelectItem key={brand} value={brand}>
+                  {brand}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <Separator />
 
         <div className="space-y-2">

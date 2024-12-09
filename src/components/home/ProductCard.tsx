@@ -7,9 +7,10 @@ interface ProductCardProps {
   price: number;
   salePrice?: number | null;
   imageUrl?: string;
+  brand?: string | null;
 }
 
-export const ProductCard = ({ id, name, price, salePrice, imageUrl }: ProductCardProps) => {
+export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: ProductCardProps) => {
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -41,6 +42,9 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl }: ProductCar
           )}
         </div>
         <CardContent className="p-4">
+          {brand && (
+            <p className="text-sm text-muted-foreground mb-1">{brand}</p>
+          )}
           <h3 className="font-semibold line-clamp-2">{name}</h3>
         </CardContent>
         <CardFooter className="p-4 pt-0">

@@ -17,6 +17,7 @@ const Shop = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">("default");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   
   const { data: products, isLoading, error } = useQuery({
@@ -62,14 +63,14 @@ const Shop = () => {
     const meetsPrice = price >= priceRange[0] && price <= priceRange[1];
     const meetsSale = showSaleOnly ? product.sale_price !== null : true;
     const meetsFeatured = showFeaturedOnly ? product.featured : true;
+    const meetsBrand = selectedBrand ? product.brand === selectedBrand : true;
     
-    // Consider products added in the last 30 days as new arrivals
     const isNewArrival = product.added_date 
       ? new Date(product.added_date) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
       : false;
     const meetsNewArrival = showNewArrivalsOnly ? isNewArrival : true;
 
-    return meetsPrice && meetsSale && meetsFeatured && meetsNewArrival;
+    return meetsPrice && meetsSale && meetsFeatured && meetsNewArrival && meetsBrand;
   });
 
   const sortedProducts = [...(filteredProducts || [])].sort((a, b) => {
@@ -128,6 +129,8 @@ const Shop = () => {
                   setShowFeaturedOnly={setShowFeaturedOnly}
                   showNewArrivalsOnly={showNewArrivalsOnly}
                   setShowNewArrivalsOnly={setShowNewArrivalsOnly}
+                  selectedBrand={selectedBrand}
+                  setSelectedBrand={setSelectedBrand}
                 />
               </div>
             </SheetContent>
@@ -151,6 +154,8 @@ const Shop = () => {
             setShowFeaturedOnly={setShowFeaturedOnly}
             showNewArrivalsOnly={showNewArrivalsOnly}
             setShowNewArrivalsOnly={setShowNewArrivalsOnly}
+            selectedBrand={selectedBrand}
+            setSelectedBrand={setSelectedBrand}
           />
         </div>
 
