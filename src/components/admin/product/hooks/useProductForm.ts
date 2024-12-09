@@ -16,19 +16,21 @@ interface UseProductFormProps {
 export function useProductForm({ product, onSuccess }: UseProductFormProps) {
   const { toast } = useToast();
   
+  const defaultValues: ProductFormData = {
+    name: "",
+    description: "",
+    price: 0,
+    sale_price: null,
+    images: [],
+    video_urls: [],
+    status: "draft",
+    category_id: null,
+    subcategory_id: null,
+  };
+
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productFormSchema),
-    defaultValues: {
-      name: "",
-      description: "",
-      price: 0,
-      sale_price: null,
-      images: [],
-      video_urls: [],
-      status: "draft",
-      category_id: null,
-      subcategory_id: null,
-    },
+    defaultValues,
   });
 
   // Load product data into form when available
@@ -51,7 +53,7 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
       console.log("[useProductForm] Setting form data:", formData);
       form.reset(formData);
     }
-  }, [product, form]);
+  }, [product]);
 
   const onSubmit = async (values: ProductFormData) => {
     try {
@@ -103,18 +105,7 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
           description: "Product created successfully",
         });
 
-        // Only reset form for new products
-        form.reset({
-          name: "",
-          description: "",
-          price: 0,
-          sale_price: null,
-          images: [],
-          video_urls: [],
-          status: "draft",
-          category_id: null,
-          subcategory_id: null,
-        });
+        form.reset(defaultValues);
       }
       
       onSuccess?.();
