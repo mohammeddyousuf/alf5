@@ -28,7 +28,6 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
         .select("*")
         .order("name");
       if (error) throw error;
-      console.log("Fetched categories:", data);
       return data;
     },
   });
@@ -39,8 +38,6 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
       const categoryId = form.watch("category_id");
       if (!categoryId) return [];
       
-      console.log("Fetching subcategories for category:", categoryId);
-      
       const { data, error } = await supabase
         .from("subcategories")
         .select("*")
@@ -48,22 +45,27 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
         .order("name");
       
       if (error) throw error;
-      console.log("Fetched subcategories:", data);
       return data;
     },
     enabled: Boolean(form.watch("category_id")),
   });
 
-  // Reset subcategory when category changes
+  // Only reset subcategory when category changes and it's a different category
   useEffect(() => {
     const categoryId = form.watch("category_id");
-    console.log("Category changed to:", categoryId);
+    const currentSubcategoryId = form.watch("subcategory_id");
     
-    if (categoryId) {
-      console.log("Resetting subcategory");
-      form.setValue("subcategory_id", null);
+    if (categoryId && currentSubcategoryId) {
+      // Check if current subcategory belongs to selected category
+      const subcategoryBelongsToCategory = subcategories?.some(
+        sub => sub.id === currentSubcategoryId
+      );
+      
+      if (!subcategoryBelongsToCategory) {
+        form.setValue("subcategory_id", null);
+      }
     }
-  }, [form.watch("category_id")]);
+  }, [form.watch("category_id"), subcategories]);
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -74,10 +76,7 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
           <FormItem>
             <FormLabel>Category</FormLabel>
             <Select
-              onValueChange={(value) => {
-                console.log("Category selected:", value);
-                field.onChange(value);
-              }}
+              onValueChange={field.onChange}
               value={field.value || undefined}
             >
               <FormControl>
@@ -105,10 +104,7 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
           <FormItem>
             <FormLabel>Subcategory</FormLabel>
             <Select
-              onValueChange={(value) => {
-                console.log("Subcategory selected:", value);
-                field.onChange(value);
-              }}
+              onValueChange={field.onChange}
               value={field.value || undefined}
               disabled={!form.watch("category_id")}
             >
