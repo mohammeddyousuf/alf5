@@ -134,7 +134,7 @@ export const ProductList = () => {
           sale_timer_enabled: newTimerState,
           sale_end_date: endDate
         })
-        .is('sale_price', 'not.null');  // Changed from .not('sale_price', 'is', null)
+        .not('sale_price', 'is', null);  // Reverted back to original working syntax
 
       if (error) {
         console.error("Error in handleGlobalSaleTimer:", error);
