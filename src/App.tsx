@@ -25,9 +25,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { initializeThemeColors } from "@/utils/themeUtils";
 import "./App.css";
 
-// Separate component for theme initialization
+// Separate component for theme initialization and tracking codes
 function ThemeInitializer() {
-  useQuery({
+  const { data } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -40,6 +40,13 @@ function ThemeInitializer() {
       if (data) {
         console.log('Loading initial theme colors');
         initializeThemeColors(data);
+
+        // Inject tracking codes if they exist
+        if (data.tracking_codes) {
+          const scriptElement = document.createElement('script');
+          scriptElement.innerHTML = data.tracking_codes;
+          document.head.appendChild(scriptElement);
+        }
       }
       
       return data;

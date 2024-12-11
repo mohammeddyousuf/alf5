@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { ImageUploadField } from "../shared/ImageUploadField";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,11 +16,13 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const [websiteName, setWebsiteName] = useState(settings?.website_name || "");
+  const [trackingCodes, setTrackingCodes] = useState(settings?.tracking_codes || "");
 
   // Update state when settings change
   useEffect(() => {
     if (settings) {
       setWebsiteName(settings.website_name || "");
+      setTrackingCodes(settings.tracking_codes || "");
     }
   }, [settings]);
 
@@ -42,6 +45,30 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       toast({
         title: "Error",
         description: "Failed to update website name",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleTrackingCodesUpdate = async () => {
+    try {
+      const { error } = await supabase
+        .from('settings')
+        .update({ tracking_codes: trackingCodes })
+        .eq('id', settings?.id);
+
+      if (error) throw error;
+
+      await refetch();
+      toast({
+        title: "Success",
+        description: "Tracking codes updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating tracking codes:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update tracking codes",
         variant: "destructive",
       });
     }
@@ -105,6 +132,20 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
             placeholder="Enter website name"
           />
           <Button onClick={handleWebsiteNameUpdate}>Save</Button>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="trackingCodes">Tracking Codes</Label>
+        <div className="space-y-2">
+          <Textarea
+            id="trackingCodes"
+            value={trackingCodes}
+            onChange={(e) => setTrackingCodes(e.target.value)}
+            placeholder="Paste your tracking codes here (e.g., Google Analytics)"
+            className="min-h-[150px] font-mono text-sm"
+          />
+          <Button onClick={handleTrackingCodesUpdate} className="w-full">Save Tracking Codes</Button>
         </div>
       </div>
 
