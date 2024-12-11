@@ -45,9 +45,32 @@ function ThemeInitializer() {
         if (data.tracking_codes) {
           console.log('Injecting tracking codes:', data.tracking_codes);
           try {
-            const scriptElement = document.createElement('script');
-            scriptElement.innerHTML = data.tracking_codes;
-            document.head.appendChild(scriptElement);
+            // Create a temporary div to validate HTML content
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = data.tracking_codes;
+            
+            // Extract only script elements
+            const scripts = tempDiv.getElementsByTagName('script');
+            
+            // Inject each valid script
+            Array.from(scripts).forEach(script => {
+              const newScript = document.createElement('script');
+              // Copy content and attributes
+              if (script.src) {
+                newScript.src = script.src;
+              }
+              if (script.textContent) {
+                newScript.textContent = script.textContent;
+              }
+              // Copy other attributes
+              Array.from(script.attributes).forEach(attr => {
+                if (attr.name !== 'src') { // Skip src as it's already handled
+                  newScript.setAttribute(attr.name, attr.value);
+                }
+              });
+              document.head.appendChild(newScript);
+            });
+            
             console.log('Tracking codes successfully injected');
           } catch (error) {
             console.error('Error injecting tracking codes:', error);
