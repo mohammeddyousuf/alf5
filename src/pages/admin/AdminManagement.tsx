@@ -29,11 +29,10 @@ const AdminManagement = () => {
 
   const fetchAdmins = async () => {
     try {
-      // Modified query to avoid RLS recursion
+      // Simplified query to just get all profiles and filter client-side
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('*')
-        .or('role.eq.admin,role.eq.super_admin');
+        .select('*');
 
       if (profilesError) {
         console.error('Error fetching admins:', profilesError);
@@ -45,7 +44,12 @@ const AdminManagement = () => {
         return;
       }
 
-      setAdmins(profilesData || []);
+      // Filter admin roles client-side
+      const adminProfiles = (profilesData || []).filter(
+        profile => profile.role === 'admin' || profile.role === 'super_admin'
+      );
+      
+      setAdmins(adminProfiles);
     } catch (error) {
       console.error('Error in fetchAdmins:', error);
       toast({
