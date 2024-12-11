@@ -29,6 +29,21 @@ const Pages = () => {
     );
   }
 
+  const getLocationDisplay = (location: string | null) => {
+    switch (location) {
+      case "header":
+        return "Header Navigation";
+      case "footer_company":
+        return "Footer - Company Section";
+      case "footer_legal":
+        return "Footer - Legal Section";
+      case "none":
+        return "No Navigation Link";
+      default:
+        return "No Location Set";
+    }
+  };
+
   return (
     <div className="container py-12">
       <div className="flex justify-between items-center mb-8">
@@ -42,9 +57,9 @@ const Pages = () => {
               <div className="space-y-1">
                 <h2 className="text-xl font-semibold">{page.title}</h2>
                 <p className="text-sm text-muted-foreground leading-none">/{page.slug}</p>
-                {page.location && (
-                  <p className="text-sm text-muted-foreground">Location: {page.location}</p>
-                )}
+                <p className="text-sm text-muted-foreground">
+                  Location: {getLocationDisplay(page.location)}
+                </p>
               </div>
               <Button 
                 variant="default" 

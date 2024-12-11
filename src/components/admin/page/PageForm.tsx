@@ -40,7 +40,7 @@ interface PageFormProps {
     title: string;
     slug: string;
     content: string;
-    location?: string;
+    location?: "header" | "footer_company" | "footer_legal" | "none" | null;
   };
 }
 
@@ -66,14 +66,24 @@ export const PageForm = ({ initialData }: PageFormProps) => {
       if (initialData) {
         const { error } = await supabase
           .from("pages")
-          .update(values)
+          .update({
+            title: values.title,
+            slug: values.slug,
+            content: values.content,
+            location: values.location,
+          })
           .eq("id", initialData.id);
 
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from("pages")
-          .insert(values);
+          .insert({
+            title: values.title,
+            slug: values.slug,
+            content: values.content,
+            location: values.location,
+          });
 
         if (error) throw error;
       }
