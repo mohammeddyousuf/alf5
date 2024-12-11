@@ -40,6 +40,14 @@ export default function Orders() {
     },
   });
 
+  const formatPrice = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   const downloadCSV = () => {
     if (!orders) return;
 
@@ -59,7 +67,7 @@ export default function Orders() {
       format(new Date(order.created_at), "yyyy-MM-dd HH:mm:ss"),
       order.product_name,
       order.product_brand || "",
-      order.product_price,
+      formatPrice(order.product_price),
       order.customer_name,
       order.customer_email,
       order.customer_mobile,
@@ -165,7 +173,7 @@ export default function Orders() {
                     {order.customer_address}
                   </div>
                 </TableCell>
-                <TableCell>${order.product_price}</TableCell>
+                <TableCell>{formatPrice(order.product_price)}</TableCell>
                 <TableCell>
                   <div className="capitalize">{order.payment_mode}</div>
                 </TableCell>
