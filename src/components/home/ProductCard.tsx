@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { SaleCountdown } from "@/components/product/SaleCountdown";
 
 interface ProductCardProps {
   id: string;
@@ -12,6 +15,21 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: ProductCardProps) => {
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -32,6 +50,18 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
   const shortId = id.split('-')[0];
   const productUrl = `/products/${formatUrlSlug(name)}-${shortId}`;
 
+  // Check if sale is active and timer hasn't expired
+  const showSaleTimer = settings?.clearance_sale_active && 
+    settings?.clearance_sale_end_date && 
+    salePrice && 
+    salePrice < price;
+
+  // Check if sale price should be shown (either no timer or timer not expired)
+  const showSalePrice = salePrice && salePrice < price && 
+    (!settings?.clearance_sale_active || 
+      (settings?.clearance_sale_active && settings?.clearance_sale_end_date && 
+       new Date(settings.clearance_sale_end_date) > new Date()));
+
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
       <Link to={productUrl}>
@@ -43,10 +73,13 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
                 alt={name}
                 className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
               />
-              {salePrice && salePrice < price && (
+              {showSalePrice && (
                 <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground rounded-md px-2 py-1">
                   <span className="text-xs font-bold">SALE</span>
                 </div>
+              )}
+              {showSaleTimer && settings?.clearance_sale_end_date && (
+                <SaleCountdown endDate={settings.clearance_sale_end_date} />
               )}
             </>
           ) : (
@@ -64,7 +97,7 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
       </Link>
       <CardFooter className="p-4 pt-0 flex flex-col gap-3">
         <div className="flex flex-col">
-          {salePrice && salePrice < price ? (
+          {showSalePrice ? (
             <>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground line-through">

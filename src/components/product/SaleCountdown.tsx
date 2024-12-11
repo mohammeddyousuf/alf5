@@ -28,8 +28,22 @@ export function SaleCountdown({ endDate }: SaleCountdownProps) {
       };
     };
 
+    // Initial calculation
+    setTimeLeft(calculateTimeLeft());
+
+    // Update every second
     const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
+      const newTimeLeft = calculateTimeLeft();
+      setTimeLeft(newTimeLeft);
+      
+      // If timer has expired, trigger a refetch of the settings
+      if (newTimeLeft.days === 0 && 
+          newTimeLeft.hours === 0 && 
+          newTimeLeft.minutes === 0 && 
+          newTimeLeft.seconds === 0) {
+        // The parent component will handle the price update through its own query
+        clearInterval(timer);
+      }
     }, 1000);
 
     return () => clearInterval(timer);
