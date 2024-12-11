@@ -18,11 +18,16 @@ const Products = () => {
   const { data: products, refetch, isLoading: isLoadingProducts } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("products").select("*");
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order('created_at', { ascending: false });  // Add ordering to ensure consistent display
+      
       if (error) {
         console.error("Error fetching products:", error);
         throw error;
       }
+      console.log("Fetched products:", data);  // Add logging to debug
       return data;
     },
   });
@@ -33,7 +38,9 @@ const Products = () => {
       // First try to get existing limits
       const { data: existingLimits, error: fetchError } = await supabase
         .from("system_limits")
-        .select("*");
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1);  // Get the most recent limit
       
       if (fetchError) {
         console.error("Error fetching limits:", fetchError);
