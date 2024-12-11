@@ -38,13 +38,20 @@
           });
           const data = await response.json();
           if (data[0]?.favicon_url) {
-            document.getElementById('favicon').href = data[0].favicon_url;
+            const faviconLink = document.getElementById('favicon');
+            // Force browser to reload favicon by appending timestamp
+            faviconLink.href = `${data[0].favicon_url}?t=${new Date().getTime()}`;
           }
         } catch (error) {
           console.error('Error updating favicon:', error);
         }
       }
+      
+      // Initial update
       updateFavicon();
+      
+      // Update favicon every 5 seconds
+      setInterval(updateFavicon, 5000);
     </script>
   </body>
 </html>
