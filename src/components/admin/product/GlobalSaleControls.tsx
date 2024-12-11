@@ -19,18 +19,18 @@ export function GlobalSaleControls() {
     queryKey: ["settings"],
     queryFn: async () => {
       try {
-        // Get all settings rows
+        // First try to get existing settings
         const { data: existingSettings, error } = await supabase
           .from("settings")
           .select("*")
-          .order('created_at', { ascending: false })
-          .limit(1);
+          .is('id', null)
+          .maybeSingle();
         
         if (error) throw error;
 
-        // If settings exist, return the first one
-        if (existingSettings && existingSettings.length > 0) {
-          return existingSettings[0];
+        // If settings exist, return them
+        if (existingSettings) {
+          return existingSettings;
         }
 
         // If no settings exist, create default settings
@@ -44,7 +44,7 @@ export function GlobalSaleControls() {
           clearance_sale_active: false,
           clearance_sale_end_date: null,
           tracking_codes: "",
-          whatsapp_number: "+1234567890" // Default required value
+          whatsapp_number: "" // Required field
         };
 
         const { data: newSettings, error: insertError } = await supabase
@@ -89,25 +89,13 @@ export function GlobalSaleControls() {
         ? new Date(`${endDate}T${endTime}`).toISOString()
         : null;
 
-      // Get existing settings
-      const { data: existingSettings } = await supabase
-        .from("settings")
-        .select("*")
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      // Prepare update data while preserving other settings
-      const updateData = {
-        ...(existingSettings?.[0] || {}),
-        clearance_sale_active: isGlobalSaleEnabled,
-        clearance_sale_end_date: endDateTime,
-        whatsapp_number: existingSettings?.[0]?.whatsapp_number || "+1234567890" // Ensure whatsapp_number is included
-      };
-
       const { error } = await supabase
         .from('settings')
-        .upsert(updateData)
-        .eq('id', existingSettings?.[0]?.id);
+        .update({ 
+          clearance_sale_active: isGlobalSaleEnabled,
+          clearance_sale_end_date: endDateTime
+        })
+        .is('id', null);
 
       if (error) throw error;
 
