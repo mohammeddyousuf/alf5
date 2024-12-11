@@ -167,6 +167,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
                 onImageChange={(url) => form.setValue("image_url", url || "")}
                 isUploading={isUploading}
                 setIsUploading={setIsUploading}
+                isCollection={true}
               />
               <FormMessage />
             </FormItem>
