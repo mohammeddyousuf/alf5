@@ -5,6 +5,9 @@ import { Database } from "@/integrations/supabase/types";
 import { Pencil } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ProductForm } from "./ProductForm";
+import { SaleCountdown } from "@/components/product/SaleCountdown";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +31,19 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: ProductCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -54,6 +70,11 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
     }
   };
 
+  const showSaleTimer = settings?.clearance_sale_active && 
+    settings?.clearance_sale_end_date && 
+    product.sale_price && 
+    product.sale_price < product.price;
+
   return (
     <Card key={product.id} className="p-4">
       <div className="aspect-square mb-4 overflow-hidden rounded-lg relative">
@@ -68,6 +89,9 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
               <div className="absolute top-2 left-2">
                 <Badge variant="destructive">SALE</Badge>
               </div>
+            )}
+            {showSaleTimer && settings?.clearance_sale_end_date && (
+              <SaleCountdown endDate={settings.clearance_sale_end_date} />
             )}
           </>
         ) : (
@@ -102,7 +126,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
               {formatPrice(product.price)}
             </span>
             <span className="ml-2 text-destructive">
-              (-{calculateDiscount(product.price, product.sale_price)}%)
+              ({calculateDiscount(product.price, product.sale_price)}%)
             </span>
           </>
         ) : (
