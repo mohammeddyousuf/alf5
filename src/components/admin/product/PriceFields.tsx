@@ -20,7 +20,16 @@ export function PriceFields({ form }: PriceFieldsProps) {
           <FormItem>
             <FormLabel>Price</FormLabel>
             <FormControl>
-              <Input type="number" step="0.01" {...field} />
+              <Input 
+                type="number" 
+                step="0.01" 
+                {...field} 
+                onChange={(e) => {
+                  field.onChange(e);
+                  // When regular price changes, trigger sale_price validation
+                  form.trigger("sale_price");
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
