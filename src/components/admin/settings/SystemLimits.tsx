@@ -5,6 +5,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
+import { Database } from "@/integrations/supabase/types";
+
+type SystemLimits = Database['public']['Tables']['system_limits']['Row'];
 
 export function SystemLimits() {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -19,7 +22,7 @@ export function SystemLimits() {
         .single();
       
       if (error) throw error;
-      return data;
+      return data as SystemLimits;
     },
   });
 
@@ -31,7 +34,7 @@ export function SystemLimits() {
       const { error } = await supabase
         .from("system_limits")
         .upsert({ 
-          id: 1, // Single row for system limits
+          id: 1,
           product_limit: parseInt(productLimit) 
         });
 

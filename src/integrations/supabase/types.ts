@@ -275,7 +275,7 @@ export type Database = {
           updated_at?: string
           website_name?: string | null
           whatsapp_group_url?: string | null
-          whatsapp_number?: string
+          whatsapp_number?: string;
         }
         Relationships: []
       }
@@ -393,7 +393,28 @@ export type Database = {
           customer_address?: string
           payment_mode?: string
         }
-        Relationships: [] // Removed the foreign key relationship
+        Relationships: []
+      }
+      system_limits: {
+        Row: {
+          id: number
+          product_limit: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          product_limit: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          product_limit?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
     }
     Views: {
@@ -453,10 +474,10 @@ export type TablesInsert<
     : never
   : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
     ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
+      Insert: infer I
+    }
+    ? I
+    : never
     : never
 
 export type TablesUpdate<
