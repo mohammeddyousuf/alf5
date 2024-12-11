@@ -154,7 +154,9 @@ const Admin = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <WhatsAppSettings />
+          <div className="space-y-6">
+            <WhatsAppSettings />
+          </div>
           <WebsiteSettings />
         </div>
       </div>
