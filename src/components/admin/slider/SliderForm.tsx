@@ -94,6 +94,7 @@ export const SliderForm = ({ slider, onSuccess }: SliderFormProps) => {
             onImageChange={(url) => setFormData({ ...formData, image_url: url || "" })}
             isUploading={isUploading}
             setIsUploading={setIsUploading}
+            isSlider={true}
           />
         </div>
 

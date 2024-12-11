@@ -14,6 +14,7 @@ interface ImageUploadFieldProps {
   acceptedFileTypes?: string;
   isFavicon?: boolean;
   isLogo?: boolean;
+  isSlider?: boolean;
 }
 
 export function ImageUploadField({
@@ -24,6 +25,7 @@ export function ImageUploadField({
   acceptedFileTypes = "image/*",
   isFavicon = false,
   isLogo = false,
+  isSlider = false,
 }: ImageUploadFieldProps) {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
@@ -63,9 +65,10 @@ export function ImageUploadField({
       if (isFavicon) {
         fileName = `ico_${timestamp}.${extension}`;
       } else if (isLogo) {
-        // Explicitly add logo_ prefix for logo uploads
         fileName = `logo_${timestamp}.${extension}`;
-        console.log("Creating logo filename:", fileName); // Debug log
+      } else if (isSlider) {
+        fileName = `slider_${timestamp}.${extension}`;
+        console.log("Creating slider filename:", fileName);
       } else {
         fileName = `${timestamp}.${extension}`;
       }
@@ -93,7 +96,7 @@ export function ImageUploadField({
       } else {
         toast({
           title: "Success",
-          description: `${isFavicon ? 'Favicon' : (isLogo ? 'Logo' : 'Image')} uploaded successfully`,
+          description: `${isFavicon ? 'Favicon' : (isLogo ? 'Logo' : (isSlider ? 'Slider image' : 'Image'))} uploaded successfully`,
         });
       }
     } catch (error: any) {
@@ -127,7 +130,7 @@ export function ImageUploadField({
       
       toast({
         title: "Success",
-        description: `${isFavicon ? 'Favicon' : (isLogo ? 'Logo' : 'Image')} deleted successfully`,
+        description: `${isFavicon ? 'Favicon' : (isLogo ? 'Logo' : (isSlider ? 'Slider image' : 'Image'))} deleted successfully`,
       });
     } catch (error: any) {
       console.error("Error deleting image:", error);
@@ -168,7 +171,7 @@ export function ImageUploadField({
             ) : (
               <div className="flex items-center gap-2">
                 <ImagePlus className="h-5 w-5" />
-                <span>Upload {isFavicon ? 'Favicon' : (isLogo ? 'Logo' : 'Image')}</span>
+                <span>Upload {isFavicon ? 'Favicon' : (isLogo ? 'Logo' : (isSlider ? 'Slider Image' : 'Image'))}</span>
               </div>
             )}
           </div>
