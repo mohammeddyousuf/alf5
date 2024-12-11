@@ -19,44 +19,16 @@ export function GlobalSaleControls() {
     queryKey: ["settings"],
     queryFn: async () => {
       try {
-        // First try to get existing settings
-        const { data: existingSettings, error } = await supabase
+        const { data, error } = await supabase
           .from("settings")
           .select("*")
           .is('id', null)
           .maybeSingle();
         
         if (error) throw error;
-
-        // If settings exist, return them
-        if (existingSettings) {
-          return existingSettings;
-        }
-
-        // If no settings exist, create default settings
-        const defaultSettings = {
-          website_name: "My Website",
-          primary_color: "#9b87f5",
-          secondary_color: "#7E69AB",
-          accent_color: "#6E59A5",
-          background_color: "#FFFFFF",
-          foreground_color: "#000000",
-          clearance_sale_active: false,
-          clearance_sale_end_date: null,
-          tracking_codes: "",
-          whatsapp_number: "" // Required field
-        };
-
-        const { data: newSettings, error: insertError } = await supabase
-          .from("settings")
-          .insert([defaultSettings])
-          .select()
-          .single();
-
-        if (insertError) throw insertError;
-        return newSettings;
+        return data;
       } catch (error) {
-        console.error("Error in settings query:", error);
+        console.error("Error fetching settings:", error);
         throw error;
       }
     },
