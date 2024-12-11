@@ -21,7 +21,8 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
   };
 
   const calculateDiscount = (originalPrice: number, salePrice: number) => {
-    return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+    const discount = ((originalPrice - salePrice) / originalPrice) * 100;
+    return Math.round(discount);
   };
 
   const formatUrlSlug = (name: string) => {
