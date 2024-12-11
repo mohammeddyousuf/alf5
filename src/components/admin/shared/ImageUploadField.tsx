@@ -36,7 +36,6 @@ export function ImageUploadField({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // For favicon, accept both .ico and common image formats
     if (isFavicon && !file.type.includes('image/')) {
       toast({
         variant: "destructive",
@@ -47,17 +46,21 @@ export function ImageUploadField({
 
     actualSetIsUploading(true);
     try {
-      // Generate the filename with the appropriate prefix
-      let prefix = '';
-      if (isFavicon) {
-        prefix = 'ico_';
-      } else if (isLogo) {
-        prefix = 'logo_';
-      }
+      // Get file extension
+      const extension = file.name.split('.').pop() || '';
       
-      // Ensure unique filename with prefix
+      // Generate timestamp
       const timestamp = new Date().getTime();
-      const fileName = `${prefix}${timestamp}_${encodeURIComponent(file.name)}`;
+      
+      // Construct filename with prefix first, then timestamp
+      let fileName;
+      if (isFavicon) {
+        fileName = `ico_${timestamp}.${extension}`;
+      } else if (isLogo) {
+        fileName = `logo_${timestamp}.${extension}`;
+      } else {
+        fileName = `${timestamp}.${extension}`;
+      }
       
       const { error: uploadError } = await supabase.storage
         .from("product-images")
