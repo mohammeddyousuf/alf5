@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import type { Pages } from "@/integrations/supabase/types/pages";
 
 const Pages = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Pages = () => {
         .order("created_at", { ascending: false });
       
       if (error) throw error;
-      return data;
+      return data as Pages["Row"][];
     },
   });
 
