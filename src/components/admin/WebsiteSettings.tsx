@@ -10,20 +10,47 @@ export const WebsiteSettings = () => {
   const { data: settings, refetch } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First try to get existing settings
+      const { data: existingSettings, error: fetchError } = await supabase
         .from("settings")
         .select("*")
         .is('id', null)
         .single();
       
-      if (error) throw error;
-      
-      // Initialize theme colors when settings are loaded
-      if (data) {
-        initializeThemeColors(data);
+      // If settings exist, return them
+      if (existingSettings) {
+        initializeThemeColors(existingSettings);
+        return existingSettings;
       }
-      
-      return data;
+
+      // If no settings exist, create default settings
+      const defaultSettings = {
+        website_name: "My Website",
+        primary_color: "#9b87f5",
+        secondary_color: "#7E69AB",
+        accent_color: "#6E59A5",
+        background_color: "#FFFFFF",
+        foreground_color: "#000000",
+        clearance_sale_active: false,
+        clearance_sale_end_date: null,
+        tracking_codes: "",
+        whatsapp_number: "" // Required field
+      };
+
+      const { data: newSettings, error: insertError } = await supabase
+        .from("settings")
+        .insert([defaultSettings])
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      // Initialize theme colors with new settings
+      if (newSettings) {
+        initializeThemeColors(newSettings);
+      }
+
+      return newSettings;
     },
   });
 
