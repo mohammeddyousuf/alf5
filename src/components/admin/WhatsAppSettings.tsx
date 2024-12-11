@@ -14,6 +14,8 @@ export const WhatsAppSettings = () => {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [whatsappGroupUrl, setWhatsappGroupUrl] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [instagramUrl, setInstagramUrl] = useState("");
+  const [facebookUrl, setFacebookUrl] = useState("");
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -34,6 +36,12 @@ export const WhatsAppSettings = () => {
     }
     if (settings?.whatsapp_group_url) {
       setWhatsappGroupUrl(settings.whatsapp_group_url);
+    }
+    if (settings?.instagram_url) {
+      setInstagramUrl(settings.instagram_url);
+    }
+    if (settings?.facebook_url) {
+      setFacebookUrl(settings.facebook_url);
     }
   }, [settings]);
 
@@ -63,6 +71,38 @@ export const WhatsAppSettings = () => {
         variant: "destructive",
         title: "Error",
         description: "Failed to update WhatsApp settings",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleSocialMediaUpdate = async () => {
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from("settings")
+        .update({
+          instagram_url: instagramUrl,
+          facebook_url: facebookUrl,
+        })
+        .eq("id", settings?.id);
+
+      if (error) throw error;
+
+      // Invalidate and refetch settings query
+      await queryClient.invalidateQueries({ queryKey: ["settings"] });
+
+      toast({
+        title: "Success",
+        description: "Social media links updated successfully",
+      });
+    } catch (error) {
+      console.error("Error updating social media links:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update social media links",
       });
     } finally {
       setIsUpdating(false);
@@ -101,6 +141,40 @@ export const WhatsAppSettings = () => {
             'Update WhatsApp'
           )}
         </Button>
+
+        <div className="mt-8">
+          <h3 className="text-lg font-medium mb-4">Social Media Links</h3>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="instagramUrl">Instagram URL</Label>
+              <Input
+                id="instagramUrl"
+                value={instagramUrl}
+                onChange={(e) => setInstagramUrl(e.target.value)}
+                placeholder="Enter full Instagram URL"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="facebookUrl">Facebook URL</Label>
+              <Input
+                id="facebookUrl"
+                value={facebookUrl}
+                onChange={(e) => setFacebookUrl(e.target.value)}
+                placeholder="Enter full Facebook URL"
+              />
+            </div>
+            <Button onClick={handleSocialMediaUpdate} disabled={isUpdating}>
+              {isUpdating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Save Social Media Links'
+              )}
+            </Button>
+          </div>
+        </div>
       </div>
     </Card>
   );
