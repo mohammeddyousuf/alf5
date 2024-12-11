@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -26,9 +26,25 @@ export function SystemLimits() {
     },
   });
 
-  const [productLimit, setProductLimit] = useState(limits?.product_limit?.toString() || "");
+  const [productLimit, setProductLimit] = useState("");
+
+  // Update local state when limits data changes
+  useEffect(() => {
+    if (limits?.product_limit) {
+      setProductLimit(limits.product_limit.toString());
+    }
+  }, [limits]);
 
   const handleUpdateLimit = async () => {
+    if (!productLimit) {
+      toast({
+        title: "Error",
+        description: "Please enter a product limit",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsUpdating(true);
     try {
       const { error } = await supabase
@@ -79,6 +95,7 @@ export function SystemLimits() {
             value={productLimit}
             onChange={(e) => setProductLimit(e.target.value)}
             className="max-w-[200px]"
+            placeholder="Enter product limit"
           />
           <Button 
             onClick={handleUpdateLimit}
