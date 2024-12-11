@@ -171,6 +171,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
           onImageChange={handleFaviconChange}
           isUploading={isUploading}
           setIsUploading={setIsUploading}
+          isFavicon={true}
         />
       </div>
     </div>

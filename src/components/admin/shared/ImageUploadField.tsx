@@ -19,6 +19,8 @@ interface ImageUploadFieldProps {
   onImageChange: (url: string | null) => void;
   isUploading?: boolean;
   setIsUploading?: (value: boolean) => void;
+  acceptedFileTypes?: string;
+  isFavicon?: boolean;
 }
 
 export function ImageUploadField({
@@ -26,6 +28,8 @@ export function ImageUploadField({
   onImageChange,
   isUploading: externalIsUploading,
   setIsUploading: externalSetIsUploading,
+  acceptedFileTypes = "image/*",
+  isFavicon = false,
 }: ImageUploadFieldProps) {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
@@ -37,6 +41,15 @@ export function ImageUploadField({
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    // Validate file type for favicon
+    if (isFavicon && !file.type.includes('x-icon') && !file.name.endsWith('.ico')) {
+      toast({
+        variant: "destructive",
+        description: "Please upload a valid ICO file for favicon",
+      });
+      return;
+    }
 
     actualSetIsUploading(true);
     try {
@@ -109,11 +122,21 @@ export function ImageUploadField({
     <div className="space-y-4">
       {imageUrl && (
         <div className="relative group">
-          <img
-            src={imageUrl}
-            alt="Preview"
-            className="w-40 h-40 object-cover rounded-lg"
-          />
+          {isFavicon ? (
+            <div className="w-40 h-40 flex items-center justify-center bg-gray-100 rounded-lg">
+              <img
+                src={imageUrl}
+                alt="Favicon Preview"
+                className="w-16 h-16"
+              />
+            </div>
+          ) : (
+            <img
+              src={imageUrl}
+              alt="Preview"
+              className="w-40 h-40 object-cover rounded-lg"
+            />
+          )}
           <button
             type="button"
             onClick={() => setShowDeleteDialog(true)}
@@ -131,7 +154,7 @@ export function ImageUploadField({
       <div className="relative">
         <Input
           type="file"
-          accept="image/*"
+          accept={isFavicon ? ".ico" : acceptedFileTypes}
           onChange={handleImageUpload}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
           disabled={actualIsUploading}
@@ -142,7 +165,7 @@ export function ImageUploadField({
           ) : (
             <div className="flex items-center gap-2">
               <ImagePlus className="h-5 w-5" />
-              <span>Upload Image</span>
+              <span>Upload {isFavicon ? 'Favicon' : 'Image'}</span>
             </div>
           )}
         </div>
@@ -153,7 +176,7 @@ export function ImageUploadField({
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the image.
+              This action cannot be undone. This will permanently delete the {isFavicon ? 'favicon' : 'image'}.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
