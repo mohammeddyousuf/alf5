@@ -24,41 +24,72 @@ const AdminManagement = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchAdmins();
-  }, []);
-
-  const fetchAdmins = async () => {
-    try {
-      // Simplified query to just get all profiles and filter client-side
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*');
-
-      if (profilesError) {
-        console.error('Error fetching admins:', profilesError);
+    const checkUserAndFetchAdmins = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user) {
         toast({
           title: "Error",
-          description: "Failed to fetch admin list",
+          description: "You must be logged in to access this page",
+          variant: "destructive",
+        });
+        navigate("/auth");
+        return;
+      }
+
+      // Get the current user's profile first
+      const { data: currentUserProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching user profile:', profileError);
+        toast({
+          title: "Error",
+          description: "Failed to verify admin access",
           variant: "destructive",
         });
         return;
       }
 
-      // Filter admin roles client-side
-      const adminProfiles = (profilesData || []).filter(
-        profile => profile.role === 'admin' || profile.role === 'super_admin'
-      );
-      
-      setAdmins(adminProfiles);
-    } catch (error) {
-      console.error('Error in fetchAdmins:', error);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
-    }
-  };
+      // Only proceed if user is an admin
+      if (currentUserProfile?.role !== 'admin' && currentUserProfile?.role !== 'super_admin') {
+        toast({
+          title: "Access Denied",
+          description: "You don't have permission to access this page",
+          variant: "destructive",
+        });
+        navigate("/");
+        return;
+      }
+
+      // Now fetch other admin profiles
+      try {
+        const { data: profilesData, error: adminsError } = await supabase
+          .from('profiles')
+          .select('*');
+
+        if (adminsError) throw adminsError;
+
+        const adminProfiles = profilesData?.filter(
+          profile => profile.role === 'admin' || profile.role === 'super_admin'
+        ) || [];
+
+        setAdmins(adminProfiles);
+      } catch (error: any) {
+        console.error('Error fetching admins:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch admin list",
+          variant: "destructive",
+        });
+      }
+    };
+
+    checkUserAndFetchAdmins();
+  }, [navigate, toast]);
 
   const handleGrantAccess = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +124,17 @@ const AdminManagement = () => {
       });
 
       setEmail("");
-      fetchAdmins(); // Refresh the list
+      
+      // Refresh the admin list
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('*');
+
+      const adminProfiles = profilesData?.filter(
+        profile => profile.role === 'admin' || profile.role === 'super_admin'
+      ) || [];
+
+      setAdmins(adminProfiles);
     } catch (error: any) {
       console.error('Error granting admin access:', error);
       toast({
