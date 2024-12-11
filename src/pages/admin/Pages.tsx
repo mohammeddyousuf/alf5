@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Pencil, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { Pages } from "@/integrations/supabase/types/pages";
 import { useState, useEffect } from "react";
@@ -55,9 +55,18 @@ const Pages = () => {
       <div className="grid gap-4">
         {pages?.map((page) => (
           <Card key={page.id} className="p-4">
-            <div className="space-y-1">
-              <h2 className="text-xl font-semibold">{page.title}</h2>
-              <p className="text-sm text-muted-foreground leading-none">/{page.slug}</p>
+            <div className="flex justify-between items-start">
+              <div className="space-y-1">
+                <h2 className="text-xl font-semibold">{page.title}</h2>
+                <p className="text-sm text-muted-foreground leading-none">/{page.slug}</p>
+              </div>
+              <Button 
+                variant="outline"
+                onClick={() => navigate(`/admin/pages/${page.id}`)}
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
             </div>
           </Card>
         ))}
