@@ -9,13 +9,17 @@ export const productFormSchema = z.object({
     .min(0, "Sale price must be a positive number")
     .nullable()
     .optional()
-    .refine(
-      (val, ctx) => {
-        if (val === null || val === undefined) return true;
-        return val < ctx.parent.price;
-      },
-      "Sale price must be less than regular price"
-    ),
+    .superRefine((val, ctx) => {
+      if (val === null || val === undefined) return;
+
+      const price = ctx.parent.price;
+      if (val >= price) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Sale price must be less than regular price",
+        });
+      }
+    }),
   images: z.array(z.string()).default([]),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   category_id: z.string().nullable().optional(),
