@@ -12,7 +12,10 @@ export const productFormSchema = z.object({
     .superRefine((val, ctx) => {
       if (val === null || val === undefined) return;
 
-      const price = ctx.parent.price;
+      // Get the price from the parent object that's being validated
+      const parentData = ctx.path[0] ? ctx.getData() : {};
+      const price = (parentData as { price: number }).price;
+
       if (val >= price) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
