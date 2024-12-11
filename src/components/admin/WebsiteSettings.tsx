@@ -13,6 +13,7 @@ export const WebsiteSettings = () => {
       const { data, error } = await supabase
         .from("settings")
         .select("*")
+        .is('id', null)
         .single();
       
       if (error) throw error;

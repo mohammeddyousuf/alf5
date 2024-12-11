@@ -33,7 +33,7 @@ export function GlobalSaleControls() {
           clearance_sale_active: isGlobalSaleEnabled,
           clearance_sale_end_date: endDateTime
         })
-        .eq('id', 1);
+        .is('id', null); // This will match the first row since we only have one settings record
 
       if (error) throw error;
 

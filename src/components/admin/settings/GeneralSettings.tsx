@@ -31,7 +31,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       const { error } = await supabase
         .from('settings')
         .update({ website_name: websiteName })
-        .eq('id', settings?.id);
+        .is('id', null);
 
       if (error) throw error;
 
@@ -51,37 +51,11 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
   };
 
   const handleTrackingCodesUpdate = async () => {
-    if (!settings?.id) {
-      console.error('No settings ID found');
-      toast({
-        title: "Error",
-        description: "Settings ID not found",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
-      console.log('Updating tracking codes for settings ID:', settings.id);
-      console.log('New tracking codes value:', trackingCodes);
-      
-      // First, try to fetch the current settings to verify the column exists
-      const { data: currentSettings, error: fetchError } = await supabase
-        .from('settings')
-        .select('tracking_codes')
-        .eq('id', settings.id)
-        .single();
-
-      if (fetchError) {
-        console.error('Error fetching current settings:', fetchError);
-        throw new Error('Unable to verify tracking codes column. Please ensure the column exists in the database.');
-      }
-
-      // If we get here, the column exists, so we can proceed with the update
       const { error: updateError } = await supabase
         .from('settings')
         .update({ tracking_codes: trackingCodes })
-        .eq('id', settings.id);
+        .is('id', null);
 
       if (updateError) {
         console.error('Supabase update error:', updateError);
@@ -108,7 +82,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       const { error } = await supabase
         .from('settings')
         .update({ logo_url: url })
-        .eq('id', settings?.id);
+        .is('id', null);
 
       if (error) throw error;
       await refetch();
@@ -127,7 +101,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       const { error } = await supabase
         .from('settings')
         .update({ favicon_url: url })
-        .eq('id', settings?.id);
+        .is('id', null);
 
       if (error) throw error;
       await refetch();

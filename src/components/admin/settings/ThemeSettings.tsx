@@ -34,7 +34,7 @@ export const ThemeSettings = ({ settings, refetch }: ThemeSettingsProps) => {
       const { error } = await supabase
         .from('settings')
         .update({ [`${colorKey}_color`]: value })
-        .eq('id', settings?.id);
+        .is('id', null); // This will match the first row
 
       if (error) throw error;
       await refetch();
