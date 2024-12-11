@@ -1,16 +1,25 @@
-import { Shield, Settings, UserCheck, Lock } from "lucide-react";
+import { Shield, Settings, UserCheck, Lock, ArrowLeft } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { SystemLimits } from "@/components/admin/settings/SystemLimits";
+import { useNavigate } from "react-router-dom";
 
 const SuperAdmin = () => {
+  const navigate = useNavigate();
+
   return (
     <ProtectedRoute>
       <div className="container mx-auto p-6 space-y-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Shield className="h-6 w-6" />
-          <h1 className="text-3xl font-bold">Super Admin Dashboard</h1>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Shield className="h-6 w-6" />
+            <h1 className="text-3xl font-bold">Super Admin Dashboard</h1>
+          </div>
+          <Button variant="outline" className="gap-2" onClick={() => navigate("/admin")}>
+            <ArrowLeft className="h-4 w-4" />
+            Back to Admin Dashboard
+          </Button>
         </div>
 
         <Card className="p-6">
