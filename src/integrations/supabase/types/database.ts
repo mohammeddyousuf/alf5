@@ -1,3 +1,5 @@
+import { SocialMediaLink } from './social';
+
 export interface Database {
   public: {
     Tables: {
@@ -297,7 +299,7 @@ export interface Database {
           link_url?: string | null;
           order_index?: number;
           title: string;
-          updated_at?: string;
+          updated_at: string;
         };
         Update: {
           active?: boolean | null;
@@ -308,8 +310,8 @@ export interface Database {
           image_url: string;
           link_url?: string | null;
           order_index?: number;
-          title?: string;
-          updated_at?: string;
+          title: string;
+          updated_at: string;
         };
         Relationships: [];
       };
@@ -387,27 +389,6 @@ export interface Database {
           customer_mobile?: string;
           customer_address?: string;
           payment_mode?: string;
-        };
-        Relationships: [];
-      };
-      system_limits: {
-        Row: {
-          id: number;
-          product_limit: number;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: number;
-          product_limit: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: number;
-          product_limit?: number;
-          created_at?: string;
-          updated_at?: string;
         };
         Relationships: [];
       };
