@@ -14,7 +14,7 @@ const Shop = () => {
   const location = useLocation();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 5000]); // Updated to 5000
+  const [priceRange, setPriceRange] = useState([0, 15000]); // Updated to 15000
   const [showSaleOnly, setShowSaleOnly] = useState(false);
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(false);
