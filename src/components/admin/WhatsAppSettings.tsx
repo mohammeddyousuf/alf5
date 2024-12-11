@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import type { SocialMediaLink } from "@/integrations/supabase/types/social";
 
 export const WhatsAppSettings = () => {
   const { toast } = useToast();
@@ -14,8 +15,7 @@ export const WhatsAppSettings = () => {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [whatsappGroupUrl, setWhatsappGroupUrl] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
-  const [instagramUrl, setInstagramUrl] = useState("");
-  const [facebookUrl, setFacebookUrl] = useState("");
+  const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLink[]>([]);
   const [isSocialMediaUpdating, setIsSocialMediaUpdating] = useState(false);
 
   const { data: settings } = useQuery({
@@ -38,11 +38,14 @@ export const WhatsAppSettings = () => {
     if (settings?.whatsapp_group_url) {
       setWhatsappGroupUrl(settings.whatsapp_group_url);
     }
-    if (settings?.instagram_url) {
-      setInstagramUrl(settings.instagram_url);
-    }
-    if (settings?.facebook_url) {
-      setFacebookUrl(settings.facebook_url);
+    if (settings?.social_media_links) {
+      setSocialMediaLinks(settings.social_media_links);
+    } else {
+      // Initialize with default social media links if none exist
+      setSocialMediaLinks([
+        { name: "Instagram", url: settings?.instagram_url || "" },
+        { name: "Facebook", url: settings?.facebook_url || "" },
+      ]);
     }
   }, [settings]);
 
@@ -83,8 +86,9 @@ export const WhatsAppSettings = () => {
       const { error } = await supabase
         .from("settings")
         .update({
-          instagram_url: instagramUrl,
-          facebook_url: facebookUrl,
+          social_media_links: socialMediaLinks,
+          instagram_url: socialMediaLinks.find(link => link.name === "Instagram")?.url || null,
+          facebook_url: socialMediaLinks.find(link => link.name === "Facebook")?.url || null,
         })
         .eq("id", settings?.id);
 
@@ -106,6 +110,20 @@ export const WhatsAppSettings = () => {
     } finally {
       setIsSocialMediaUpdating(false);
     }
+  };
+
+  const addSocialMediaLink = () => {
+    setSocialMediaLinks([...socialMediaLinks, { name: "", url: "" }]);
+  };
+
+  const removeSocialMediaLink = (index: number) => {
+    setSocialMediaLinks(socialMediaLinks.filter((_, i) => i !== index));
+  };
+
+  const updateSocialMediaLink = (index: number, field: keyof SocialMediaLink, value: string) => {
+    const updatedLinks = [...socialMediaLinks];
+    updatedLinks[index] = { ...updatedLinks[index], [field]: value };
+    setSocialMediaLinks(updatedLinks);
   };
 
   return (
@@ -147,24 +165,44 @@ export const WhatsAppSettings = () => {
       <div className="pt-4 border-t">
         <h2 className="text-xl font-semibold mb-4">Social Media Links</h2>
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="instagram">Instagram URL</Label>
-            <Input
-              id="instagram"
-              value={instagramUrl}
-              onChange={(e) => setInstagramUrl(e.target.value)}
-              placeholder="Enter Instagram URL"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="facebook">Facebook URL</Label>
-            <Input
-              id="facebook"
-              value={facebookUrl}
-              onChange={(e) => setFacebookUrl(e.target.value)}
-              placeholder="Enter Facebook URL"
-            />
-          </div>
+          {socialMediaLinks.map((link, index) => (
+            <div key={index} className="flex gap-4 items-start">
+              <div className="flex-1 space-y-2">
+                <Label>Platform Name</Label>
+                <Input
+                  value={link.name}
+                  onChange={(e) => updateSocialMediaLink(index, "name", e.target.value)}
+                  placeholder="Enter platform name"
+                />
+              </div>
+              <div className="flex-1 space-y-2">
+                <Label>URL</Label>
+                <Input
+                  value={link.url}
+                  onChange={(e) => updateSocialMediaLink(index, "url", e.target.value)}
+                  placeholder="Enter URL"
+                />
+              </div>
+              {index > 1 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="mt-8"
+                  onClick={() => removeSocialMediaLink(index)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          ))}
+          <Button
+            variant="outline"
+            onClick={addSocialMediaLink}
+            className="w-full"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Social Media Link
+          </Button>
           <Button onClick={handleUpdateSocialMedia} disabled={isSocialMediaUpdating}>
             {isSocialMediaUpdating ? (
               <>

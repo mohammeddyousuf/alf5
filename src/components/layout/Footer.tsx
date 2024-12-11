@@ -120,26 +120,17 @@ export const Footer = () => {
                 Join WhatsApp Group
               </a>
             )}
-            {settings?.instagram_url && (
-              <a 
-                href={formatSocialLink(settings.instagram_url)}
+            {settings?.social_media_links?.map((link, index) => (
+              <a
+                key={index}
+                href={formatSocialLink(link.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
-                Instagram
+                {link.name}
               </a>
-            )}
-            {settings?.facebook_url && (
-              <a 
-                href={formatSocialLink(settings.facebook_url)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
-                Facebook
-              </a>
-            )}
+            ))}
           </div>
         </div>
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
