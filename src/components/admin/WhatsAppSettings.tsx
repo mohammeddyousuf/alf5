@@ -27,24 +27,30 @@ export const WhatsAppSettings = () => {
         .select("*")
         .single();
       if (error) throw error;
+      console.log("Settings data:", data); // Added for debugging
       return data;
     },
   });
 
   useEffect(() => {
-    if (settings?.whatsapp_number) {
-      setWhatsappNumber(settings.whatsapp_number);
-    }
-    if (settings?.whatsapp_group_url) {
-      setWhatsappGroupUrl(settings.whatsapp_group_url);
-    }
-    if (settings?.social_media_links) {
-      setSocialMediaLinks(settings.social_media_links);
-    } else {
-      setSocialMediaLinks([
-        { name: "Instagram", url: settings?.instagram_url || "" },
-        { name: "Facebook", url: settings?.facebook_url || "" },
-      ]);
+    if (settings) {
+      setWhatsappNumber(settings.whatsapp_number || "");
+      setWhatsappGroupUrl(settings.whatsapp_group_url || "");
+      
+      // Initialize social media links from settings
+      if (settings.social_media_links && settings.social_media_links.length > 0) {
+        setSocialMediaLinks(settings.social_media_links);
+      } else {
+        // Fallback to individual URLs if social_media_links array is empty
+        const links: SocialMediaLink[] = [];
+        if (settings.instagram_url) {
+          links.push({ name: "Instagram", url: settings.instagram_url });
+        }
+        if (settings.facebook_url) {
+          links.push({ name: "Facebook", url: settings.facebook_url });
+        }
+        setSocialMediaLinks(links);
+      }
     }
   }, [settings]);
 
