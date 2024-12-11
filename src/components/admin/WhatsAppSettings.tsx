@@ -27,7 +27,7 @@ export const WhatsAppSettings = () => {
         .select("*")
         .single();
       if (error) throw error;
-      console.log("Settings data:", data); // Added for debugging
+      console.log("Settings data:", data); // For debugging
       return data;
     },
   });
@@ -38,19 +38,24 @@ export const WhatsAppSettings = () => {
       setWhatsappGroupUrl(settings.whatsapp_group_url || "");
       
       // Initialize social media links from settings
-      if (settings.social_media_links && settings.social_media_links.length > 0) {
-        setSocialMediaLinks(settings.social_media_links);
+      let links: SocialMediaLink[] = [];
+      
+      if (settings.social_media_links && Array.isArray(settings.social_media_links) && settings.social_media_links.length > 0) {
+        console.log("Using social_media_links array:", settings.social_media_links);
+        links = settings.social_media_links;
       } else {
-        // Fallback to individual URLs if social_media_links array is empty
-        const links: SocialMediaLink[] = [];
+        console.log("Using individual URLs as fallback");
+        // Fallback to individual URLs if social_media_links array is empty or invalid
         if (settings.instagram_url) {
           links.push({ name: "Instagram", url: settings.instagram_url });
         }
         if (settings.facebook_url) {
           links.push({ name: "Facebook", url: settings.facebook_url });
         }
-        setSocialMediaLinks(links);
       }
+      
+      console.log("Setting social media links:", links);
+      setSocialMediaLinks(links);
     }
   }, [settings]);
 
@@ -86,6 +91,7 @@ export const WhatsAppSettings = () => {
   };
 
   const handleUpdateSocialMedia = async (links: SocialMediaLink[]) => {
+    console.log("Updating social media links:", links);
     setIsSocialMediaUpdating(true);
     try {
       const { error } = await supabase
