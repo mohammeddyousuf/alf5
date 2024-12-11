@@ -20,7 +20,14 @@ export function PriceFields({ form }: PriceFieldsProps) {
           <FormItem>
             <FormLabel>Price</FormLabel>
             <FormControl>
-              <Input type="number" step="0.01" {...field} />
+              <Input 
+                type="number" 
+                {...field} 
+                onChange={(e) => {
+                  const value = Math.floor(Number(e.target.value));
+                  field.onChange(value);
+                }}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -35,12 +42,11 @@ export function PriceFields({ form }: PriceFieldsProps) {
             <FormLabel>Sale Price (Optional)</FormLabel>
             <FormControl>
               <Input 
-                type="number" 
-                step="0.01" 
+                type="number"
                 {...field} 
                 value={field.value ?? ''} 
                 onChange={(e) => {
-                  const value = e.target.value === '' ? null : e.target.value;
+                  const value = e.target.value === '' ? null : Math.floor(Number(e.target.value));
                   field.onChange(value);
                 }}
               />

@@ -3,8 +3,21 @@ import { z } from "zod";
 export const productFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().nullable().optional(),
-  price: z.coerce.number().min(0, "Price must be a positive number"),
-  sale_price: z.coerce.number().min(0, "Sale price must be a positive number").nullable().optional(),
+  price: z.coerce
+    .number()
+    .int("Price must be a whole number")
+    .min(0, "Price must be a positive number"),
+  sale_price: z.coerce
+    .number()
+    .int("Sale price must be a whole number")
+    .min(0, "Sale price must be a positive number")
+    .refine((sale_price, ctx) => {
+      const { price } = ctx.parent as { price: number };
+      if (!sale_price) return true;
+      return sale_price < price;
+    }, "Sale price must be less than regular price")
+    .nullable()
+    .optional(),
   images: z.array(z.string()).default([]),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   category_id: z.string().nullable().optional(),
