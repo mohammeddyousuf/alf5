@@ -136,20 +136,6 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="trackingCodes">Tracking Codes</Label>
-        <div className="space-y-2">
-          <Textarea
-            id="trackingCodes"
-            value={trackingCodes}
-            onChange={(e) => setTrackingCodes(e.target.value)}
-            placeholder="Paste your tracking codes here (e.g., Google Analytics)"
-            className="min-h-[150px] font-mono text-sm"
-          />
-          <Button onClick={handleTrackingCodesUpdate} className="w-full">Save Tracking Codes</Button>
-        </div>
-      </div>
-
-      <div className="space-y-2">
         <Label htmlFor="logo">Logo</Label>
         <ImageUploadField
           imageUrl={settings?.logo_url}
@@ -168,6 +154,20 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
           setIsUploading={setIsUploading}
           isFavicon={true}
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="trackingCodes">Tracking Codes</Label>
+        <div className="space-y-2">
+          <Textarea
+            id="trackingCodes"
+            value={trackingCodes}
+            onChange={(e) => setTrackingCodes(e.target.value)}
+            placeholder="Paste your tracking codes here (e.g., Google Analytics)"
+            className="min-h-[150px] font-mono text-sm"
+          />
+          <Button onClick={handleTrackingCodesUpdate} className="w-full">Save Tracking Codes</Button>
+        </div>
       </div>
     </div>
   );

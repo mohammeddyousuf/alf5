@@ -14,6 +14,7 @@ export interface Settings {
   logo_url: string | null;
   primary_color: string | null;
   secondary_color: string | null;
+  tracking_codes: string | null;
   updated_at: string;
   website_name: string | null;
   whatsapp_group_url: string | null;
