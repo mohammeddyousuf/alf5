@@ -23,6 +23,8 @@ const defaultValues: ProductFormData = {
   subcategory_id: null,
   featured: false,
   brand: null,
+  sale_timer_enabled: false,
+  sale_end_date: null,
 };
 
 export function useProductForm({ product, onSuccess }: UseProductFormProps) {
@@ -41,6 +43,8 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
       subcategory_id: product.subcategory_id,
       featured: product.featured ?? false,
       brand: product.brand ?? null,
+      sale_timer_enabled: product.sale_timer_enabled ?? false,
+      sale_end_date: product.sale_end_date ?? null,
     } : defaultValues,
   });
 
@@ -57,6 +61,8 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
         subcategory_id: values.subcategory_id || null,
         featured: values.featured,
         brand: values.brand || null,
+        sale_timer_enabled: values.sale_timer_enabled,
+        sale_end_date: values.sale_timer_enabled ? values.sale_end_date : null,
       };
 
       if (product?.id) {
