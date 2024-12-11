@@ -14,13 +14,9 @@ export const productFormSchema = z.object({
     .nullable()
     .optional()
     .refine(
-      (sale_price, ctx) => {
+      (sale_price) => {
         if (!sale_price) return true;
-        
-        const price = (ctx as any).parent?.price;
-        if (typeof price !== "number") return true;
-        
-        return sale_price < price;
+        return true;
       },
       {
         message: "Sale price must be less than regular price"
