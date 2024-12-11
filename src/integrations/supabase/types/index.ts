@@ -1,7 +1,13 @@
 import type { Products } from './products';
 import type { SystemLimits } from './system';
 import type { Pages } from './pages';
-import type { PublicSchema } from './schema';
+import type { Settings } from './settings';
+import type { Collections } from './collections';
+import type { NewsTicker } from './newsTicker';
+import type { Categories } from './categories';
+import type { Subcategories } from './subcategories';
+import type { Orders } from './orders';
+import type { Sliders } from './sliders';
 
 export type Json =
   | string
@@ -17,6 +23,13 @@ export interface Database {
       products: Products;
       system_limits: SystemLimits;
       pages: Pages;
+      settings: Settings;
+      collections: Collections;
+      news_ticker: NewsTicker;
+      categories: Categories;
+      subcategories: Subcategories;
+      orders: Orders;
+      sliders: Sliders;
     }
     Views: {
       [_ in never]: never
