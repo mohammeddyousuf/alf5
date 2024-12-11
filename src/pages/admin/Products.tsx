@@ -26,12 +26,40 @@ const Products = () => {
   const { data: systemLimits } = useQuery({
     queryKey: ["system-limits"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First try to get existing limits
+      const { data: existingLimits, error: fetchError } = await supabase
         .from("system_limits")
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data;
+        .select("*");
+      
+      if (fetchError) {
+        console.error("Error fetching limits:", fetchError);
+        throw fetchError;
+      }
+
+      // If no limits exist, create default ones
+      if (!existingLimits || existingLimits.length === 0) {
+        console.log("No limits found, creating default");
+        const defaultLimit = {
+          product_limit: 100 // Default limit
+        };
+        
+        const { data: insertedData, error: insertError } = await supabase
+          .from("system_limits")
+          .insert([defaultLimit])
+          .select()
+          .maybeSingle();
+          
+        if (insertError) {
+          console.error("Error creating default limits:", insertError);
+          throw insertError;
+        }
+
+        console.log("Created default limits:", insertedData);
+        return insertedData;
+      }
+      
+      console.log("Found existing limits:", existingLimits[0]);
+      return existingLimits[0];
     },
   });
 
