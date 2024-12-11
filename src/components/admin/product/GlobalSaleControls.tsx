@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function GlobalSaleControls() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isGlobalSaleEnabled, setIsGlobalSaleEnabled] = useState(false);
   const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -61,9 +62,12 @@ export function GlobalSaleControls() {
           clearance_sale_active: isGlobalSaleEnabled,
           clearance_sale_end_date: endDateTime
         })
-        .is('id', null); // This will match the first row since we only have one settings record
+        .is('id', null);
 
       if (error) throw error;
+
+      // Invalidate and refetch settings
+      await queryClient.invalidateQueries({ queryKey: ["settings"] });
 
       toast({
         title: "Success",
