@@ -129,7 +129,12 @@ const Products = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Products</h1>
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold">Products</h1>
+          <p className="text-sm text-muted-foreground">
+            {products?.length || 0} of {systemLimits?.product_limit || 0} products used
+          </p>
+        </div>
         <Button onClick={handleAddProduct}>
           Add Product
         </Button>
