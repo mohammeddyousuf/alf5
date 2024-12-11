@@ -4,6 +4,13 @@ import { ProductCard } from "@/components/home/ProductCard";
 import { CollectionCard } from "@/components/home/CollectionCard";
 import { HeroSlider } from "@/components/home/HeroSlider";
 import { NewsTickerBanner } from "@/components/home/NewsTickerBanner";
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem, 
+  CarouselNext, 
+  CarouselPrevious 
+} from "@/components/ui/carousel";
 
 const Index = () => {
   const { data: products, isLoading: isLoadingProducts } = useQuery({
@@ -72,18 +79,23 @@ const Index = () => {
 
       <div className="container mx-auto py-12">
         <h2 className="text-3xl font-bold text-center mb-8">Latest Products</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products?.map((product) => (
-            <ProductCard
-              key={product.id}
-              id={product.id}
-              name={product.name}
-              price={product.price}
-              salePrice={product.sale_price}
-              imageUrl={product.images?.[0]}
-            />
-          ))}
-        </div>
+        <Carousel className="w-full max-w-screen-xl mx-auto">
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {products?.map((product) => (
+              <CarouselItem key={product.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+                <ProductCard
+                  id={product.id}
+                  name={product.name}
+                  price={product.price}
+                  salePrice={product.sale_price}
+                  imageUrl={product.images?.[0]}
+                />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className="hidden sm:flex -left-4 lg:-left-12" />
+          <CarouselNext className="hidden sm:flex -right-4 lg:-right-12" />
+        </Carousel>
       </div>
     </div>
   );
