@@ -34,7 +34,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
   const generateUniqueFileName = async (originalFileName: string): Promise<string> => {
     const extension = originalFileName.split('.').pop() || '';
     const baseName = originalFileName.slice(0, -(extension.length + 1));
-    let fileName = `${baseName}.${extension}`;
+    let fileName = `product_${baseName}.${extension}`;
     let counter = 1;
 
     // Check if file exists
@@ -45,7 +45,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
     const existingFiles = data?.map(file => file.name) || [];
 
     while (existingFiles.includes(fileName)) {
-      fileName = `${baseName}_${counter}.${extension}`;
+      fileName = `product_${baseName}_${counter}.${extension}`;
       counter++;
     }
 
@@ -68,7 +68,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
           const { error: uploadError, data } = await supabase.storage
             .from("product-images")
             .upload(fileName, file, {
-              upsert: false // Changed to false since we're handling duplicates
+              upsert: false
             });
 
           if (uploadError) throw uploadError;
