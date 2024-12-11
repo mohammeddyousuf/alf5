@@ -19,18 +19,18 @@ export function GlobalSaleControls() {
     queryKey: ["settings"],
     queryFn: async () => {
       try {
-        // First try to get existing settings
+        // Get all settings rows
         const { data: existingSettings, error } = await supabase
           .from("settings")
           .select("*")
-          .is('id', null)
-          .maybeSingle();
+          .order('created_at', { ascending: false })
+          .limit(1);
         
         if (error) throw error;
 
-        // If settings exist, return them
-        if (existingSettings) {
-          return existingSettings;
+        // If settings exist, return the first one
+        if (existingSettings && existingSettings.length > 0) {
+          return existingSettings[0];
         }
 
         // If no settings exist, create default settings
@@ -89,25 +89,25 @@ export function GlobalSaleControls() {
         ? new Date(`${endDate}T${endTime}`).toISOString()
         : null;
 
-      // Get existing settings first
+      // Get existing settings
       const { data: existingSettings } = await supabase
         .from("settings")
         .select("*")
-        .is('id', null)
-        .maybeSingle();
+        .order('created_at', { ascending: false })
+        .limit(1);
 
       // Prepare update data while preserving other settings
       const updateData = {
-        ...(existingSettings || {}),
+        ...(existingSettings?.[0] || {}),
         clearance_sale_active: isGlobalSaleEnabled,
         clearance_sale_end_date: endDateTime,
-        whatsapp_number: existingSettings?.whatsapp_number || "+1234567890" // Ensure whatsapp_number is included
+        whatsapp_number: existingSettings?.[0]?.whatsapp_number || "+1234567890" // Ensure whatsapp_number is included
       };
 
       const { error } = await supabase
         .from('settings')
         .upsert(updateData)
-        .is('id', null);
+        .eq('id', existingSettings?.[0]?.id);
 
       if (error) throw error;
 
