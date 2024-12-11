@@ -42,7 +42,7 @@ const Index = () => {
         .from("products")
         .select("*")
         .eq("status", "published")
-        .eq("featured", true)  // Changed from is_featured to featured
+        .eq("featured", true)
         .limit(8);
       
       if (error) {
@@ -62,7 +62,7 @@ const Index = () => {
       const { data, error } = await supabase
         .from("collections")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: true }); // Changed to ascending order
       
       if (error) {
         console.error("Error fetching collections:", error);
