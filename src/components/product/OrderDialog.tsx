@@ -158,7 +158,7 @@ export function OrderDialog({
         <DialogHeader>
           <DialogTitle className="text-foreground">Contact on WhatsApp</DialogTitle>
           <DialogDescription>
-            Fill in your details to place the order
+            Fill in your details
           </DialogDescription>
         </DialogHeader>
 
@@ -233,7 +233,7 @@ export function OrderDialog({
               name="paymentMode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground">Payment Mode</FormLabel>
+                  <FormLabel className="text-foreground">Preferred Payment Mode</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className="bg-background text-foreground">
