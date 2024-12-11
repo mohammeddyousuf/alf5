@@ -68,6 +68,7 @@ export function ImageUploadField({
         fileName = `ico_${timestamp}.${extension}`;
       } else if (isLogo) {
         fileName = `logo_${timestamp}.${extension}`;
+        console.log("Creating logo filename:", fileName);
       } else if (isSlider) {
         fileName = `slider_${timestamp}.${extension}`;
         console.log("Creating slider filename:", fileName);
