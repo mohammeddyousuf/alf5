@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2, Plus, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { SocialMediaLinksSection } from "./settings/SocialMediaLinksSection";
 import type { SocialMediaLink } from "@/integrations/supabase/types/social";
 
 export const WhatsAppSettings = () => {
@@ -30,7 +31,6 @@ export const WhatsAppSettings = () => {
     },
   });
 
-  // Update state when settings change
   useEffect(() => {
     if (settings?.whatsapp_number) {
       setWhatsappNumber(settings.whatsapp_number);
@@ -41,7 +41,6 @@ export const WhatsAppSettings = () => {
     if (settings?.social_media_links) {
       setSocialMediaLinks(settings.social_media_links);
     } else {
-      // Initialize with default social media links if none exist
       setSocialMediaLinks([
         { name: "Instagram", url: settings?.instagram_url || "" },
         { name: "Facebook", url: settings?.facebook_url || "" },
@@ -80,21 +79,22 @@ export const WhatsAppSettings = () => {
     }
   };
 
-  const handleUpdateSocialMedia = async () => {
+  const handleUpdateSocialMedia = async (links: SocialMediaLink[]) => {
     setIsSocialMediaUpdating(true);
     try {
       const { error } = await supabase
         .from("settings")
         .update({
-          social_media_links: socialMediaLinks || [],
-          instagram_url: socialMediaLinks.find(link => link.name === "Instagram")?.url || null,
-          facebook_url: socialMediaLinks.find(link => link.name === "Facebook")?.url || null,
+          social_media_links: links,
+          instagram_url: links.find(link => link.name === "Instagram")?.url || null,
+          facebook_url: links.find(link => link.name === "Facebook")?.url || null,
         })
         .eq("id", settings?.id);
 
       if (error) throw error;
 
       await queryClient.invalidateQueries({ queryKey: ["settings"] });
+      setSocialMediaLinks(links);
 
       toast({
         title: "Success",
@@ -110,20 +110,6 @@ export const WhatsAppSettings = () => {
     } finally {
       setIsSocialMediaUpdating(false);
     }
-  };
-
-  const addSocialMediaLink = () => {
-    setSocialMediaLinks([...socialMediaLinks, { name: "", url: "" }]);
-  };
-
-  const removeSocialMediaLink = (index: number) => {
-    setSocialMediaLinks(socialMediaLinks.filter((_, i) => i !== index));
-  };
-
-  const updateSocialMediaLink = (index: number, field: keyof SocialMediaLink, value: string) => {
-    const updatedLinks = [...socialMediaLinks];
-    updatedLinks[index] = { ...updatedLinks[index], [field]: value };
-    setSocialMediaLinks(updatedLinks);
   };
 
   return (
@@ -164,56 +150,11 @@ export const WhatsAppSettings = () => {
 
       <div className="pt-4 border-t">
         <h2 className="text-xl font-semibold mb-4">Social Media Links</h2>
-        <div className="space-y-4">
-          {socialMediaLinks.map((link, index) => (
-            <div key={index} className="flex gap-4 items-start">
-              <div className="flex-1 space-y-2">
-                <Label>Platform Name</Label>
-                <Input
-                  value={link.name}
-                  onChange={(e) => updateSocialMediaLink(index, "name", e.target.value)}
-                  placeholder="Enter platform name"
-                />
-              </div>
-              <div className="flex-1 space-y-2">
-                <Label>URL</Label>
-                <Input
-                  value={link.url}
-                  onChange={(e) => updateSocialMediaLink(index, "url", e.target.value)}
-                  placeholder="Enter URL"
-                />
-              </div>
-              {index > 1 && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="mt-8"
-                  onClick={() => removeSocialMediaLink(index)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          ))}
-          <Button
-            variant="outline"
-            onClick={addSocialMediaLink}
-            className="w-full"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Social Media Link
-          </Button>
-          <Button onClick={handleUpdateSocialMedia} disabled={isSocialMediaUpdating}>
-            {isSocialMediaUpdating ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Updating...
-              </>
-            ) : (
-              'Save Social Media Links'
-            )}
-          </Button>
-        </div>
+        <SocialMediaLinksSection
+          links={socialMediaLinks}
+          onUpdate={handleUpdateSocialMedia}
+          isUpdating={isSocialMediaUpdating}
+        />
       </div>
     </Card>
   );
