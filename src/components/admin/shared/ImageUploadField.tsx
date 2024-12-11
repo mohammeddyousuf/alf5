@@ -63,7 +63,9 @@ export function ImageUploadField({
       if (isFavicon) {
         fileName = `ico_${timestamp}.${extension}`;
       } else if (isLogo) {
-        fileName = `logo_${timestamp}.${extension}`; // Fixed: Ensure logo_ prefix is added
+        // Explicitly add logo_ prefix for logo uploads
+        fileName = `logo_${timestamp}.${extension}`;
+        console.log("Creating logo filename:", fileName); // Debug log
       } else {
         fileName = `${timestamp}.${extension}`;
       }
