@@ -42,11 +42,11 @@ export function ImageUploadField({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type for favicon
-    if (isFavicon && !file.type.includes('x-icon') && !file.name.endsWith('.ico')) {
+    // For favicon, accept both .ico and common image formats
+    if (isFavicon && !file.type.includes('image/')) {
       toast({
         variant: "destructive",
-        description: "Please upload a valid ICO file for favicon",
+        description: "Please upload a valid image file (ICO, PNG, JPG, SVG)",
       });
       return;
     }
@@ -69,10 +69,16 @@ export function ImageUploadField({
 
       onImageChange(publicUrl);
       
-      toast({
-        title: "Success",
-        description: "Image uploaded successfully",
-      });
+      if (isFavicon && !file.type.includes('x-icon')) {
+        toast({
+          description: "Note: ICO format is recommended for favicons, but other image formats will work.",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Image uploaded successfully",
+        });
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -154,7 +160,7 @@ export function ImageUploadField({
       <div className="relative">
         <Input
           type="file"
-          accept={isFavicon ? ".ico" : acceptedFileTypes}
+          accept={isFavicon ? ".ico,image/*" : acceptedFileTypes}
           onChange={handleImageUpload}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
           disabled={actualIsUploading}
