@@ -20,11 +20,6 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
     }).format(amount);
   };
 
-  const calculateDiscount = (originalPrice: number, salePrice: number) => {
-    const discount = ((originalPrice - salePrice) / originalPrice) * 100;
-    return Math.round(discount);
-  };
-
   const formatUrlSlug = (name: string) => {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   };
@@ -44,11 +39,9 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
                 alt={name}
                 className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
               />
-              {salePrice && salePrice < price && (
+              {salePrice && (
                 <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground rounded-md px-2 py-1">
-                  <span className="text-xs font-bold">
-                    {calculateDiscount(price, salePrice)}% OFF
-                  </span>
+                  <span className="text-xs font-bold">SALE</span>
                 </div>
               )}
             </>
@@ -67,10 +60,10 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
       </Link>
       <CardFooter className="p-4 pt-0 flex flex-col gap-3">
         <div className="flex flex-col">
-          {salePrice && salePrice < price ? (
+          {salePrice ? (
             <>
               <span className="text-sm text-muted-foreground line-through">
-                {formatPrice(price)} (-{calculateDiscount(price, salePrice)}%)
+                {formatPrice(price)}
               </span>
               <span className="text-lg font-bold text-destructive">
                 {formatPrice(salePrice)}
