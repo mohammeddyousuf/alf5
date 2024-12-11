@@ -25,17 +25,9 @@ export const AdminHeader = () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUserEmail(user?.email);
       
-      // Check if user is super admin
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-        
-        if (profile?.role === 'super_admin') {
-          setUserRole('Super Admin');
-        }
+      // Check user's role from metadata
+      if (user?.app_metadata?.role === 'super_admin') {
+        setUserRole('Super Admin');
       }
     };
     getUser();
