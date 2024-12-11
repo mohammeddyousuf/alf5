@@ -55,13 +55,9 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       const { error } = await supabase
         .from('settings')
         .update({ tracking_codes: trackingCodes })
-        .eq('id', settings?.id)
-        .single();
+        .eq('id', settings?.id);
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       await refetch();
       toast({
@@ -72,7 +68,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       console.error('Error updating tracking codes:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to update tracking codes",
+        description: "Failed to update tracking codes",
         variant: "destructive",
       });
     }
