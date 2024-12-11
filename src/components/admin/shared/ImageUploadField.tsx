@@ -53,7 +53,8 @@ export function ImageUploadField({
 
     actualSetIsUploading(true);
     try {
-      const fileName = encodeURIComponent(file.name);
+      // Add 'ico_' prefix for favicon uploads
+      const fileName = isFavicon ? `ico_${encodeURIComponent(file.name)}` : encodeURIComponent(file.name);
       
       const { error: uploadError } = await supabase.storage
         .from("product-images")
