@@ -308,7 +308,7 @@ export interface Database {
           link_url?: string | null
           order_index?: number
           title: string
-          updated_at?: string
+          updated_at: string
         }
         Update: {
           active?: boolean | null
@@ -320,7 +320,7 @@ export interface Database {
           link_url?: string | null
           order_index?: number
           title: string
-          updated_at?: string
+          updated_at: string
         }
         Relationships: []
       }
