@@ -15,7 +15,8 @@ export const WebsiteSettings = () => {
         const { data: existingSettings } = await supabase
           .from("settings")
           .select("*")
-          .is('id', null)
+          .order('created_at', { ascending: false })
+          .limit(1)
           .maybeSingle(); // Use maybeSingle instead of single to handle no results case
         
         // If settings exist, return them
