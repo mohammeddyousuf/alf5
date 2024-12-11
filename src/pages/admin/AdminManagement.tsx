@@ -28,22 +28,39 @@ const AdminManagement = () => {
   }, []);
 
   const fetchAdmins = async () => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .in('role', ['admin', 'super_admin']);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('role', ['admin', 'super_admin']);
 
-    if (error) {
-      console.error('Error fetching admins:', error);
+      if (error) {
+        console.error('Error fetching admins:', error);
+        if (error.message.includes('does not exist')) {
+          toast({
+            title: "Database Setup Required",
+            description: "The profiles table needs to be set up. Please contact the system administrator.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to fetch admin list",
+            variant: "destructive",
+          });
+        }
+        return;
+      }
+
+      setAdmins(data || []);
+    } catch (error) {
+      console.error('Error in fetchAdmins:', error);
       toast({
         title: "Error",
-        description: "Failed to fetch admin list",
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
-      return;
     }
-
-    setAdmins(data || []);
   };
 
   const handleGrantAccess = async (e: React.FormEvent) => {
@@ -51,14 +68,8 @@ const AdminManagement = () => {
     setIsLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        throw new Error("Not authenticated");
-      }
-
-      // If user doesn't exist, create an invitation
-      const { data, error } = await supabase.auth.signInWithOtp({
+      // Send magic link
+      const { error: inviteError } = await supabase.auth.signInWithOtp({
         email,
         options: {
           data: {
@@ -67,12 +78,12 @@ const AdminManagement = () => {
         }
       });
 
-      if (error) throw error;
+      if (inviteError) throw inviteError;
 
-      // Create profile entry
+      // Create or update profile
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert({
+        .upsert({
           email,
           role: 'admin'
         });
