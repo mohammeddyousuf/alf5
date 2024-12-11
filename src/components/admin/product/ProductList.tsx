@@ -117,27 +117,31 @@ export const ProductList = () => {
   const handleGlobalSaleTimer = async () => {
     try {
       const newTimerState = !globalSaleTimer;
-      setGlobalSaleTimer(newTimerState);
-
+      const endDate = newTimerState ? globalEndDate : null;
+      
       console.log("Updating global sale timer:", {
         newTimerState,
-        globalEndDate,
+        endDate,
         query: "sale_price.neq.null"
       });
 
+      // Update all products with sale prices
       const { data, error } = await supabase
         .from("products")
         .update({
           sale_timer_enabled: newTimerState,
-          sale_end_date: newTimerState && globalEndDate ? globalEndDate : null
+          sale_end_date: endDate
         })
-        .not('sale_price', 'is', null)
-        .select();
+        .not('sale_price', 'is', null);
 
       if (error) {
         console.error("Error in handleGlobalSaleTimer:", error);
         throw error;
       }
+
+      // Update local state after successful database update
+      setGlobalSaleTimer(newTimerState);
+      setGlobalEndDate(endDate || "");
 
       console.log("Updated products:", data);
 
