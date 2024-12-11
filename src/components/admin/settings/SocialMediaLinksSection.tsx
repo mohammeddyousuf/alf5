@@ -11,16 +11,18 @@ interface SocialMediaLinksSectionProps {
 }
 
 export const SocialMediaLinksSection = ({
-  links,
+  links: initialLinks,
   onUpdate,
   isUpdating,
 }: SocialMediaLinksSectionProps) => {
+  const [localLinks, setLocalLinks] = useState<SocialMediaLink[]>(initialLinks);
+
   const addSocialMediaLink = () => {
-    onUpdate([...links, { name: "", url: "" }]);
+    setLocalLinks([...localLinks, { name: "", url: "" }]);
   };
 
   const removeSocialMediaLink = (index: number) => {
-    onUpdate(links.filter((_, i) => i !== index));
+    setLocalLinks(localLinks.filter((_, i) => i !== index));
   };
 
   const updateSocialMediaLink = (
@@ -28,14 +30,18 @@ export const SocialMediaLinksSection = ({
     field: keyof SocialMediaLink,
     value: string
   ) => {
-    const updatedLinks = [...links];
+    const updatedLinks = [...localLinks];
     updatedLinks[index] = { ...updatedLinks[index], [field]: value };
-    onUpdate(updatedLinks);
+    setLocalLinks(updatedLinks);
+  };
+
+  const handleSave = () => {
+    onUpdate(localLinks);
   };
 
   return (
     <div className="space-y-4">
-      {links.map((link, index) => (
+      {localLinks.map((link, index) => (
         <SocialMediaLinkInput
           key={index}
           link={link}
@@ -48,7 +54,7 @@ export const SocialMediaLinksSection = ({
         <Plus className="mr-2 h-4 w-4" />
         Add Social Media Link
       </Button>
-      <Button onClick={() => onUpdate(links)} disabled={isUpdating}>
+      <Button onClick={handleSave} disabled={isUpdating}>
         {isUpdating ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
