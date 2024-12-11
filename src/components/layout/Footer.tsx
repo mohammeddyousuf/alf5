@@ -33,7 +33,6 @@ export const Footer = () => {
   };
 
   const handleShopClick = (filter: 'all' | 'new' | 'featured') => {
-    // Reset all filters in the query cache
     queryClient.setQueryData(["shop-filters"], {
       showSaleOnly: false,
       showFeaturedOnly: filter === 'featured',
@@ -45,7 +44,6 @@ export const Footer = () => {
       sortOrder: "default"
     });
 
-    // Navigate to shop page
     navigate('/shop', { 
       state: { 
         filter,
@@ -59,7 +57,7 @@ export const Footer = () => {
     <footer className="border-t bg-background">
       <div className="container py-8 md:py-12">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col items-start gap-2">
             <h3 className="text-lg font-semibold">Shop</h3>
             <button 
               onClick={() => handleShopClick('all')}
@@ -80,7 +78,7 @@ export const Footer = () => {
               Featured
             </button>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col items-start gap-2">
             <h3 className="text-lg font-semibold">Company</h3>
             <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground">
               About Us
@@ -92,7 +90,7 @@ export const Footer = () => {
               FAQ
             </Link>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col items-start gap-2">
             <h3 className="text-lg font-semibold">Legal</h3>
             <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground">
               Privacy Policy
@@ -101,7 +99,7 @@ export const Footer = () => {
               Terms of Service
             </Link>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col items-start gap-2">
             <h3 className="text-lg font-semibold">Connect</h3>
             <a 
               href={getWhatsAppLink()} 
