@@ -7,6 +7,7 @@ import { CategoryFields } from "./CategoryFields";
 import { BasicFields } from "./BasicFields";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useProductForm } from "./hooks/useProductForm";
+import { useNavigate } from "react-router-dom";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
@@ -20,6 +21,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
     product, 
     onSuccess 
   });
+  const navigate = useNavigate();
 
   if (!form) return null;
 
@@ -34,9 +36,18 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
             <MediaFields form={form} />
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {product ? "Update Product" : "Create Product"}
-          </Button>
+          <div className="flex gap-4">
+            <Button type="submit" disabled={isSubmitting}>
+              {product ? "Update Product" : "Create Product"}
+            </Button>
+            <Button 
+              type="button" 
+              variant="outline"
+              onClick={() => navigate("/admin/products")}
+            >
+              Cancel
+            </Button>
+          </div>
         </form>
       </Form>
     </ScrollArea>
