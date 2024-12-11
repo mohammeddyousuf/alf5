@@ -14,7 +14,7 @@ const Shop = () => {
   const location = useLocation();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 15000]); // Updated to 15000
+  const [priceRange, setPriceRange] = useState([0, 0]); // Changed to start with no maximum
   const [showSaleOnly, setShowSaleOnly] = useState(false);
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(false);
@@ -34,7 +34,7 @@ const Shop = () => {
       setSelectedCategory(null);
       setSelectedSubcategory(null);
       setSelectedBrand(null);
-      setPriceRange([0, 5000]);
+      setPriceRange([0, 0]); // Reset to no maximum
       setSortOrder("default");
     }
   }, [location.state]);
