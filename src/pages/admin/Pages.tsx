@@ -2,12 +2,22 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Pencil } from "lucide-react";
+import { Loader2, Pencil, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { Pages } from "@/integrations/supabase/types/pages";
+import { useState, useEffect } from "react";
 
 const Pages = () => {
   const navigate = useNavigate();
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  
+  useEffect(() => {
+    const checkSuperAdmin = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsSuperAdmin(session?.user?.email === 'mohammedd.yousuf@gmail.com');
+    };
+    checkSuperAdmin();
+  }, []);
   
   const { data: pages, isLoading } = useQuery({
     queryKey: ["admin-pages"],
@@ -49,6 +59,12 @@ const Pages = () => {
     <div className="container py-12">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Pages</h1>
+        {isSuperAdmin && (
+          <Button onClick={() => navigate("/admin/pages/new")}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add New Page
+          </Button>
+        )}
       </div>
 
       <div className="grid gap-4">
