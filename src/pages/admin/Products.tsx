@@ -5,9 +5,11 @@ import { ProductCard } from "@/components/admin/product/ProductCard";
 import { ProductFilters } from "@/components/admin/product/ProductFilters";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 const Products = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [showSaleProducts, setShowSaleProducts] = useState(true);
   const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
@@ -20,6 +22,30 @@ const Products = () => {
       return data;
     },
   });
+
+  const { data: systemLimits } = useQuery({
+    queryKey: ["system-limits"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("system_limits")
+        .select("*")
+        .single();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const handleAddProduct = () => {
+    if (systemLimits?.product_limit && products && products.length >= systemLimits.product_limit) {
+      toast({
+        title: "Limit Reached",
+        description: `You can only add up to ${systemLimits.product_limit} products. Contact super admin to increase the limit.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    navigate("/admin/products/new");
+  };
 
   const handleStatusChange = async (id: string, currentStatus: string | null) => {
     const newStatus = currentStatus === "published" ? "draft" : "published";
@@ -57,7 +83,7 @@ const Products = () => {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Products</h1>
-        <Button onClick={() => navigate("/admin/products/new")}>
+        <Button onClick={handleAddProduct}>
           Add Product
         </Button>
       </div>

@@ -1,0 +1,94 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+
+export function SystemLimits() {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const { toast } = useToast();
+  
+  const { data: limits, isLoading, refetch } = useQuery({
+    queryKey: ["system-limits"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("system_limits")
+        .select("*")
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const [productLimit, setProductLimit] = useState(limits?.product_limit?.toString() || "");
+
+  const handleUpdateLimit = async () => {
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from("system_limits")
+        .upsert({ 
+          id: 1, // Single row for system limits
+          product_limit: parseInt(productLimit) 
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Product limit updated successfully",
+      });
+      
+      refetch();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center p-8">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col space-y-2">
+        <label htmlFor="productLimit" className="text-sm font-medium">
+          Maximum Products Allowed
+        </label>
+        <div className="flex space-x-2">
+          <Input
+            id="productLimit"
+            type="number"
+            min="1"
+            value={productLimit}
+            onChange={(e) => setProductLimit(e.target.value)}
+            className="max-w-[200px]"
+          />
+          <Button 
+            onClick={handleUpdateLimit}
+            disabled={isUpdating}
+          >
+            {isUpdating ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Update Limit"
+            )}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
