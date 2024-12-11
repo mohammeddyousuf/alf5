@@ -11,11 +11,18 @@ export const productFormSchema = z.object({
     .number()
     .int("Sale price must be a whole number")
     .min(0, "Sale price must be a positive number")
-    .refine((sale_price, ctx) => {
+    .superRefine((sale_price, ctx) => {
       const { price } = ctx.parent as { price: number };
       if (!sale_price) return true;
-      return sale_price < price;
-    }, "Sale price must be less than regular price")
+      if (sale_price >= price) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Sale price must be less than regular price",
+        });
+        return false;
+      }
+      return true;
+    })
     .nullable()
     .optional(),
   images: z.array(z.string()).default([]),
