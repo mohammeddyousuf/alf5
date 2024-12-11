@@ -36,7 +36,16 @@ const Products = () => {
   });
 
   const handleAddProduct = () => {
-    if (systemLimits?.product_limit && products && products.length >= systemLimits.product_limit) {
+    if (!systemLimits?.product_limit) {
+      toast({
+        title: "Error",
+        description: "System limits not configured. Please contact super admin.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (products && products.length >= systemLimits.product_limit) {
       toast({
         title: "Limit Reached",
         description: `You can only add up to ${systemLimits.product_limit} products. Contact super admin to increase the limit.`,
