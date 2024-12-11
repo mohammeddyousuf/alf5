@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductList } from "@/components/admin/product/ProductList";
+import { useProducts } from "@/hooks/useProducts";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const Products = () => {
   const [search, setSearch] = useState("");
   const [showSaleProducts, setShowSaleProducts] = useState(true);
   const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
+  const { data: products } = useProducts();
 
   const { data: systemLimits, isLoading: isLoadingLimits } = useQuery({
     queryKey: ["system-limits"],
@@ -62,6 +64,15 @@ const Products = () => {
       return;
     }
 
+    if (products && products.length >= systemLimits.product_limit) {
+      toast({
+        title: "Error",
+        description: `Product limit (${systemLimits.product_limit}) reached. Please contact super admin to increase the limit.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     navigate("/admin/products/new");
   };
 
@@ -71,7 +82,7 @@ const Products = () => {
         <div className="space-y-1">
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-sm text-muted-foreground">
-            Manage your products
+            Manage your products ({products?.length || 0} of {systemLimits?.product_limit || '...'} allowed)
           </p>
         </div>
         <Button onClick={handleAddProduct}>
