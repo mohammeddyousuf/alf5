@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { ProductCard } from "@/components/admin/product/ProductCard";
 import { ProductFilters } from "@/components/admin/product/ProductFilters";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { ProductList } from "@/components/admin/product/ProductList";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -15,43 +14,24 @@ const Products = () => {
   const [showSaleProducts, setShowSaleProducts] = useState(true);
   const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
 
-  const { data: products, refetch, isLoading: isLoadingProducts } = useQuery({
-    queryKey: ["products"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .order('created_at', { ascending: false });  // Add ordering to ensure consistent display
-      
-      if (error) {
-        console.error("Error fetching products:", error);
-        throw error;
-      }
-      console.log("Fetched products:", data);  // Add logging to debug
-      return data;
-    },
-  });
-
   const { data: systemLimits, isLoading: isLoadingLimits } = useQuery({
     queryKey: ["system-limits"],
     queryFn: async () => {
-      // First try to get existing limits
       const { data: existingLimits, error: fetchError } = await supabase
         .from("system_limits")
         .select("*")
         .order('created_at', { ascending: false })
-        .limit(1);  // Get the most recent limit
+        .limit(1);
       
       if (fetchError) {
         console.error("Error fetching limits:", fetchError);
         throw fetchError;
       }
       
-      // If no limits exist, create default ones
       if (!existingLimits || existingLimits.length === 0) {
         console.log("No limits found, creating default");
         const defaultLimit = {
-          product_limit: 100 // Default limit
+          product_limit: 100
         };
         
         const { data: insertedData, error: insertError } = await supabase
@@ -82,100 +62,8 @@ const Products = () => {
       return;
     }
 
-    if (products && products.length >= systemLimits.product_limit) {
-      toast({
-        title: "Limit Reached",
-        description: `You can only add up to ${systemLimits.product_limit} products. Contact super admin to increase the limit.`,
-        variant: "destructive",
-      });
-      return;
-    }
     navigate("/admin/products/new");
   };
-
-  const handleStatusChange = async (id: string, currentStatus: string | null) => {
-    const newStatus = currentStatus === "published" ? "draft" : "published";
-    const { error } = await supabase
-      .from("products")
-      .update({ status: newStatus })
-      .eq("id", id);
-    
-    if (error) throw error;
-    refetch();
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      // First get the product to access its images
-      const { data: product, error: fetchError } = await supabase
-        .from("products")
-        .select("images")
-        .eq("id", id)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      // Delete images from storage if they exist
-      if (product?.images && product.images.length > 0) {
-        const fileNames = product.images.map(url => {
-          const fileName = decodeURIComponent(url.split("/").pop() || "");
-          return fileName;
-        });
-
-        console.log("Deleting image files:", fileNames);
-
-        const { error: storageError } = await supabase.storage
-          .from("product-images")
-          .remove(fileNames);
-
-        if (storageError) {
-          console.error("Error deleting images:", storageError);
-          // Continue with product deletion even if image deletion fails
-        }
-      }
-
-      // Delete the product from the database
-      const { error: deleteError } = await supabase
-        .from("products")
-        .delete()
-        .eq("id", id);
-      
-      if (deleteError) throw deleteError;
-
-      toast({
-        title: "Success",
-        description: "Product and associated images deleted successfully",
-      });
-
-      refetch();
-    } catch (error: any) {
-      console.error("Error deleting product:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete product: " + error.message,
-      });
-    }
-  };
-
-  const filteredProducts = products?.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
-    const isSaleProduct = product.sale_price && product.sale_price < product.price;
-    
-    if (!matchesSearch) return false;
-    if (isSaleProduct && !showSaleProducts) return false;
-    if (!isSaleProduct && !showNonSaleProducts) return false;
-    
-    return true;
-  });
-
-  if (isLoadingProducts || isLoadingLimits) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -183,7 +71,7 @@ const Products = () => {
         <div className="space-y-1">
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-sm text-muted-foreground">
-            {products?.length || 0} of {systemLimits?.product_limit || 0} products used
+            Manage your products
           </p>
         </div>
         <Button onClick={handleAddProduct}>
@@ -200,17 +88,7 @@ const Products = () => {
         setShowNonSaleProducts={setShowNonSaleProducts}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredProducts?.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onStatusChange={handleStatusChange}
-            onDelete={handleDelete}
-            onSuccess={refetch}
-          />
-        ))}
-      </div>
+      <ProductList />
     </div>
   );
 };
