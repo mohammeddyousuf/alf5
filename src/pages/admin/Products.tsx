@@ -99,7 +99,11 @@ const Products = () => {
         setShowNonSaleProducts={setShowNonSaleProducts}
       />
 
-      <ProductList />
+      <ProductList 
+        search={search}
+        showSaleProducts={showSaleProducts}
+        showNonSaleProducts={showNonSaleProducts}
+      />
     </div>
   );
 };

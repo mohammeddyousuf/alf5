@@ -7,7 +7,13 @@ import { useToast } from "@/hooks/use-toast";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
-export const ProductList = () => {
+interface ProductListProps {
+  search: string;
+  showSaleProducts: boolean;
+  showNonSaleProducts: boolean;
+}
+
+export const ProductList = ({ search, showSaleProducts, showNonSaleProducts }: ProductListProps) => {
   const { data: products, refetch, isLoading } = useProducts();
   const { toast } = useToast();
 
@@ -83,9 +89,23 @@ export const ProductList = () => {
     );
   }
 
+  // Filter products based on search and sale status
+  const filteredProducts = products?.filter((product: ProductRow) => {
+    const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
+    const isSaleProduct = product.sale_price !== null && product.sale_price > 0;
+    
+    // Check if product should be shown based on sale status filters
+    const showBasedOnSaleStatus = (
+      (isSaleProduct && showSaleProducts) || 
+      (!isSaleProduct && showNonSaleProducts)
+    );
+
+    return matchesSearch && showBasedOnSaleStatus;
+  });
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {products?.map((product: ProductRow) => (
+      {filteredProducts?.map((product: ProductRow) => (
         <ProductCard
           key={product.id}
           product={product}
