@@ -1,7 +1,10 @@
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { queryClient } from "@/lib/react-query";
 
 export const Footer = () => {
+  const navigate = useNavigate();
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
@@ -10,86 +13,136 @@ export const Footer = () => {
         .select("*")
         .single();
       if (error) throw error;
+      console.log("Footer settings:", data);
       return data;
     },
   });
 
-  const createWhatsAppUrl = () => {
-    const websiteName = settings?.website_name || "your website";
-    const message = encodeURIComponent(`Hi, Just visited ${websiteName}.`);
-    const phoneNumber = settings?.whatsapp_number;
-    return `https://wa.me/${phoneNumber}?text=${message}`;
+  const getWhatsAppLink = () => {
+    if (!settings?.whatsapp_number) return "#";
+    const cleanNumber = settings.whatsapp_number.replace(/\D/g, '');
+    return `https://wa.me/${cleanNumber}`;
+  };
+
+  const formatSocialLink = (url: string | null) => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+    return `https://${url}`;
+  };
+
+  const handleShopClick = (filter: 'all' | 'new' | 'featured') => {
+    queryClient.setQueryData(["shop-filters"], {
+      showSaleOnly: false,
+      showFeaturedOnly: filter === 'featured',
+      showNewArrivalsOnly: filter === 'new',
+      selectedCategory: null,
+      selectedSubcategory: null,
+      selectedBrand: null,
+      priceRange: [0, 1000],
+      sortOrder: "default"
+    });
+
+    navigate('/shop', { 
+      state: { 
+        filter,
+        showFeaturedOnly: filter === 'featured',
+        showNewArrivalsOnly: filter === 'new' 
+      } 
+    });
   };
 
   return (
-    <footer className="bg-background text-foreground py-12 mt-12">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-4">
+    <footer className="border-t bg-background">
+      <div className="container py-8 md:py-12">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          <div className="flex flex-col items-start gap-2">
+            <h3 className="text-lg font-semibold">Shop</h3>
+            <button 
+              onClick={() => handleShopClick('all')}
+              className="text-left text-sm text-muted-foreground hover:text-foreground"
+            >
+              All Products
+            </button>
+            <button 
+              onClick={() => handleShopClick('new')}
+              className="text-left text-sm text-muted-foreground hover:text-foreground"
+            >
+              New Arrivals
+            </button>
+            <button 
+              onClick={() => handleShopClick('featured')}
+              className="text-left text-sm text-muted-foreground hover:text-foreground"
+            >
+              Featured
+            </button>
+          </div>
+          <div className="flex flex-col items-start gap-2">
+            <h3 className="text-lg font-semibold">Company</h3>
+            <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground">
+              About Us
+            </Link>
+            <Link to="/contact" className="text-sm text-muted-foreground hover:text-foreground">
+              Contact
+            </Link>
+            <Link to="/faq" className="text-sm text-muted-foreground hover:text-foreground">
+              FAQ
+            </Link>
+          </div>
+          <div className="flex flex-col items-start gap-2">
+            <h3 className="text-lg font-semibold">Legal</h3>
+            <Link to="/privacy-policy" className="text-sm text-muted-foreground hover:text-foreground">
+              Privacy Policy
+            </Link>
+            <Link to="/terms-of-service" className="text-sm text-muted-foreground hover:text-foreground">
+              Terms of Service
+            </Link>
+          </div>
+          <div className="flex flex-col items-start gap-2">
             <h3 className="text-lg font-semibold">Connect</h3>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href={createWhatsAppUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  WhatsApp
-                </a>
-              </li>
-              <li>
-                <a
-                  href={settings?.whatsapp_group_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Join WhatsApp Group
-                </a>
-              </li>
-              <li>
-                <a
-                  href={settings?.instagram_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Instagram
-                </a>
-              </li>
-              <li>
-                <a
-                  href={settings?.facebook_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Facebook
-                </a>
-              </li>
-            </ul>
+            <a 
+              href={getWhatsAppLink()} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              WhatsApp
+            </a>
+            {settings?.whatsapp_group_url && (
+              <a 
+                href={settings.whatsapp_group_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Join WhatsApp Group
+              </a>
+            )}
+            {settings?.instagram_url && (
+              <a 
+                href={formatSocialLink(settings.instagram_url)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Instagram
+              </a>
+            )}
+            {settings?.facebook_url && (
+              <a 
+                href={formatSocialLink(settings.facebook_url)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
+                Facebook
+              </a>
+            )}
           </div>
-          
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">About Us</h3>
-            <p className="text-muted-foreground">
-              We are committed to providing the best service to our customers.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Contact</h3>
-            <p className="text-muted-foreground">Email: support@example.com</p>
-            <p className="text-muted-foreground">Phone: +1234567890</p>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Follow Us</h3>
-            <p className="text-muted-foreground">
-              Follow us on social media to stay updated with our latest products and offers.
-            </p>
-          </div>
+        </div>
+        <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
+          © {new Date().getFullYear()} {settings?.website_name || "WhatsApp Store"}. All rights reserved.
         </div>
       </div>
     </footer>
