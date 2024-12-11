@@ -8,12 +8,16 @@ interface PriceRangeFilterProps {
 
 export function PriceRangeFilter({ priceRange, setPriceRange }: PriceRangeFilterProps) {
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newMin = Math.max(0, parseInt(e.target.value) || 0);
+    const value = e.target.value;
+    // If empty string, set to 0
+    const newMin = value === '' ? 0 : Math.max(0, parseInt(value) || 0);
     setPriceRange([newMin, priceRange[1]]);
   };
 
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newMax = Math.max(0, parseInt(e.target.value) || 0);
+    const value = e.target.value;
+    // If empty string, set to 0
+    const newMax = value === '' ? 0 : Math.max(0, parseInt(value) || 0);
     setPriceRange([priceRange[0], newMax]);
   };
 
@@ -26,9 +30,10 @@ export function PriceRangeFilter({ priceRange, setPriceRange }: PriceRangeFilter
           <Input
             type="number"
             min={0}
-            value={priceRange[0]}
+            value={priceRange[0] === 0 ? '' : priceRange[0]}
             onChange={handleMinPriceChange}
             className="mt-1"
+            placeholder="0"
           />
         </div>
         <div className="flex-1">
@@ -36,9 +41,10 @@ export function PriceRangeFilter({ priceRange, setPriceRange }: PriceRangeFilter
           <Input
             type="number"
             min={0}
-            value={priceRange[1]}
+            value={priceRange[1] === 0 ? '' : priceRange[1]}
             onChange={handleMaxPriceChange}
             className="mt-1"
+            placeholder="0"
           />
         </div>
       </div>
