@@ -96,8 +96,9 @@ const Shop = () => {
       name: product.name,
       price: product.price,
       priceRange,
-      meetsPrice: (product.sale_price || product.price) >= priceRange[0] && 
-                  (product.sale_price || product.price) <= priceRange[1]
+      meetsPrice: priceRange[0] === 0 && priceRange[1] === 0 ? true : 
+                  (product.sale_price || product.price) >= priceRange[0] && 
+                  (product.sale_price || product.price) <= (priceRange[1] || Infinity)
     });
 
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -105,7 +106,9 @@ const Shop = () => {
       (product.brand?.toLowerCase().includes(searchQuery.toLowerCase()));
     
     const price = product.sale_price || product.price;
-    const meetsPrice = price >= priceRange[0] && price <= priceRange[1];
+    const meetsPrice = priceRange[0] === 0 && priceRange[1] === 0 ? true :
+                      price >= priceRange[0] && 
+                      (priceRange[1] === 0 ? true : price <= priceRange[1]);
     const meetsSale = showSaleOnly ? product.sale_price !== null : true;
     const meetsBrand = selectedBrand ? product.brand === selectedBrand : true;
     
