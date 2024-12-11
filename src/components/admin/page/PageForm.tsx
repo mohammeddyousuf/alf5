@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,8 +46,17 @@ interface PageFormProps {
 
 export const PageForm = ({ initialData }: PageFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const checkSuperAdmin = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsSuperAdmin(session?.user?.email === 'mohammedd.yousuf@gmail.com');
+    };
+    checkSuperAdmin();
+  }, []);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -63,25 +72,38 @@ export const PageForm = ({ initialData }: PageFormProps) => {
     try {
       setIsLoading(true);
 
+      const updateData = {
+        title: values.title,
+        content: values.content,
+        ...(isSuperAdmin && {
+          slug: values.slug,
+          location: values.location,
+        }),
+      };
+
       if (initialData) {
         const { error } = await supabase
           .from("pages")
-          .update({
-            title: values.title,
-            slug: values.slug,
-            content: values.content,
-            location: values.location,
-          })
+          .update(updateData)
           .eq("id", initialData.id);
 
         if (error) throw error;
       } else {
+        // Only superadmin can create new pages
+        if (!isSuperAdmin) {
+          toast({
+            variant: "destructive",
+            title: "Access Denied",
+            description: "Only super admin can create new pages",
+          });
+          return;
+        }
+
         const { error } = await supabase
           .from("pages")
           .insert({
-            title: values.title,
+            ...updateData,
             slug: values.slug,
-            content: values.content,
             location: values.location,
           });
 
@@ -121,43 +143,47 @@ export const PageForm = ({ initialData }: PageFormProps) => {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="slug"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Slug</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {isSuperAdmin && (
+          <>
+            <FormField
+              control={form.control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Slug</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Page Location</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select page location" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="header">Header Navigation</SelectItem>
-                  <SelectItem value="footer_company">Footer - Company Section</SelectItem>
-                  <SelectItem value="footer_legal">Footer - Legal Section</SelectItem>
-                  <SelectItem value="none">No Navigation Link</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Page Location</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select page location" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="header">Header Navigation</SelectItem>
+                      <SelectItem value="footer_company">Footer - Company Section</SelectItem>
+                      <SelectItem value="footer_legal">Footer - Legal Section</SelectItem>
+                      <SelectItem value="none">No Navigation Link</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </>
+        )}
 
         <FormField
           control={form.control}
