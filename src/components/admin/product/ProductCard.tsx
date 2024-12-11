@@ -89,11 +89,17 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
         </Button>
       </div>
       <p className="text-sm text-muted-foreground mb-4">
-        {formatPrice(product.price)}
-        {product.sale_price && product.sale_price < product.price && (
-          <span className="ml-2 text-destructive line-through">
-            {formatPrice(product.sale_price)}
-          </span>
+        {product.sale_price && product.sale_price < product.price ? (
+          <>
+            <span className="text-destructive font-semibold">
+              {formatPrice(product.sale_price)}
+            </span>
+            <span className="ml-2 line-through">
+              {formatPrice(product.price)}
+            </span>
+          </>
+        ) : (
+          formatPrice(product.price)
         )}
       </p>
       <div className="flex gap-2">
