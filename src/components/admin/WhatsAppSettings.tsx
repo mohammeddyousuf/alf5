@@ -16,8 +16,6 @@ export const WhatsAppSettings = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [instagramUrl, setInstagramUrl] = useState("");
   const [facebookUrl, setFacebookUrl] = useState("");
-  const [instagramName, setInstagramName] = useState("");
-  const [facebookName, setFacebookName] = useState("");
   const [isSocialMediaUpdating, setIsSocialMediaUpdating] = useState(false);
 
   const { data: settings } = useQuery({
@@ -45,12 +43,6 @@ export const WhatsAppSettings = () => {
     }
     if (settings?.facebook_url) {
       setFacebookUrl(settings.facebook_url);
-    }
-    if (settings?.instagram_name) {
-      setInstagramName(settings.instagram_name);
-    }
-    if (settings?.facebook_name) {
-      setFacebookName(settings.facebook_name);
     }
   }, [settings]);
 
@@ -93,8 +85,6 @@ export const WhatsAppSettings = () => {
         .update({
           instagram_url: instagramUrl,
           facebook_url: facebookUrl,
-          instagram_name: instagramName,
-          facebook_name: facebookName,
         })
         .eq("id", settings?.id);
 
@@ -158,30 +148,12 @@ export const WhatsAppSettings = () => {
         <h2 className="text-xl font-semibold mb-4">Social Media Links</h2>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="instagramName">Instagram Name</Label>
-            <Input
-              id="instagramName"
-              value={instagramName}
-              onChange={(e) => setInstagramName(e.target.value)}
-              placeholder="Enter Instagram Name (e.g., Our Instagram)"
-            />
-          </div>
-          <div className="space-y-2">
             <Label htmlFor="instagram">Instagram URL</Label>
             <Input
               id="instagram"
               value={instagramUrl}
               onChange={(e) => setInstagramUrl(e.target.value)}
               placeholder="Enter Instagram URL"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="facebookName">Facebook Name</Label>
-            <Input
-              id="facebookName"
-              value={facebookName}
-              onChange={(e) => setFacebookName(e.target.value)}
-              placeholder="Enter Facebook Name (e.g., Our Facebook)"
             />
           </div>
           <div className="space-y-2">
