@@ -36,6 +36,16 @@ export function ImageUploadField({
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Prevent upload if there's already a logo and this is a logo upload
+    if (isLogo && imageUrl) {
+      toast({
+        variant: "destructive",
+        description: "Please delete the existing logo before uploading a new one",
+      });
+      event.target.value = "";
+      return;
+    }
+
     if (isFavicon && !file.type.includes('image/')) {
       toast({
         variant: "destructive",
@@ -49,7 +59,6 @@ export function ImageUploadField({
       const extension = file.name.split('.').pop() || '';
       const timestamp = new Date().getTime();
       
-      // Ensure prefix is applied before timestamp
       let fileName;
       if (isFavicon) {
         fileName = `ico_${timestamp}.${extension}`;
@@ -59,7 +68,7 @@ export function ImageUploadField({
         fileName = `${timestamp}.${extension}`;
       }
 
-      console.log("Uploading file with name:", fileName); // Debug log
+      console.log("Uploading file with name:", fileName);
       
       const { error: uploadError } = await supabase.storage
         .from("product-images")
