@@ -1,3 +1,5 @@
+import { SocialMediaLink } from './social';
+
 export interface Settings {
   accent_color: string | null;
   background_color: string | null;

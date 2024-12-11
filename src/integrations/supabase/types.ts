@@ -238,6 +238,7 @@ export type Database = {
           website_name: string | null
           whatsapp_group_url: string | null
           whatsapp_number: string
+          social_media_links: SocialMediaLink[] | null;
         }
         Insert: {
           accent_color?: string | null
@@ -257,6 +258,7 @@ export type Database = {
           website_name?: string | null
           whatsapp_group_url?: string | null
           whatsapp_number: string
+          social_media_links?: SocialMediaLink[] | null;
         }
         Update: {
           accent_color?: string | null
@@ -276,6 +278,7 @@ export type Database = {
           website_name?: string | null
           whatsapp_group_url?: string | null
           whatsapp_number?: string;
+          social_media_links?: SocialMediaLink[] | null;
         }
         Relationships: []
       }
@@ -453,10 +456,10 @@ export type Tables<
         PublicSchema["Views"])
     ? (PublicSchema["Tables"] &
         PublicSchema["Views"])[PublicTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
+      Row: infer R
+    }
+    ? R
+    : never
     : never
 
 export type TablesInsert<
