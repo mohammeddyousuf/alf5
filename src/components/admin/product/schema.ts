@@ -9,20 +9,17 @@ export const productFormSchema = z.object({
     .min(0, "Sale price must be a positive number")
     .nullable()
     .optional()
-    .superRefine((val, ctx) => {
-      if (val === null || val === undefined) return;
-
-      // Get the price from the parent object that's being validated
-      const parentData = ctx.path[0] ? ctx.getData() : {};
-      const price = (parentData as { price: number }).price;
-
-      if (val >= price) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Sale price must be less than regular price",
-        });
+    .refine(
+      (val, ctx) => {
+        if (val === null || val === undefined) return true;
+        const formData = ctx.path[0] ? (ctx as any).parent : {};
+        const price = formData.price;
+        return val < price;
+      },
+      {
+        message: "Sale price must be less than regular price",
       }
-    }),
+    ),
   images: z.array(z.string()).default([]),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   category_id: z.string().nullable().optional(),
