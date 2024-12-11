@@ -35,13 +35,14 @@ export function AdminHeader() {
       <h1 className="text-3xl font-bold">Dashboard</h1>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" size="icon">
             <User className="h-4 w-4" />
-            {session?.user?.email}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>My Account</DropdownMenuLabel>
+          <DropdownMenuLabel>
+            <span className="block truncate">{session?.user?.email}</span>
+          </DropdownMenuLabel>
           <DropdownMenuSeparator />
           {isSuperAdmin && (
             <DropdownMenuItem onClick={() => navigate("/sa83ms")}>
