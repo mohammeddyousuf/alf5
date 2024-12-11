@@ -66,9 +66,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
             />
             {product.sale_price && product.sale_price < product.price && (
               <div className="absolute top-2 left-2">
-                <Badge variant="destructive">
-                  {calculateDiscount(product.price, product.sale_price)}% OFF
-                </Badge>
+                <Badge variant="destructive">SALE</Badge>
               </div>
             )}
           </>

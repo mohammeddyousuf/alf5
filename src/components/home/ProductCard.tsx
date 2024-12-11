@@ -45,9 +45,7 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
               />
               {salePrice && salePrice < price && (
                 <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground rounded-md px-2 py-1">
-                  <span className="text-xs font-bold">
-                    {calculateDiscount(price, salePrice)}% OFF
-                  </span>
+                  <span className="text-xs font-bold">SALE</span>
                 </div>
               )}
             </>
