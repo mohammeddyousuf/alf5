@@ -2,8 +2,11 @@ import { Shield, Settings, UserCheck, Lock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const SuperAdmin = () => {
+  const navigate = useNavigate();
+
   return (
     <ProtectedRoute>
       <div className="container mx-auto p-6 space-y-6">
@@ -21,7 +24,12 @@ const SuperAdmin = () => {
             <p className="text-muted-foreground mb-4">
               Manage admin access and permissions
             </p>
-            <Button className="w-full">Manage Admins</Button>
+            <Button 
+              className="w-full"
+              onClick={() => navigate("/sa83ms/admin-management")}
+            >
+              Manage Admins
+            </Button>
           </Card>
 
           <Card className="p-6">
