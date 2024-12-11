@@ -13,6 +13,7 @@ interface ImageUploadFieldProps {
   setIsUploading?: (value: boolean) => void;
   acceptedFileTypes?: string;
   isFavicon?: boolean;
+  isLogo?: boolean;
 }
 
 export function ImageUploadField({
@@ -22,6 +23,7 @@ export function ImageUploadField({
   setIsUploading: externalSetIsUploading,
   acceptedFileTypes = "image/*",
   isFavicon = false,
+  isLogo = false,
 }: ImageUploadFieldProps) {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
@@ -45,8 +47,9 @@ export function ImageUploadField({
 
     actualSetIsUploading(true);
     try {
-      // Add 'ico_' prefix for favicon uploads
-      const fileName = isFavicon ? `ico_${encodeURIComponent(file.name)}` : encodeURIComponent(file.name);
+      // Add prefix based on type (favicon or logo)
+      const prefix = isFavicon ? 'ico_' : (isLogo ? 'logo_' : '');
+      const fileName = `${prefix}${encodeURIComponent(file.name)}`;
       
       const { error: uploadError } = await supabase.storage
         .from("product-images")
@@ -69,7 +72,7 @@ export function ImageUploadField({
       } else {
         toast({
           title: "Success",
-          description: "Image uploaded successfully",
+          description: `${isFavicon ? 'Favicon' : (isLogo ? 'Logo' : 'Image')} uploaded successfully`,
         });
       }
     } catch (error: any) {
@@ -103,7 +106,7 @@ export function ImageUploadField({
       
       toast({
         title: "Success",
-        description: "Image deleted successfully",
+        description: `${isFavicon ? 'Favicon' : (isLogo ? 'Logo' : 'Image')} deleted successfully`,
       });
     } catch (error: any) {
       console.error("Error deleting image:", error);
@@ -116,6 +119,9 @@ export function ImageUploadField({
     }
   };
 
+  // Only show upload input if there's no existing image for favicon or logo
+  const showUploadInput = !imageUrl || (!isFavicon && !isLogo);
+
   return (
     <div className="space-y-4">
       {imageUrl && (
@@ -126,7 +132,7 @@ export function ImageUploadField({
           isFavicon={isFavicon}
         />
       )}
-      {(!imageUrl || !isFavicon) && (
+      {showUploadInput && (
         <div className="relative">
           <Input
             type="file"
@@ -141,7 +147,7 @@ export function ImageUploadField({
             ) : (
               <div className="flex items-center gap-2">
                 <ImagePlus className="h-5 w-5" />
-                <span>Upload {isFavicon ? 'Favicon' : 'Image'}</span>
+                <span>Upload {isFavicon ? 'Favicon' : (isLogo ? 'Logo' : 'Image')}</span>
               </div>
             )}
           </div>
