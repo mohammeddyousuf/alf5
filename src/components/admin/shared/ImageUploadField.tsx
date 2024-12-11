@@ -47,9 +47,17 @@ export function ImageUploadField({
 
     actualSetIsUploading(true);
     try {
-      // Add prefix based on type (favicon or logo)
-      const prefix = isFavicon ? 'ico_' : (isLogo ? 'logo_' : '');
-      const fileName = `${prefix}${encodeURIComponent(file.name)}`;
+      // Generate the filename with the appropriate prefix
+      let prefix = '';
+      if (isFavicon) {
+        prefix = 'ico_';
+      } else if (isLogo) {
+        prefix = 'logo_';
+      }
+      
+      // Ensure unique filename with prefix
+      const timestamp = new Date().getTime();
+      const fileName = `${prefix}${timestamp}_${encodeURIComponent(file.name)}`;
       
       const { error: uploadError } = await supabase.storage
         .from("product-images")
