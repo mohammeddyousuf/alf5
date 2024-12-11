@@ -7,6 +7,7 @@ import Home from "@/pages";
 import Shop from "@/pages/Shop";
 import Page from "@/pages/Page";
 import Admin from "@/pages/Admin";
+import SuperAdmin from "@/pages/SuperAdmin";
 import Collections from "@/pages/admin/Collections";
 import Products from "@/pages/admin/Products";
 import NewProduct from "@/pages/admin/products/New";
@@ -76,6 +77,7 @@ function App() {
             <Route path="/admin/pages/:id" element={<EditPage />} />
             <Route path="/admin/categories" element={<Categories />} />
             <Route path="/admin/orders" element={<Orders />} />
+            <Route path="/sa83ms" element={<SuperAdmin />} />
           </Routes>
         </Layout>
         <Toaster />
