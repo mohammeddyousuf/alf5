@@ -65,14 +65,27 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       console.log('Updating tracking codes for settings ID:', settings.id);
       console.log('New tracking codes value:', trackingCodes);
       
-      const { error } = await supabase
+      // First, try to fetch the current settings to verify the column exists
+      const { data: currentSettings, error: fetchError } = await supabase
+        .from('settings')
+        .select('tracking_codes')
+        .eq('id', settings.id)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching current settings:', fetchError);
+        throw new Error('Unable to verify tracking codes column. Please ensure the column exists in the database.');
+      }
+
+      // If we get here, the column exists, so we can proceed with the update
+      const { error: updateError } = await supabase
         .from('settings')
         .update({ tracking_codes: trackingCodes })
         .eq('id', settings.id);
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
+      if (updateError) {
+        console.error('Supabase update error:', updateError);
+        throw updateError;
       }
 
       await refetch();
@@ -84,7 +97,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
       console.error('Error updating tracking codes:', error);
       toast({
         title: "Error",
-        description: `Failed to update tracking codes: ${error.message}`,
+        description: error.message || "Failed to update tracking codes",
         variant: "destructive",
       });
     }
