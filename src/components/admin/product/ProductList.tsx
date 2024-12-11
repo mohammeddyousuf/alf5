@@ -117,7 +117,9 @@ export const ProductList = () => {
   const handleGlobalSaleTimer = async () => {
     try {
       const newTimerState = !globalSaleTimer;
-      const endDate = newTimerState ? globalEndDate : null;
+      
+      // Only include end date if timer is being enabled and date is valid
+      const endDate = newTimerState && globalEndDate ? globalEndDate : null;
       
       console.log("Updating global sale timer:", {
         newTimerState,
@@ -126,13 +128,13 @@ export const ProductList = () => {
       });
 
       // Update all products with sale prices
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("products")
         .update({
           sale_timer_enabled: newTimerState,
           sale_end_date: endDate
         })
-        .not('sale_price', 'is', null);
+        .is('sale_price', 'not.null');  // Changed from .not('sale_price', 'is', null)
 
       if (error) {
         console.error("Error in handleGlobalSaleTimer:", error);
@@ -141,9 +143,9 @@ export const ProductList = () => {
 
       // Update local state after successful database update
       setGlobalSaleTimer(newTimerState);
-      setGlobalEndDate(endDate || "");
-
-      console.log("Updated products:", data);
+      if (!newTimerState) {
+        setGlobalEndDate("");
+      }
 
       toast({
         title: "Success",
