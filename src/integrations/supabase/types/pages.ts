@@ -1,3 +1,5 @@
+export type PageLocation = "header" | "footer_company" | "footer_legal" | "none" | null;
+
 export interface Pages {
   Row: {
     content: string;
@@ -6,7 +8,7 @@ export interface Pages {
     slug: string;
     title: string;
     updated_at: string;
-    location: "header" | "footer_company" | "footer_legal" | "none" | null;
+    location: PageLocation;
   };
   Insert: {
     content: string;
@@ -15,7 +17,7 @@ export interface Pages {
     slug: string;
     title: string;
     updated_at?: string;
-    location?: "header" | "footer_company" | "footer_legal" | "none" | null;
+    location?: PageLocation;
   };
   Update: {
     content?: string;
@@ -24,7 +26,7 @@ export interface Pages {
     slug?: string;
     title?: string;
     updated_at?: string;
-    location?: "header" | "footer_company" | "footer_legal" | "none" | null;
+    location?: PageLocation;
   };
   Relationships: [];
 }

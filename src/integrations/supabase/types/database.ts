@@ -1,4 +1,8 @@
 import { SocialMediaLink } from './social';
+import { Pages } from './pages';
+import { Products } from './products';
+import { SystemLimits } from './system';
+import { Settings } from './settings';
 
 export interface Database {
   public: {
@@ -150,33 +154,7 @@ export interface Database {
         };
         Relationships: [];
       };
-      pages: {
-        Row: {
-          content: string;
-          created_at: string;
-          id: string;
-          slug: string;
-          title: string;
-          updated_at: string;
-        };
-        Insert: {
-          content: string;
-          created_at?: string;
-          id?: string;
-          slug: string;
-          title: string;
-          updated_at?: string;
-        };
-        Update: {
-          content?: string;
-          created_at?: string;
-          id?: string;
-          slug?: string;
-          title?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
+      pages: Pages;
       products: {
         Row: {
           added_date: string | null;
