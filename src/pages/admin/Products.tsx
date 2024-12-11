@@ -6,6 +6,7 @@ import { ProductFilters } from "@/components/admin/product/ProductFilters";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -14,16 +15,19 @@ const Products = () => {
   const [showSaleProducts, setShowSaleProducts] = useState(true);
   const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
 
-  const { data: products, refetch } = useQuery({
+  const { data: products, refetch, isLoading: isLoadingProducts } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
       const { data, error } = await supabase.from("products").select("*");
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching products:", error);
+        throw error;
+      }
       return data;
     },
   });
 
-  const { data: systemLimits } = useQuery({
+  const { data: systemLimits, isLoading: isLoadingLimits } = useQuery({
     queryKey: ["system-limits"],
     queryFn: async () => {
       // First try to get existing limits
@@ -35,7 +39,7 @@ const Products = () => {
         console.error("Error fetching limits:", fetchError);
         throw fetchError;
       }
-
+      
       // If no limits exist, create default ones
       if (!existingLimits || existingLimits.length === 0) {
         console.log("No limits found, creating default");
@@ -47,18 +51,16 @@ const Products = () => {
           .from("system_limits")
           .insert([defaultLimit])
           .select()
-          .maybeSingle();
+          .single();
           
         if (insertError) {
           console.error("Error creating default limits:", insertError);
           throw insertError;
         }
 
-        console.log("Created default limits:", insertedData);
         return insertedData;
       }
       
-      console.log("Found existing limits:", existingLimits[0]);
       return existingLimits[0];
     },
   });
@@ -115,6 +117,14 @@ const Products = () => {
     
     return true;
   });
+
+  if (isLoadingProducts || isLoadingLimits) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
