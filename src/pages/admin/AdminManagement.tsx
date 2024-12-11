@@ -9,6 +9,7 @@ import GrantAccessForm from "@/components/admin/GrantAccessForm";
 
 const AdminManagement = () => {
   const [admins, setAdmins] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -16,15 +17,12 @@ const AdminManagement = () => {
     try {
       const { data: profilesData, error: adminsError } = await supabase
         .from('profiles')
-        .select('*');
+        .select('*')
+        .or('role.eq.admin,role.eq.super_admin');
 
       if (adminsError) throw adminsError;
 
-      const adminProfiles = profilesData?.filter(
-        profile => profile.role === 'admin' || profile.role === 'super_admin'
-      ) || [];
-
-      setAdmins(adminProfiles);
+      setAdmins(profilesData || []);
     } catch (error: any) {
       console.error('Error fetching admins:', error);
       toast({
@@ -32,54 +30,82 @@ const AdminManagement = () => {
         description: "Failed to fetch admin list",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     const checkUserAndFetchAdmins = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.user) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session?.user) {
+          toast({
+            title: "Error",
+            description: "You must be logged in to access this page",
+            variant: "destructive",
+          });
+          navigate("/auth");
+          return;
+        }
+
+        // First check if user exists in profiles
+        const { data: userProfile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profileError) {
+          // If profile doesn't exist, create it
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: session.user.id,
+              email: session.user.email,
+              role: 'user'
+            });
+
+          if (insertError) throw insertError;
+          
+          toast({
+            title: "Access Denied",
+            description: "You don't have permission to access this page",
+            variant: "destructive",
+          });
+          navigate("/");
+          return;
+        }
+
+        if (userProfile?.role !== 'admin' && userProfile?.role !== 'super_admin') {
+          toast({
+            title: "Access Denied",
+            description: "You don't have permission to access this page",
+            variant: "destructive",
+          });
+          navigate("/");
+          return;
+        }
+
+        fetchAdmins();
+      } catch (error: any) {
+        console.error('Error checking user access:', error);
         toast({
           title: "Error",
-          description: "You must be logged in to access this page",
+          description: error.message || "Failed to verify access",
           variant: "destructive",
         });
         navigate("/auth");
-        return;
       }
-
-      const { data: currentUserProfile, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-
-      if (profileError) {
-        console.error('Error fetching user profile:', profileError);
-        toast({
-          title: "Error",
-          description: "Failed to verify admin access",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (currentUserProfile?.role !== 'admin' && currentUserProfile?.role !== 'super_admin') {
-        toast({
-          title: "Access Denied",
-          description: "You don't have permission to access this page",
-          variant: "destructive",
-        });
-        navigate("/");
-        return;
-      }
-
-      fetchAdmins();
     };
 
     checkUserAndFetchAdmins();
   }, [navigate, toast]);
+
+  if (isLoading) {
+    return <div className="container mx-auto p-6">Loading...</div>;
+  }
 
   return (
     <div className="container mx-auto p-6 space-y-6">
