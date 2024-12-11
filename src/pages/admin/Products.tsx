@@ -98,13 +98,57 @@ const Products = () => {
   };
 
   const handleDelete = async (id: string) => {
-    const { error } = await supabase
-      .from("products")
-      .delete()
-      .eq("id", id);
-    
-    if (error) throw error;
-    refetch();
+    try {
+      // First get the product to access its images
+      const { data: product, error: fetchError } = await supabase
+        .from("products")
+        .select("images")
+        .eq("id", id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Delete images from storage if they exist
+      if (product?.images && product.images.length > 0) {
+        const fileNames = product.images.map(url => {
+          const fileName = decodeURIComponent(url.split("/").pop() || "");
+          return fileName;
+        });
+
+        console.log("Deleting image files:", fileNames);
+
+        const { error: storageError } = await supabase.storage
+          .from("product-images")
+          .remove(fileNames);
+
+        if (storageError) {
+          console.error("Error deleting images:", storageError);
+          // Continue with product deletion even if image deletion fails
+        }
+      }
+
+      // Delete the product from the database
+      const { error: deleteError } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", id);
+      
+      if (deleteError) throw deleteError;
+
+      toast({
+        title: "Success",
+        description: "Product and associated images deleted successfully",
+      });
+
+      refetch();
+    } catch (error: any) {
+      console.error("Error deleting product:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete product: " + error.message,
+      });
+    }
   };
 
   const filteredProducts = products?.filter((product) => {
