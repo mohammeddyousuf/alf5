@@ -1,4 +1,4 @@
-import { Shield, Settings, UserCheck, Lock, ArrowLeft } from "lucide-react";
+import { Shield, Settings, UserCheck, Lock, ArrowLeft, FileText, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,22 @@ const SuperAdmin = () => {
             Back to Admin Dashboard
           </Button>
         </div>
+
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              <h2 className="text-xl font-semibold">Page Management</h2>
+            </div>
+            <Button onClick={() => navigate("/admin/pages/new")} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Create New Page
+            </Button>
+          </div>
+          <p className="text-muted-foreground">
+            Create new pages and manage their placement in the navigation
+          </p>
+        </Card>
 
         <Card className="p-6">
           <div className="flex items-center gap-2 mb-4">
