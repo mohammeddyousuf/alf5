@@ -29,13 +29,14 @@ const AdminManagement = () => {
 
   const fetchAdmins = async () => {
     try {
-      const { data, error } = await supabase
+      // Modified query to avoid RLS recursion
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('*')
-        .in('role', ['admin', 'super_admin']);
+        .or('role.eq.admin,role.eq.super_admin');
 
-      if (error) {
-        console.error('Error fetching admins:', error);
+      if (profilesError) {
+        console.error('Error fetching admins:', profilesError);
         toast({
           title: "Error",
           description: "Failed to fetch admin list",
@@ -44,7 +45,7 @@ const AdminManagement = () => {
         return;
       }
 
-      setAdmins(data || []);
+      setAdmins(profilesData || []);
     } catch (error) {
       console.error('Error in fetchAdmins:', error);
       toast({
