@@ -44,7 +44,7 @@ export function GlobalSaleControls() {
           clearance_sale_active: false,
           clearance_sale_end_date: null,
           tracking_codes: "",
-          whatsapp_number: "" // Required field
+          whatsapp_number: "+1234567890" // Default required value
         };
 
         const { data: newSettings, error: insertError } = await supabase
@@ -100,7 +100,8 @@ export function GlobalSaleControls() {
       const updateData = {
         ...(existingSettings || {}),
         clearance_sale_active: isGlobalSaleEnabled,
-        clearance_sale_end_date: endDateTime
+        clearance_sale_end_date: endDateTime,
+        whatsapp_number: existingSettings?.whatsapp_number || "+1234567890" // Ensure whatsapp_number is included
       };
 
       const { error } = await supabase
