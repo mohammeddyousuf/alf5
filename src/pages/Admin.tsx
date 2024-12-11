@@ -105,27 +105,9 @@ const Admin = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Categories</h2>
-            <p className="text-3xl font-bold mb-4">{categories?.length || 0}</p>
-            <Button onClick={() => navigate("/admin/categories")}>Manage Categories</Button>
-          </Card>
-
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Subcategories</h2>
-            <p className="text-3xl font-bold mb-4">{subcategories?.length || 0}</p>
-            <Button onClick={() => navigate("/admin/categories")}>Manage Subcategories</Button>
-          </Card>
-
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Collections</h2>
-            <p className="text-3xl font-bold mb-4">{collections?.length || 0}</p>
-            <Button onClick={() => navigate("/admin/collections")}>Manage Collections</Button>
-          </Card>
-
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Products</h2>
-            <p className="text-3xl font-bold mb-4">{products?.length || 0}</p>
-            <Button onClick={() => navigate("/admin/products")}>Manage Products</Button>
+            <h2 className="text-xl font-semibold mb-2">News Ticker</h2>
+            <p className="text-3xl font-bold mb-4">{newsTicker?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/news")}>Manage News</Button>
           </Card>
 
           <Card className="p-6">
@@ -135,15 +117,33 @@ const Admin = () => {
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">News Ticker</h2>
-            <p className="text-3xl font-bold mb-4">{newsTicker?.length || 0}</p>
-            <Button onClick={() => navigate("/admin/news")}>Manage News</Button>
+            <h2 className="text-xl font-semibold mb-2">Collections</h2>
+            <p className="text-3xl font-bold mb-4">{collections?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/collections")}>Manage Collections</Button>
           </Card>
 
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-2">Pages</h2>
             <p className="text-3xl font-bold mb-4">{pages?.length || 0}</p>
             <Button onClick={() => navigate("/admin/pages")}>Manage Pages</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Products</h2>
+            <p className="text-3xl font-bold mb-4">{products?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/products")}>Manage Products</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Categories</h2>
+            <p className="text-3xl font-bold mb-4">{categories?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/categories")}>Manage Categories</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Subcategories</h2>
+            <p className="text-3xl font-bold mb-4">{subcategories?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/categories")}>Manage Subcategories</Button>
           </Card>
 
           <Card className="p-6">
