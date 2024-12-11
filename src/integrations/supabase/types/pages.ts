@@ -7,7 +7,7 @@ export interface Pages {
     title: string;
     updated_at: string;
     location: "header" | "footer_company" | "footer_legal" | "none" | null;
-  };
+  }
   Insert: {
     content: string;
     created_at?: string;
@@ -16,7 +16,7 @@ export interface Pages {
     title: string;
     updated_at?: string;
     location?: "header" | "footer_company" | "footer_legal" | "none" | null;
-  };
+  }
   Update: {
     content?: string;
     created_at?: string;
@@ -25,6 +25,9 @@ export interface Pages {
     title?: string;
     updated_at?: string;
     location?: "header" | "footer_company" | "footer_legal" | "none" | null;
-  };
-  Relationships: [];
+  }
 }
+
+export type PagesInsert = Pages['Insert']
+export type PagesUpdate = Pages['Update']
+export type PagesRow = Pages['Row']

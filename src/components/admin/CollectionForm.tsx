@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { ImageUploadField } from "./shared/ImageUploadField";
+import { Collections } from "@/integrations/supabase/types/collections";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -26,7 +27,7 @@ const formSchema = z.object({
   button_text: z.string().optional(),
 });
 
-type CollectionRow = Database["public"]["Tables"]["collections"]["Row"];
+type CollectionRow = Collections['Row'];
 
 interface CollectionFormProps {
   collection?: CollectionRow;
