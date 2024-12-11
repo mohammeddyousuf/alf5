@@ -11,13 +11,24 @@ export const productFormSchema = z.object({
     .number()
     .int("Sale price must be a whole number")
     .min(0, "Sale price must be a positive number")
-    .refine((sale_price, ctx) => {
-      const { price } = ctx.parent as { price: number };
-      if (!sale_price) return true;
-      return sale_price < price;
-    }, "Sale price must be less than regular price")
     .nullable()
-    .optional(),
+    .optional()
+    .superRefine((sale_price, ctx) => {
+      if (!sale_price) return true;
+
+      const price = (ctx.path[0] === "sale_price" ? ctx.parent : undefined)?.price;
+      if (typeof price !== "number") return true;
+
+      if (sale_price >= price) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Sale price must be less than regular price",
+        });
+        return false;
+      }
+
+      return true;
+    }),
   images: z.array(z.string()).default([]),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   category_id: z.string().nullable().optional(),
