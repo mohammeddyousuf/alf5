@@ -17,7 +17,7 @@ export const WebsiteSettings = () => {
           .select("*")
           .order('created_at', { ascending: false })
           .limit(1)
-          .maybeSingle(); // Use maybeSingle instead of single to handle no results case
+          .maybeSingle();
         
         // If settings exist, return them
         if (existingSettings) {
