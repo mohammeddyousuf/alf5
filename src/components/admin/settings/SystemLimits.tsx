@@ -16,13 +16,29 @@ export function SystemLimits() {
   const { data: limits, isLoading, refetch } = useQuery({
     queryKey: ["system-limits"],
     queryFn: async () => {
+      // First try to get existing limits
       const { data, error } = await supabase
         .from("system_limits")
-        .select("*")
-        .single();
+        .select("*");
       
       if (error) throw error;
-      return data as SystemLimits;
+      
+      // If no limits exist, create default ones
+      if (!data || data.length === 0) {
+        const { data: newData, error: insertError } = await supabase
+          .from("system_limits")
+          .insert({
+            id: 1,
+            product_limit: 100 // Default limit
+          })
+          .select()
+          .single();
+          
+        if (insertError) throw insertError;
+        return newData;
+      }
+      
+      return data[0] as SystemLimits;
     },
   });
 
