@@ -1,16 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 export function GlobalSaleControls() {
   const { toast } = useToast();
   const [isGlobalSaleEnabled, setIsGlobalSaleEnabled] = useState(false);
   const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
+
+  // Fetch current settings
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .is('id', null)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Initialize state from settings
+  useEffect(() => {
+    if (settings) {
+      setIsGlobalSaleEnabled(settings.clearance_sale_active || false);
+      if (settings.clearance_sale_end_date) {
+        const endDateTime = new Date(settings.clearance_sale_end_date);
+        setEndDate(endDateTime.toISOString().split('T')[0]);
+        setEndTime(endDateTime.toISOString().split('T')[1].substring(0, 5));
+      }
+    }
+  }, [settings]);
 
   const handleSaveSettings = async () => {
     if (isGlobalSaleEnabled && (!endDate || !endTime)) {
