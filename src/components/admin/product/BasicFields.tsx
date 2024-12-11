@@ -12,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect } from "react";
 
 type FormData = z.infer<typeof productFormSchema>;
 
@@ -21,17 +20,6 @@ interface BasicFieldsProps {
 }
 
 export function BasicFields({ form }: BasicFieldsProps) {
-  // Watch for changes in sale_timer_enabled
-  const saleTimerEnabled = form.watch("sale_timer_enabled");
-  const salePrice = form.watch("sale_price");
-
-  // Reset sale end date when timer is disabled
-  useEffect(() => {
-    if (!saleTimerEnabled) {
-      form.setValue("sale_end_date", null);
-    }
-  }, [saleTimerEnabled, form]);
-
   return (
     <>
       <div className="flex justify-between items-center">
@@ -56,54 +44,6 @@ export function BasicFields({ form }: BasicFieldsProps) {
           )}
         />
       </div>
-
-      <FormField
-        control={form.control}
-        name="sale_timer_enabled"
-        render={({ field }) => (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <FormLabel className="text-base">Enable Sale Timer</FormLabel>
-              <div className="text-sm text-muted-foreground">
-                Set a timer for the sale price
-              </div>
-            </div>
-            <FormControl>
-              <Switch
-                checked={field.value}
-                onCheckedChange={(checked) => {
-                  field.onChange(checked);
-                  if (!checked) {
-                    form.setValue("sale_end_date", null);
-                  }
-                }}
-                disabled={!salePrice}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-
-      {saleTimerEnabled && salePrice && (
-        <FormField
-          control={form.control}
-          name="sale_end_date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Sale End Date and Time</FormLabel>
-              <FormControl>
-                <Input 
-                  type="datetime-local" 
-                  {...field} 
-                  value={field.value || ''} 
-                  min={new Date().toISOString().slice(0, 16)}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      )}
 
       <FormField
         control={form.control}

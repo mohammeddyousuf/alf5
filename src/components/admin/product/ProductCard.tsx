@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
@@ -28,7 +28,6 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: ProductCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [timeLeft, setTimeLeft] = useState<string | null>(null);
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -51,38 +50,6 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
     }
   };
 
-  useEffect(() => {
-    const calculateTimeLeft = () => {
-      if (!product.sale_timer_enabled || !product.sale_end_date) {
-        setTimeLeft(null);
-        return;
-      }
-
-      const endDate = new Date(product.sale_end_date).getTime();
-      const now = new Date().getTime();
-      const difference = endDate - now;
-
-      if (difference <= 0) {
-        setTimeLeft(null);
-        // Here we should update the product to remove the sale price
-        // This would typically be handled by a backend job
-        return;
-      }
-
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-      setTimeLeft(`${days}d:${hours}h:${minutes}m:${seconds}s`);
-    };
-
-    const timer = setInterval(calculateTimeLeft, 1000);
-    calculateTimeLeft(); // Initial calculation
-
-    return () => clearInterval(timer);
-  }, [product.sale_timer_enabled, product.sale_end_date]);
-
   return (
     <Card key={product.id} className="p-4">
       <div className="aspect-square mb-4 overflow-hidden rounded-lg relative">
@@ -96,13 +63,6 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
             {product.sale_price && product.sale_price < product.price && (
               <div className="absolute top-2 left-2">
                 <Badge variant="destructive">Sale</Badge>
-              </div>
-            )}
-            {timeLeft && (
-              <div className="absolute top-2 right-2">
-                <Badge variant="secondary" className="font-mono">
-                  {timeLeft}
-                </Badge>
               </div>
             )}
           </>
