@@ -1,0 +1,19 @@
+export interface Orders {
+  id: string;
+  created_at: string;
+  product_id: string;
+  product_name: string;
+  product_brand: string | null;
+  product_price: number;
+  customer_name: string;
+  customer_email: string;
+  customer_mobile: string;
+  customer_address: string;
+  payment_mode: string;
+}
+
+export interface OrdersInsert extends Partial<Omit<Orders, 'created_at'>> {
+  created_at?: string;
+}
+
+export interface OrdersUpdate extends Partial<Orders> {}

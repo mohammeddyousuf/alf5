@@ -21,3 +21,11 @@ export interface Settings {
   whatsapp_number: string;
   social_media_links: SocialMediaLink[] | null;
 }
+
+export interface SettingsInsert extends Partial<Omit<Settings, 'whatsapp_number' | 'created_at' | 'updated_at'>> {
+  whatsapp_number: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface SettingsUpdate extends Partial<Settings> {}
