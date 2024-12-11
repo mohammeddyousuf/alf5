@@ -7,8 +7,6 @@ interface Product {
   sale_price: number | null;
   images: string[];
   brand: string | null;
-  sale_timer_enabled: boolean | null;
-  sale_end_date: string | null;
 }
 
 interface ProductGridProps {
@@ -35,8 +33,6 @@ export function ProductGrid({ products }: ProductGridProps) {
           salePrice={product.sale_price}
           imageUrl={product.images?.[0]}
           brand={product.brand}
-          saleTimerEnabled={product.sale_timer_enabled}
-          saleEndDate={product.sale_end_date}
         />
       ))}
     </div>

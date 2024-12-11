@@ -11,8 +11,6 @@ export interface Products {
     name: string
     price: number
     sale_price: number | null
-    sale_timer_enabled: boolean | null
-    sale_end_date: string | null
     status: "draft" | "published" | "archived" | null
     subcategory_id: string | null
     updated_at: string
@@ -30,8 +28,6 @@ export interface Products {
     name: string
     price: number
     sale_price?: number | null
-    sale_timer_enabled?: boolean | null
-    sale_end_date?: string | null
     status?: "draft" | "published" | "archived" | null
     subcategory_id?: string | null
     updated_at?: string
@@ -49,8 +45,6 @@ export interface Products {
     name?: string
     price?: number
     sale_price?: number | null
-    sale_timer_enabled?: boolean | null
-    sale_end_date?: string | null
     status?: "draft" | "published" | "archived" | null
     subcategory_id?: string | null
     updated_at?: string
