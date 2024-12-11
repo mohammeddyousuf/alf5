@@ -28,10 +28,22 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
 
   const handleWebsiteNameUpdate = async () => {
     try {
+      // Get the most recent settings row
+      const { data: existingSettings } = await supabase
+        .from('settings')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      // Update the existing row or create a new one if none exists
       const { error } = await supabase
         .from('settings')
-        .update({ website_name: websiteName })
-        .is('id', null);
+        .upsert({
+          ...existingSettings,
+          website_name: websiteName,
+          updated_at: new Date().toISOString()
+        });
 
       if (error) throw error;
 
@@ -52,15 +64,24 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
 
   const handleTrackingCodesUpdate = async () => {
     try {
-      const { error: updateError } = await supabase
+      // Get the most recent settings row
+      const { data: existingSettings } = await supabase
         .from('settings')
-        .update({ tracking_codes: trackingCodes })
-        .is('id', null);
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
 
-      if (updateError) {
-        console.error('Supabase update error:', updateError);
-        throw updateError;
-      }
+      // Update the existing row or create a new one if none exists
+      const { error } = await supabase
+        .from('settings')
+        .upsert({
+          ...existingSettings,
+          tracking_codes: trackingCodes,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
 
       await refetch();
       toast({
@@ -79,10 +100,22 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
 
   const handleLogoChange = async (url: string | null) => {
     try {
+      // Get the most recent settings row
+      const { data: existingSettings } = await supabase
+        .from('settings')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      // Update the existing row or create a new one if none exists
       const { error } = await supabase
         .from('settings')
-        .update({ logo_url: url })
-        .is('id', null);
+        .upsert({
+          ...existingSettings,
+          logo_url: url,
+          updated_at: new Date().toISOString()
+        });
 
       if (error) throw error;
       await refetch();
@@ -98,10 +131,22 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
 
   const handleFaviconChange = async (url: string | null) => {
     try {
+      // Get the most recent settings row
+      const { data: existingSettings } = await supabase
+        .from('settings')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      // Update the existing row or create a new one if none exists
       const { error } = await supabase
         .from('settings')
-        .update({ favicon_url: url })
-        .is('id', null);
+        .upsert({
+          ...existingSettings,
+          favicon_url: url,
+          updated_at: new Date().toISOString()
+        });
 
       if (error) throw error;
       await refetch();
