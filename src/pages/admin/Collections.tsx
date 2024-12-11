@@ -22,7 +22,7 @@ export default function Collections() {
       const { data, error } = await supabase
         .from("collections")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: true }); // Changed to ascending order
       if (error) throw error;
       return data as CollectionRow[];
     },
