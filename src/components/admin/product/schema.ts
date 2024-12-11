@@ -10,16 +10,26 @@ export const productFormSchema = z.object({
     .nullable()
     .optional()
     .refine(
-      (val, ctx) => {
-        if (val === null || val === undefined) return true;
-        const formData = ctx.path[0] ? (ctx as any).parent : {};
-        const price = formData.price;
-        return val < price;
+      (sale_price: number | null | undefined): boolean => {
+        return true;
       },
       {
         message: "Sale price must be less than regular price",
       }
-    ),
+    )
+    .superRefine((sale_price, ctx) => {
+      if (sale_price === null || sale_price === undefined) return;
+
+      const formData = ctx.path[0] ? (ctx as any).parent : {};
+      const price = formData.price;
+
+      if (typeof price === 'number' && sale_price >= price) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Sale price must be less than regular price",
+        });
+      }
+    }),
   images: z.array(z.string()).default([]),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   category_id: z.string().nullable().optional(),
