@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductList } from "@/components/admin/product/ProductList";
 import { useProducts } from "@/hooks/useProducts";
-import { GlobalSaleControls } from "@/components/admin/product/GlobalSaleControls";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -90,8 +89,6 @@ const Products = () => {
           Add Product
         </Button>
       </div>
-
-      <GlobalSaleControls />
 
       <ProductFilters
         search={search}
