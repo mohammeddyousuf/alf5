@@ -126,75 +126,6 @@ export interface Database {
         }
         Relationships: []
       }
-      products: {
-        Row: {
-          added_date: string | null
-          brand: string | null
-          category_id: string | null
-          created_at: string
-          description: string | null
-          featured: boolean | null
-          id: string
-          images: string[] | null
-          name: string
-          price: number
-          sale_price: number | null
-          status: Database["public"]["Enums"]["product_status"] | null
-          subcategory_id: string | null
-          updated_at: string
-          video_urls: string[] | null
-        }
-        Insert: {
-          added_date?: string | null
-          brand?: string | null
-          category_id?: string | null
-          created_at?: string
-          description?: string | null
-          featured?: boolean | null
-          id?: string
-          images?: string[] | null
-          name: string
-          price: number
-          sale_price?: number | null
-          status?: Database["public"]["Enums"]["product_status"] | null
-          subcategory_id?: string | null
-          updated_at?: string
-          video_urls?: string[] | null
-        }
-        Update: {
-          added_date?: string | null
-          brand?: string | null
-          category_id?: string | null
-          created_at?: string
-          description?: string | null
-          featured?: boolean | null
-          id?: string
-          images?: string[] | null
-          name?: string
-          price?: number
-          sale_price?: number | null
-          status?: Database["public"]["Enums"]["product_status"] | null
-          subcategory_id?: string | null
-          updated_at?: string
-          video_urls?: string[] | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "products_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "products_subcategory_id_fkey"
-            columns: ["subcategory_id"]
-            isOneToOne: false
-            referencedRelation: "subcategories"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       products_collections: {
         Row: {
           collection_id: string
@@ -316,11 +247,11 @@ export interface Database {
           created_at?: string
           description?: string | null
           id?: string
-          image_url: string
+          image_url?: string
           link_url?: string | null
           order_index?: number
-          title: string
-          updated_at: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
