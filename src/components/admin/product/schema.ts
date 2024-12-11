@@ -13,11 +13,10 @@ export const productFormSchema = z.object({
       // If there's no sale price, validation passes
       if (sale_price === null || sale_price === undefined) return;
 
-      // Get the parent form data
-      const formData = ctx.parent as { price?: number };
+      const price = (ctx.parent as { price: number }).price;
       
-      // If we have both price and sale_price, validate that sale_price is lower
-      if (formData?.price && sale_price >= formData.price) {
+      // Validate that sale_price is lower than regular price
+      if (price && sale_price >= price) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Sale price must be less than regular price",
