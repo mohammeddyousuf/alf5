@@ -89,12 +89,23 @@ export function GlobalSaleControls() {
         ? new Date(`${endDate}T${endTime}`).toISOString()
         : null;
 
+      // Get existing settings first
+      const { data: existingSettings } = await supabase
+        .from("settings")
+        .select("*")
+        .is('id', null)
+        .maybeSingle();
+
+      // Prepare update data while preserving other settings
+      const updateData = {
+        ...(existingSettings || {}),
+        clearance_sale_active: isGlobalSaleEnabled,
+        clearance_sale_end_date: endDateTime
+      };
+
       const { error } = await supabase
         .from('settings')
-        .update({ 
-          clearance_sale_active: isGlobalSaleEnabled,
-          clearance_sale_end_date: endDateTime
-        })
+        .upsert(updateData)
         .is('id', null);
 
       if (error) throw error;
