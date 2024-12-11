@@ -105,27 +105,9 @@ const Admin = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">News Ticker</h2>
-            <p className="text-3xl font-bold mb-4">{newsTicker?.length || 0}</p>
-            <Button onClick={() => navigate("/admin/news")}>Manage News</Button>
-          </Card>
-
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Sliders</h2>
-            <p className="text-3xl font-bold mb-4">{sliders?.length || 0}</p>
-            <Button onClick={() => navigate("/admin/sliders")}>Manage Sliders</Button>
-          </Card>
-
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Collections</h2>
-            <p className="text-3xl font-bold mb-4">{collections?.length || 0}</p>
-            <Button onClick={() => navigate("/admin/collections")}>Manage Collections</Button>
-          </Card>
-
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Pages</h2>
-            <p className="text-3xl font-bold mb-4">{pages?.length || 0}</p>
-            <Button onClick={() => navigate("/admin/pages")}>Manage Pages</Button>
+            <h2 className="text-xl font-semibold mb-2">Orders</h2>
+            <p className="text-3xl font-bold mb-4">{orders?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/orders")}>View Orders</Button>
           </Card>
 
           <Card className="p-6">
@@ -147,9 +129,27 @@ const Admin = () => {
           </Card>
 
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Orders</h2>
-            <p className="text-3xl font-bold mb-4">{orders?.length || 0}</p>
-            <Button onClick={() => navigate("/admin/orders")}>View Orders</Button>
+            <h2 className="text-xl font-semibold mb-2">News Ticker</h2>
+            <p className="text-3xl font-bold mb-4">{newsTicker?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/news")}>Manage News</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Sliders</h2>
+            <p className="text-3xl font-bold mb-4">{sliders?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/sliders")}>Manage Sliders</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Collections</h2>
+            <p className="text-3xl font-bold mb-4">{collections?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/collections")}>Manage Collections</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Pages</h2>
+            <p className="text-3xl font-bold mb-4">{pages?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/pages")}>Manage Pages</Button>
           </Card>
         </div>
 
