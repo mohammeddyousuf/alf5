@@ -1,18 +1,10 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { ImagePlus, Loader2, X } from "lucide-react";
+import { ImagePlus, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ImageDeleteDialog } from "./ImageDeleteDialog";
+import { ImagePreview } from "./ImagePreview";
 
 interface ImageUploadFieldProps {
   imageUrl?: string | null;
@@ -97,7 +89,6 @@ export function ImageUploadField({
     try {
       actualSetIsUploading(true);
       
-      // Extract the filename from the URL
       const fileName = decodeURIComponent(imageUrl.split("/").pop() || "");
       if (!fileName) throw new Error("Invalid file URL");
 
@@ -128,75 +119,41 @@ export function ImageUploadField({
   return (
     <div className="space-y-4">
       {imageUrl && (
-        <div className="relative group">
-          {isFavicon ? (
-            <div className="w-40 h-40 flex items-center justify-center bg-gray-100 rounded-lg">
-              <img
-                src={imageUrl}
-                alt="Favicon Preview"
-                className="w-16 h-16"
-              />
-            </div>
-          ) : (
-            <img
-              src={imageUrl}
-              alt="Preview"
-              className="w-40 h-40 object-cover rounded-lg"
-            />
-          )}
-          <button
-            type="button"
-            onClick={() => setShowDeleteDialog(true)}
+        <ImagePreview
+          imageUrl={imageUrl}
+          onDeleteClick={() => setShowDeleteDialog(true)}
+          isUploading={actualIsUploading}
+          isFavicon={isFavicon}
+        />
+      )}
+      {(!imageUrl || !isFavicon) && (
+        <div className="relative">
+          <Input
+            type="file"
+            accept={isFavicon ? ".ico,image/*" : acceptedFileTypes}
+            onChange={handleImageUpload}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
             disabled={actualIsUploading}
-            className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
-          >
+          />
+          <div className="h-10 w-full border-2 border-dashed rounded-lg flex items-center justify-center">
             {actualIsUploading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-5 w-5 animate-spin" />
             ) : (
-              <X className="h-4 w-4" />
+              <div className="flex items-center gap-2">
+                <ImagePlus className="h-5 w-5" />
+                <span>Upload {isFavicon ? 'Favicon' : 'Image'}</span>
+              </div>
             )}
-          </button>
+          </div>
         </div>
       )}
-      <div className="relative">
-        <Input
-          type="file"
-          accept={isFavicon ? ".ico,image/*" : acceptedFileTypes}
-          onChange={handleImageUpload}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-          disabled={actualIsUploading}
-        />
-        <div className="h-10 w-full border-2 border-dashed rounded-lg flex items-center justify-center">
-          {actualIsUploading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <div className="flex items-center gap-2">
-              <ImagePlus className="h-5 w-5" />
-              <span>Upload {isFavicon ? 'Favicon' : 'Image'}</span>
-            </div>
-          )}
-        </div>
-      </div>
 
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the {isFavicon ? 'favicon' : 'image'}.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleImageDelete}
-              className="bg-red-500 hover:bg-red-600"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ImageDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirmDelete={handleImageDelete}
+        isFavicon={isFavicon}
+      />
     </div>
   );
 }
