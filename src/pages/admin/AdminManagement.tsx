@@ -19,17 +19,9 @@ const AdminManagement = () => {
 
     try {
       // First check if the user exists
-      const { data: existingUser, error: fetchError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', email)
-        .single();
+      const { data: { user } } = await supabase.auth.admin.getUserByEmail(email);
 
-      if (fetchError && fetchError.code !== 'PGRST116') {
-        throw fetchError;
-      }
-
-      if (!existingUser) {
+      if (!user) {
         // If user doesn't exist, create an invitation
         const { data, error } = await supabase.auth.signInWithOtp({
           email,
@@ -42,16 +34,30 @@ const AdminManagement = () => {
 
         if (error) throw error;
 
+        // Create profile entry
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            email,
+            role: 'admin'
+          });
+
+        if (profileError) throw profileError;
+
         toast({
           title: "Success",
           description: `Invitation sent to ${email}`,
         });
       } else {
-        // If user exists, update their role
+        // If user exists, update their profile role
         const { error: updateError } = await supabase
           .from('profiles')
-          .update({ role: 'admin' })
-          .eq('email', email);
+          .upsert({
+            id: user.id,
+            email: user.email,
+            role: 'admin',
+            updated_at: new Date().toISOString()
+          });
 
         if (updateError) throw updateError;
 
