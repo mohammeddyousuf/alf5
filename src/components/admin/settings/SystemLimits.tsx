@@ -29,21 +29,33 @@ export function SystemLimits() {
       // If no limits exist, create default ones
       if (!existingLimits || existingLimits.length === 0) {
         console.log("No limits found, creating default");
-        const { data: newLimits, error: insertError } = await supabase
+        const defaultLimit = {
+          id: 1,
+          product_limit: 100 // Default limit
+        };
+        
+        const { error: insertError } = await supabase
           .from("system_limits")
-          .insert([{
-            id: 1,
-            product_limit: 100 // Default limit
-          }])
-          .select()
-          .single();
+          .insert([defaultLimit]);
           
         if (insertError) {
           console.error("Error creating default limits:", insertError);
           throw insertError;
         }
 
-        console.log("Created default limits:", newLimits);
+        // After inserting, fetch the newly created record
+        const { data: newLimits, error: refetchError } = await supabase
+          .from("system_limits")
+          .select("*")
+          .eq('id', 1)
+          .single();
+          
+        if (refetchError) {
+          console.error("Error fetching new limits:", refetchError);
+          throw refetchError;
+        }
+
+        console.log("Created and fetched default limits:", newLimits);
         return newLimits;
       }
       
