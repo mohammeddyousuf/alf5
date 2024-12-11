@@ -51,13 +51,24 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
   };
 
   const handleTrackingCodesUpdate = async () => {
+    if (!settings?.id) {
+      console.error('No settings ID found');
+      toast({
+        title: "Error",
+        description: "Settings ID not found",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      console.log('Updating tracking codes:', trackingCodes);
+      console.log('Updating tracking codes for settings ID:', settings.id);
+      console.log('New tracking codes value:', trackingCodes);
       
       const { error } = await supabase
         .from('settings')
         .update({ tracking_codes: trackingCodes })
-        .match({ id: settings?.id });
+        .eq('id', settings.id);
 
       if (error) {
         console.error('Supabase error:', error);
