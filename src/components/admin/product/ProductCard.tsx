@@ -38,8 +38,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
   };
 
   const calculateDiscount = (originalPrice: number, salePrice: number) => {
-    const discount = ((originalPrice - salePrice) / originalPrice) * 100;
-    return Math.round(discount);
+    return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
   };
 
   const getStatusBadgeVariant = (status: string | null) => {
@@ -103,6 +102,9 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
             </span>
             <span className="ml-2 line-through">
               {formatPrice(product.price)}
+            </span>
+            <span className="ml-2 text-destructive">
+              (-{calculateDiscount(product.price, product.sale_price)}%)
             </span>
           </>
         ) : (
