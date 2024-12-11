@@ -87,6 +87,12 @@ export const ProductList = () => {
       const newTimerState = !globalSaleTimer;
       setGlobalSaleTimer(newTimerState);
 
+      console.log("Updating global sale timer:", {
+        newTimerState,
+        globalEndDate,
+        query: "sale_price.neq.null"
+      });
+
       const { data, error } = await supabase
         .from("products")
         .update({
@@ -96,7 +102,12 @@ export const ProductList = () => {
         .not('sale_price', 'is', null)
         .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error in handleGlobalSaleTimer:", error);
+        throw error;
+      }
+
+      console.log("Updated products:", data);
 
       toast({
         title: "Success",
