@@ -106,6 +106,14 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
 
       if (error) throw error;
       await refetch();
+      
+      // Dispatch custom event to update favicon
+      window.dispatchEvent(new Event('faviconUpdated'));
+      
+      toast({
+        title: "Success",
+        description: "Favicon updated successfully",
+      });
     } catch (error) {
       console.error('Error updating favicon:', error);
       toast({

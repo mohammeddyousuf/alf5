@@ -28,7 +28,7 @@
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      // Update favicon dynamically
+      // Update favicon when needed
       async function updateFavicon() {
         try {
           const response = await fetch('https://hoytbffldsdeywkyuuza.supabase.co/rest/v1/settings?select=favicon_url', {
@@ -56,8 +56,8 @@
       // Initial update
       updateFavicon();
       
-      // Update favicon every 5 seconds
-      setInterval(updateFavicon, 5000);
+      // Listen for custom event when favicon is updated
+      window.addEventListener('faviconUpdated', updateFavicon);
     </script>
   </body>
 </html>
