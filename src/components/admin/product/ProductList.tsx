@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
@@ -17,6 +17,38 @@ export const ProductList = () => {
   const { toast } = useToast();
   const [globalSaleTimer, setGlobalSaleTimer] = useState(false);
   const [globalEndDate, setGlobalEndDate] = useState("");
+
+  // Initialize global timer state based on products data
+  useEffect(() => {
+    if (products && products.length > 0) {
+      // Check if any product has sale timer enabled
+      const hasEnabledTimer = products.some(
+        (product) => product.sale_timer_enabled && product.sale_price !== null
+      );
+      
+      // Get the latest end date from products with enabled timers
+      const latestEndDate = products
+        .filter((product) => product.sale_timer_enabled && product.sale_end_date)
+        .map((product) => product.sale_end_date)
+        .sort()
+        .pop();
+
+      console.log("Initializing global timer state:", {
+        hasEnabledTimer,
+        latestEndDate
+      });
+
+      setGlobalSaleTimer(hasEnabledTimer);
+      if (latestEndDate) {
+        // Convert to local datetime-local format
+        const date = new Date(latestEndDate);
+        const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+          .toISOString()
+          .slice(0, 16);
+        setGlobalEndDate(localDateTime);
+      }
+    }
+  }, [products]);
 
   const handleStatusChange = async (id: string, currentStatus: string | null) => {
     const newStatus = currentStatus === "published" ? "draft" : "published";
