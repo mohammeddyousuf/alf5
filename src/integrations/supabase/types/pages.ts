@@ -1,26 +1,30 @@
 export interface Pages {
   Row: {
-    id: string;
-    title: string;
     content: string;
-    slug: string;
     created_at: string;
+    id: string;
+    slug: string;
+    title: string;
     updated_at: string;
+    location: "header" | "footer_company" | "footer_legal" | "none" | null;
   };
   Insert: {
-    id?: string;
-    title: string;
     content: string;
-    slug: string;
     created_at?: string;
+    id?: string;
+    slug: string;
+    title: string;
     updated_at?: string;
+    location?: "header" | "footer_company" | "footer_legal" | "none" | null;
   };
   Update: {
-    id?: string;
-    title?: string;
     content?: string;
-    slug?: string;
     created_at?: string;
+    id?: string;
+    slug?: string;
+    title?: string;
     updated_at?: string;
+    location?: "header" | "footer_company" | "footer_legal" | "none" | null;
   };
+  Relationships: [];
 }

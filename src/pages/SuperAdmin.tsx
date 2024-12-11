@@ -1,27 +1,12 @@
-import { Shield, Settings, UserCheck, Lock, ArrowLeft, FileText, Plus, Pencil } from "lucide-react";
+import { Shield, Settings, UserCheck, Lock, ArrowLeft, FileText, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { SystemLimits } from "@/components/admin/settings/SystemLimits";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 const SuperAdmin = () => {
   const navigate = useNavigate();
-
-  const { data: pages, isLoading } = useQuery({
-    queryKey: ["super-admin-pages"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("pages")
-        .select("*")
-        .order("created_at", { ascending: false });
-      
-      if (error) throw error;
-      return data;
-    },
-  });
 
   return (
     <ProtectedRoute>
@@ -48,36 +33,9 @@ const SuperAdmin = () => {
               Create New Page
             </Button>
           </div>
-          <div className="space-y-4">
-            <p className="text-muted-foreground mb-4">
-              Manage page locations and URLs
-            </p>
-            {isLoading ? (
-              <div className="text-center py-4">Loading pages...</div>
-            ) : (
-              <div className="space-y-4">
-                {pages?.map((page) => (
-                  <div key={page.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h3 className="font-medium">{page.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Location: {page.location || "None"} | Slug: {page.slug}
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-2"
-                      onClick={() => navigate(`/admin/pages/${page.id}`)}
-                    >
-                      <Pencil className="h-4 w-4" />
-                      Edit
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <p className="text-muted-foreground">
+            Create new pages and manage their placement in the navigation
+          </p>
         </Card>
 
         <Card className="p-6">

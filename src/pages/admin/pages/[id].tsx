@@ -6,7 +6,6 @@ import { Loader2 } from "lucide-react";
 
 const EditPage = () => {
   const { id } = useParams();
-  const isSuperAdmin = window.location.pathname.startsWith("/super-admin");
 
   const { data: page, isLoading } = useQuery({
     queryKey: ["admin-page", id],
@@ -41,7 +40,7 @@ const EditPage = () => {
   return (
     <div className="container py-12">
       <h1 className="text-3xl font-bold mb-8">Edit Page</h1>
-      <PageForm initialData={page} isSuperAdmin={isSuperAdmin} />
+      <PageForm initialData={page} />
     </div>
   );
 };

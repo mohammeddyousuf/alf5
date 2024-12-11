@@ -1,8 +1,4 @@
 import { SocialMediaLink } from './types/social';
-import { Pages } from './pages';
-import { Products } from './products';
-import { SystemLimits } from './system';
-import { Settings } from './settings';
 
 export type Json =
   | string
@@ -99,7 +95,33 @@ export type Database = {
         }
         Relationships: []
       }
-      pages: Pages
+      pages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           added_date: string | null
@@ -199,69 +221,71 @@ export type Database = {
           },
         ]
       }
-      settings: {
-        Row: {
-          accent_color: string | null
-          background_color: string | null
-          clearance_sale_active: boolean | null
-          clearance_sale_end_date: string | null
-          created_at: string
-          facebook_url: string | null
-          favicon_url: string | null
-          foreground_color: string | null
-          id: string
-          instagram_url: string | null
-          logo_url: string | null
-          primary_color: string | null
-          secondary_color: string | null
-          updated_at: string
-          website_name: string | null
-          whatsapp_group_url: string | null
-          whatsapp_number: string
-          social_media_links: SocialMediaLink[] | null
-        }
-        Insert: {
-          accent_color?: string | null
-          background_color?: string | null
-          clearance_sale_active?: boolean | null
-          clearance_sale_end_date?: string | null
-          created_at?: string
-          facebook_url?: string | null
-          favicon_url?: string | null
-          foreground_color?: string | null
-          id?: string
-          instagram_url?: string | null
-          logo_url?: string | null
-          primary_color?: string | null
-          secondary_color?: string | null
-          updated_at?: string
-          website_name?: string | null
-          whatsapp_group_url?: string | null
-          whatsapp_number: string
-          social_media_links?: SocialMediaLink[] | null
-        }
-        Update: {
-          accent_color?: string | null
-          background_color?: string | null
-          clearance_sale_active?: boolean | null
-          clearance_sale_end_date?: string | null
-          created_at?: string
-          facebook_url?: string | null
-          favicon_url?: string | null
-          foreground_color?: string | null
-          id?: string
-          instagram_url?: string | null
-          logo_url?: string | null
-          primary_color?: string | null
-          secondary_color?: string | null
-          updated_at?: string
-          website_name?: string | null
-          whatsapp_group_url?: string | null
-          whatsapp_number?: string
-          social_media_links?: SocialMediaLink[] | null
-        }
-        Relationships: []
-      }
+
+settings: {
+  Row: {
+    accent_color: string | null
+    background_color: string | null
+    clearance_sale_active: boolean | null
+    clearance_sale_end_date: string | null
+    created_at: string
+    facebook_url: string | null
+    favicon_url: string | null
+    foreground_color: string | null
+    id: string
+    instagram_url: string | null
+    logo_url: string | null
+    primary_color: string | null
+    secondary_color: string | null
+    updated_at: string
+    website_name: string | null
+    whatsapp_group_url: string | null
+    whatsapp_number: string
+    social_media_links: SocialMediaLink[] | null
+  }
+  Insert: {
+    accent_color?: string | null
+    background_color?: string | null
+    clearance_sale_active?: boolean | null
+    clearance_sale_end_date?: string | null
+    created_at?: string
+    facebook_url?: string | null
+    favicon_url?: string | null
+    foreground_color?: string | null
+    id?: string
+    instagram_url?: string | null
+    logo_url?: string | null
+    primary_color?: string | null
+    secondary_color?: string | null
+    updated_at?: string
+    website_name?: string | null
+    whatsapp_group_url?: string | null
+    whatsapp_number: string
+    social_media_links?: SocialMediaLink[] | null
+  }
+  Update: {
+    accent_color?: string | null
+    background_color?: string | null
+    clearance_sale_active?: boolean | null
+    clearance_sale_end_date?: string | null
+    created_at?: string
+    facebook_url?: string | null
+    favicon_url?: string | null
+    foreground_color?: string | null
+    id?: string
+    instagram_url?: string | null
+    logo_url?: string | null
+    primary_color?: string | null
+    secondary_color?: string | null
+    updated_at?: string
+    website_name?: string | null
+    whatsapp_group_url?: string | null
+    whatsapp_number?: string
+    social_media_links?: SocialMediaLink[] | null
+  }
+  Relationships: []
+}
+
       sliders: {
         Row: {
           active: boolean | null
@@ -296,7 +320,7 @@ export type Database = {
           image_url: string
           link_url?: string | null
           order_index?: number
-          title: string
+          title?: string
           updated_at?: string
         }
         Relationships: []
@@ -511,3 +535,4 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+

@@ -42,10 +42,9 @@ interface PageFormProps {
     content: string;
     location?: "header" | "footer_company" | "footer_legal" | "none" | null;
   };
-  isSuperAdmin?: boolean;
 }
 
-export const PageForm = ({ initialData, isSuperAdmin = false }: PageFormProps) => {
+export const PageForm = ({ initialData }: PageFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -64,22 +63,15 @@ export const PageForm = ({ initialData, isSuperAdmin = false }: PageFormProps) =
     try {
       setIsLoading(true);
 
-      const updateData = isSuperAdmin 
-        ? {
+      if (initialData) {
+        const { error } = await supabase
+          .from("pages")
+          .update({
             title: values.title,
             slug: values.slug,
             content: values.content,
             location: values.location,
-          }
-        : {
-            title: values.title,
-            content: values.content,
-          };
-
-      if (initialData) {
-        const { error } = await supabase
-          .from("pages")
-          .update(updateData)
+          })
           .eq("id", initialData.id);
 
         if (error) throw error;
@@ -99,7 +91,7 @@ export const PageForm = ({ initialData, isSuperAdmin = false }: PageFormProps) =
       toast({
         title: `Page ${initialData ? "updated" : "created"} successfully`,
       });
-      navigate(isSuperAdmin ? "/super-admin" : "/admin/pages");
+      navigate("/admin/pages");
     } catch (error) {
       console.error(error);
       toast({
@@ -129,47 +121,43 @@ export const PageForm = ({ initialData, isSuperAdmin = false }: PageFormProps) =
           )}
         />
 
-        {isSuperAdmin && (
-          <>
-            <FormField
-              control={form.control}
-              name="slug"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Slug</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <FormField
+          control={form.control}
+          name="slug"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Slug</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Page Location</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select page location" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="header">Header Navigation</SelectItem>
-                      <SelectItem value="footer_company">Footer - Company Section</SelectItem>
-                      <SelectItem value="footer_legal">Footer - Legal Section</SelectItem>
-                      <SelectItem value="none">No Navigation Link</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </>
-        )}
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Page Location</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select page location" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="header">Header Navigation</SelectItem>
+                  <SelectItem value="footer_company">Footer - Company Section</SelectItem>
+                  <SelectItem value="footer_legal">Footer - Legal Section</SelectItem>
+                  <SelectItem value="none">No Navigation Link</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <FormField
           control={form.control}
@@ -193,7 +181,7 @@ export const PageForm = ({ initialData, isSuperAdmin = false }: PageFormProps) =
           <Button 
             type="button" 
             variant="destructive" 
-            onClick={() => navigate(isSuperAdmin ? "/super-admin" : "/admin/pages")}
+            onClick={() => navigate("/admin/pages")}
           >
             Cancel
           </Button>
