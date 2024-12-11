@@ -51,9 +51,9 @@ function ThemeInitializer() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeInitializer />
-      <BrowserRouter>
+    <BrowserRouter>
+      <QueryClientProvider client={queryClient}>
+        <ThemeInitializer />
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -81,8 +81,8 @@ function App() {
           </Routes>
         </Layout>
         <Toaster />
-      </BrowserRouter>
-    </QueryClientProvider>
+      </QueryClientProvider>
+    </BrowserRouter>
   );
 }
 
