@@ -17,15 +17,15 @@ export function SystemLimits() {
     queryKey: ["system-limits"],
     queryFn: async () => {
       // First try to get existing limits
-      const { data, error } = await supabase
+      const { data: existingLimits, error: fetchError } = await supabase
         .from("system_limits")
         .select("*");
       
-      if (error) throw error;
+      if (fetchError) throw fetchError;
       
       // If no limits exist, create default ones
-      if (!data || data.length === 0) {
-        const { data: newData, error: insertError } = await supabase
+      if (!existingLimits || existingLimits.length === 0) {
+        const { data: newLimits, error: insertError } = await supabase
           .from("system_limits")
           .insert({
             id: 1,
@@ -35,10 +35,10 @@ export function SystemLimits() {
           .single();
           
         if (insertError) throw insertError;
-        return newData;
+        return newLimits;
       }
       
-      return data[0] as SystemLimits;
+      return existingLimits[0];
     },
   });
 
