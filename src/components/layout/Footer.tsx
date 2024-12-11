@@ -127,7 +127,7 @@ export const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
-                Instagram
+                {settings.instagram_name || "Instagram"}
               </a>
             )}
             {settings?.facebook_url && (
@@ -137,7 +137,7 @@ export const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
-                Facebook
+                {settings.facebook_name || "Facebook"}
               </a>
             )}
           </div>
