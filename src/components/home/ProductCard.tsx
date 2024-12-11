@@ -66,9 +66,14 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
         <div className="flex flex-col">
           {salePrice && salePrice < price ? (
             <>
-              <span className="text-sm text-muted-foreground line-through">
-                {formatPrice(price)} (-{calculateDiscount(price, salePrice)}%)
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground line-through">
+                  {formatPrice(price)}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  (-{calculateDiscount(price, salePrice)}%)
+                </span>
+              </div>
               <span className="text-lg font-bold text-destructive">
                 {formatPrice(salePrice)}
               </span>
