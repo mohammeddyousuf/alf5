@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from "lucide-react";
 import { SocialMediaLinkInput } from "./SocialMediaLinkInput";
@@ -16,6 +16,12 @@ export const SocialMediaLinksSection = ({
   isUpdating,
 }: SocialMediaLinksSectionProps) => {
   const [localLinks, setLocalLinks] = useState<SocialMediaLink[]>(initialLinks);
+
+  // Sync localLinks with initialLinks when they change
+  useEffect(() => {
+    console.log("Received initial links:", initialLinks);
+    setLocalLinks(initialLinks);
+  }, [initialLinks]);
 
   const addSocialMediaLink = () => {
     setLocalLinks([...localLinks, { name: "", url: "" }]);
@@ -36,6 +42,7 @@ export const SocialMediaLinksSection = ({
   };
 
   const handleSave = () => {
+    console.log("Saving links:", localLinks);
     onUpdate(localLinks);
   };
 
@@ -54,7 +61,7 @@ export const SocialMediaLinksSection = ({
         <Plus className="mr-2 h-4 w-4" />
         Add Social Media Link
       </Button>
-      <Button onClick={handleSave} disabled={isUpdating}>
+      <Button onClick={handleSave} disabled={isUpdating} className="w-full">
         {isUpdating ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
