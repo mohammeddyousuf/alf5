@@ -23,10 +23,15 @@ export const AdminHeader = () => {
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+      console.log("User metadata:", user?.app_metadata); // Debug log
       setUserEmail(user?.email);
       
-      // Set role based on user metadata
-      setUserRole(user?.app_metadata?.role === 'super_admin' ? 'Super Admin' : 'Admin');
+      // Explicitly check for super_admin role
+      if (user?.app_metadata?.role === "super_admin") {
+        setUserRole("Super Admin");
+      } else {
+        setUserRole("Admin");
+      }
     };
     getUser();
   }, []);
