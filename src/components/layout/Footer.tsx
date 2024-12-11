@@ -86,28 +86,9 @@ export const Footer = () => {
 
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Follow Us</h3>
-            <ul className="space-y-2">
-              <li>
-                <a
-                  href={settings?.twitter_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Twitter
-                </a>
-              </li>
-              <li>
-                <a
-                  href={settings?.linkedin_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  LinkedIn
-                </a>
-              </li>
-            </ul>
+            <p className="text-muted-foreground">
+              Follow us on social media to stay updated with our latest products and offers.
+            </p>
           </div>
         </div>
       </div>
