@@ -43,9 +43,17 @@ function ThemeInitializer() {
 
         // Inject tracking codes if they exist
         if (data.tracking_codes) {
-          const scriptElement = document.createElement('script');
-          scriptElement.innerHTML = data.tracking_codes;
-          document.head.appendChild(scriptElement);
+          console.log('Injecting tracking codes:', data.tracking_codes);
+          try {
+            const scriptElement = document.createElement('script');
+            scriptElement.innerHTML = data.tracking_codes;
+            document.head.appendChild(scriptElement);
+            console.log('Tracking codes successfully injected');
+          } catch (error) {
+            console.error('Error injecting tracking codes:', error);
+          }
+        } else {
+          console.log('No tracking codes found in settings');
         }
       }
       
