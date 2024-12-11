@@ -46,13 +46,10 @@ export function ImageUploadField({
 
     actualSetIsUploading(true);
     try {
-      // Get file extension
       const extension = file.name.split('.').pop() || '';
-      
-      // Generate timestamp
       const timestamp = new Date().getTime();
       
-      // Construct filename with prefix first, then timestamp
+      // Ensure prefix is applied before timestamp
       let fileName;
       if (isFavicon) {
         fileName = `ico_${timestamp}.${extension}`;
@@ -61,6 +58,8 @@ export function ImageUploadField({
       } else {
         fileName = `${timestamp}.${extension}`;
       }
+
+      console.log("Uploading file with name:", fileName); // Debug log
       
       const { error: uploadError } = await supabase.storage
         .from("product-images")
