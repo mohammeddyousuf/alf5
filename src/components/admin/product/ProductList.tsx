@@ -87,15 +87,14 @@ export const ProductList = () => {
       const newTimerState = !globalSaleTimer;
       setGlobalSaleTimer(newTimerState);
 
-      const updateData = {
-        sale_timer_enabled: newTimerState,
-        sale_end_date: newTimerState ? globalEndDate : null
-      };
-
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("products")
-        .update(updateData)
-        .neq('sale_price', null); // Only update products that have a sale price
+        .update({
+          sale_timer_enabled: newTimerState,
+          sale_end_date: newTimerState && globalEndDate ? globalEndDate : null
+        })
+        .not('sale_price', 'is', null)
+        .select();
 
       if (error) throw error;
 
