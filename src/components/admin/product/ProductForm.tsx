@@ -23,6 +23,10 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
   });
   const navigate = useNavigate();
 
+  const handleCancel = () => {
+    navigate("/admin/products");
+  };
+
   if (!form) return null;
 
   return (
@@ -43,7 +47,7 @@ export function ProductForm({ product, onSuccess }: ProductFormProps) {
             <Button 
               type="button" 
               variant="outline"
-              onClick={() => navigate("/admin/products")}
+              onClick={handleCancel}
             >
               Cancel
             </Button>
