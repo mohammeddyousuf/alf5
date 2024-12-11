@@ -86,7 +86,7 @@ export const WhatsAppSettings = () => {
       const { error } = await supabase
         .from("settings")
         .update({
-          social_media_links: socialMediaLinks,
+          social_media_links: socialMediaLinks || [],
           instagram_url: socialMediaLinks.find(link => link.name === "Instagram")?.url || null,
           facebook_url: socialMediaLinks.find(link => link.name === "Facebook")?.url || null,
         })
