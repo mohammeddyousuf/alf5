@@ -37,6 +37,10 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
     }).format(amount);
   };
 
+  const calculateDiscount = (originalPrice: number, salePrice: number) => {
+    return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+  };
+
   const getStatusBadgeVariant = (status: string | null) => {
     switch (status) {
       case "published":
@@ -62,7 +66,9 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
             />
             {product.sale_price && product.sale_price < product.price && (
               <div className="absolute top-2 left-2">
-                <Badge variant="destructive">Sale</Badge>
+                <Badge variant="destructive">
+                  {calculateDiscount(product.price, product.sale_price)}% OFF
+                </Badge>
               </div>
             )}
           </>
@@ -96,6 +102,9 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
             </span>
             <span className="ml-2 line-through">
               {formatPrice(product.price)}
+            </span>
+            <span className="ml-2 text-destructive">
+              (-{calculateDiscount(product.price, product.sale_price)}%)
             </span>
           </>
         ) : (
