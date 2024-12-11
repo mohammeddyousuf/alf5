@@ -4,12 +4,19 @@ import { Loader2 } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
 export const ProductList = () => {
   const { data: products, refetch, isLoading } = useProducts();
   const { toast } = useToast();
+  const [globalSaleTimer, setGlobalSaleTimer] = useState(false);
+  const [globalEndDate, setGlobalEndDate] = useState("");
 
   const handleStatusChange = async (id: string, currentStatus: string | null) => {
     const newStatus = currentStatus === "published" ? "draft" : "published";
@@ -75,6 +82,39 @@ export const ProductList = () => {
     }
   };
 
+  const handleGlobalSaleTimer = async () => {
+    try {
+      const newTimerState = !globalSaleTimer;
+      setGlobalSaleTimer(newTimerState);
+
+      const updateData = {
+        sale_timer_enabled: newTimerState,
+        sale_end_date: newTimerState ? globalEndDate : null
+      };
+
+      const { error } = await supabase
+        .from("products")
+        .update(updateData)
+        .neq('sale_price', null); // Only update products that have a sale price
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Sale timer ${newTimerState ? 'enabled' : 'disabled'} for all products with sale prices`,
+      });
+
+      refetch();
+    } catch (error: any) {
+      console.error("Error updating global sale timer:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update sale timer: " + error.message,
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
@@ -84,16 +124,45 @@ export const ProductList = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {products?.map((product: ProductRow) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-          onStatusChange={handleStatusChange}
-          onDelete={handleDelete}
-          onSuccess={refetch}
-        />
-      ))}
+    <div className="space-y-6">
+      <div className="p-4 border rounded-lg space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <Label>Global Sale Timer</Label>
+            <p className="text-sm text-muted-foreground">
+              Enable or disable sale timer for all products with sale prices
+            </p>
+          </div>
+          <Switch
+            checked={globalSaleTimer}
+            onCheckedChange={handleGlobalSaleTimer}
+          />
+        </div>
+        {globalSaleTimer && (
+          <div className="space-y-2">
+            <Label htmlFor="global-end-date">Sale End Date and Time</Label>
+            <Input
+              id="global-end-date"
+              type="datetime-local"
+              value={globalEndDate}
+              onChange={(e) => setGlobalEndDate(e.target.value)}
+              min={new Date().toISOString().slice(0, 16)}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {products?.map((product: ProductRow) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            onStatusChange={handleStatusChange}
+            onDelete={handleDelete}
+            onSuccess={refetch}
+          />
+        ))}
+      </div>
     </div>
   );
 };
