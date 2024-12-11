@@ -14,13 +14,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,7 +22,6 @@ const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   slug: z.string().min(1, "Slug is required"),
   content: z.string().min(1, "Content is required"),
-  location: z.enum(["header", "footer_company", "footer_legal", "none"]),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -40,7 +32,6 @@ interface PageFormProps {
     title: string;
     slug: string;
     content: string;
-    location?: "header" | "footer_company" | "footer_legal" | "none" | null;
   };
 }
 
@@ -64,7 +55,6 @@ export const PageForm = ({ initialData }: PageFormProps) => {
       title: initialData?.title || "",
       slug: initialData?.slug || "",
       content: initialData?.content || "",
-      location: (initialData?.location as FormValues["location"]) || "none",
     },
   });
 
@@ -77,7 +67,6 @@ export const PageForm = ({ initialData }: PageFormProps) => {
         content: values.content,
         ...(isSuperAdmin && {
           slug: values.slug,
-          location: values.location,
         }),
       };
 
@@ -104,7 +93,6 @@ export const PageForm = ({ initialData }: PageFormProps) => {
           .insert({
             ...updateData,
             slug: values.slug,
-            location: values.location,
           });
 
         if (error) throw error;
@@ -144,45 +132,19 @@ export const PageForm = ({ initialData }: PageFormProps) => {
         />
 
         {isSuperAdmin && (
-          <>
-            <FormField
-              control={form.control}
-              name="slug"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Slug</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Page Location</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select page location" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="header">Header Navigation</SelectItem>
-                      <SelectItem value="footer_company">Footer - Company Section</SelectItem>
-                      <SelectItem value="footer_legal">Footer - Legal Section</SelectItem>
-                      <SelectItem value="none">No Navigation Link</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </>
+          <FormField
+            control={form.control}
+            name="slug"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Slug</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         )}
 
         <FormField
