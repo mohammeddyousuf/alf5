@@ -70,8 +70,8 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
                 <span className="text-sm text-muted-foreground line-through">
                   {formatPrice(price)}
                 </span>
-                <span className="text-sm text-muted-foreground">
-                  (-{calculateDiscount(price, salePrice)}%)
+                <span className="text-sm text-destructive">
+                  ({calculateDiscount(price, salePrice)}%)
                 </span>
               </div>
               <span className="text-lg font-bold text-destructive">
