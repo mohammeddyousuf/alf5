@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserPlus } from "lucide-react";
+import { UserPlus, UserCog, Shield } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,19 +36,11 @@ const AdminManagement = () => {
 
       if (error) {
         console.error('Error fetching admins:', error);
-        if (error.message.includes('does not exist')) {
-          toast({
-            title: "Database Setup Required",
-            description: "The profiles table needs to be set up. Please contact the system administrator.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to fetch admin list",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Error",
+          description: "Failed to fetch admin list",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -109,6 +101,13 @@ const AdminManagement = () => {
     }
   };
 
+  const getRoleIcon = (role: string) => {
+    if (role === 'super_admin') {
+      return <Shield className="h-4 w-4 text-destructive" />;
+    }
+    return <UserCog className="h-4 w-4 text-primary" />;
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between mb-6">
@@ -155,20 +154,23 @@ const AdminManagement = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Added On</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {admins.map((admin) => (
                 <TableRow key={admin.id}>
-                  <TableCell>{admin.email}</TableCell>
                   <TableCell>
-                    <Badge variant={admin.role === 'super_admin' ? "destructive" : "default"}>
-                      {admin.role === 'super_admin' ? 'Super Admin' : 'Admin'}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      {getRoleIcon(admin.role)}
+                      <Badge variant={admin.role === 'super_admin' ? "destructive" : "default"}>
+                        {admin.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                      </Badge>
+                    </div>
                   </TableCell>
+                  <TableCell>{admin.email}</TableCell>
                   <TableCell>
                     {new Date(admin.created_at).toLocaleDateString()}
                   </TableCell>
