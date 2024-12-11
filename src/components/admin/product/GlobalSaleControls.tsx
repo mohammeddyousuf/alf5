@@ -18,14 +18,19 @@ export function GlobalSaleControls() {
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("settings")
-        .select("*")
-        .is('id', null)
-        .single();
-      
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await supabase
+          .from("settings")
+          .select("*")
+          .is('id', null)
+          .maybeSingle();
+        
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+        throw error;
+      }
     },
   });
 
@@ -51,11 +56,11 @@ export function GlobalSaleControls() {
       return;
     }
 
-    const endDateTime = isGlobalSaleEnabled 
-      ? new Date(`${endDate}T${endTime}`).toISOString()
-      : null;
-
     try {
+      const endDateTime = isGlobalSaleEnabled 
+        ? new Date(`${endDate}T${endTime}`).toISOString()
+        : null;
+
       const { error } = await supabase
         .from('settings')
         .update({ 
