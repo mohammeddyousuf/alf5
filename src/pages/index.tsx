@@ -42,7 +42,7 @@ const Index = () => {
         .from("products")
         .select("*")
         .eq("status", "published")
-        .eq("is_featured", true)
+        .eq("featured", true)  // Changed from is_featured to featured
         .limit(8);
       
       if (error) {
