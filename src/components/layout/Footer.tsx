@@ -21,7 +21,8 @@ export const Footer = () => {
   const getWhatsAppLink = () => {
     if (!settings?.whatsapp_number) return "#";
     const cleanNumber = settings.whatsapp_number.replace(/\D/g, '');
-    return `https://wa.me/${cleanNumber}`;
+    const message = encodeURIComponent(`Hi, Just visited ${settings.website_name || 'your website'}.`);
+    return `https://wa.me/${cleanNumber}?text=${message}`;
   };
 
   const formatSocialLink = (url: string | null) => {
