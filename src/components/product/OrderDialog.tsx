@@ -91,23 +91,25 @@ export function OrderDialog({
     try {
       const messageContent = data.message ?? "Enquiry";
       
-      // Create WhatsApp message with explicit message field
-      const whatsappMessage = `*${websiteName}*
-
-*Order Details:*
-Product: ${productName}
-Brand: ${productBrand || "N/A"}
-Price: ${formatPrice(productPrice)}
-
-*Customer Details:*
-Name: ${data.name}
-Email: ${data.email}
-Mobile: ${data.mobile}
-Address: ${data.address || ""}
-Message: ${messageContent}
-Payment Mode: ${data.paymentMode}
-
-Please reply back.`;
+      // Create WhatsApp message with proper line breaks
+      const whatsappMessage = [
+        `*${websiteName}*`,
+        "",
+        "*Order Details:*",
+        `Product: ${productName}`,
+        `Brand: ${productBrand || "N/A"}`,
+        `Price: ${formatPrice(productPrice)}`,
+        "",
+        "*Customer Details:*",
+        `Name: ${data.name}`,
+        `Email: ${data.email}`,
+        `Mobile: ${data.mobile}`,
+        `Address: ${data.address || ""}`,
+        `Message: ${messageContent}`,
+        `Payment Mode: ${data.paymentMode}`,
+        "",
+        "Please reply back."
+      ].join('\n');
       
       console.log("WhatsApp message:", whatsappMessage);
 
@@ -155,6 +157,7 @@ Please reply back.`;
         productPrice: formatPrice(productPrice)
       });
       
+      // Properly encode the message for WhatsApp URL
       const encodedMessage = encodeURIComponent(whatsappMessage);
       window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
       
