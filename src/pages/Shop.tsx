@@ -14,7 +14,7 @@ const Shop = () => {
   const location = useLocation();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 0]); // Changed to start with no maximum
+  const [priceRange, setPriceRange] = useState([0, 0]);
   const [showSaleOnly, setShowSaleOnly] = useState(false);
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(false);
@@ -24,17 +24,32 @@ const Shop = () => {
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
+  // Get settings for global sale timer
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   useEffect(() => {
     if (location.state) {
       const { showFeaturedOnly: featured, showNewArrivalsOnly: newArrivals } = location.state;
       setShowFeaturedOnly(featured || false);
       setShowNewArrivalsOnly(newArrivals || false);
-      // Reset other filters
       setShowSaleOnly(false);
       setSelectedCategory(null);
       setSelectedSubcategory(null);
       setSelectedBrand(null);
-      setPriceRange([0, 0]); // Reset to no maximum
+      setPriceRange([0, 0]);
       setSortOrder("default");
     }
   }, [location.state]);
@@ -91,6 +106,23 @@ const Shop = () => {
     },
   });
 
+  // Helper function to check if a sale is valid
+  const isSaleValid = () => {
+    if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
+      return true; // If no global sale timer, individual sale prices are valid
+    }
+    const endDate = new Date(settings.clearance_sale_end_date);
+    const now = new Date();
+    return endDate > now;
+  };
+
+  // Helper function to determine if a product is on sale
+  const isProductOnSale = (product: any) => {
+    return product.sale_price && 
+           product.sale_price < product.price && 
+           (!settings?.clearance_sale_active || isSaleValid());
+  };
+
   const filteredProducts = products?.filter((product) => {
     console.log("Filtering product:", {
       name: product.name,
@@ -105,11 +137,12 @@ const Shop = () => {
       (product.description?.toLowerCase().includes(searchQuery.toLowerCase())) ||
       (product.brand?.toLowerCase().includes(searchQuery.toLowerCase()));
     
-    const price = product.sale_price || product.price;
+    const price = isProductOnSale(product) ? product.sale_price : product.price;
     const meetsPrice = priceRange[0] === 0 && priceRange[1] === 0 ? true :
                       price >= priceRange[0] && 
                       (priceRange[1] === 0 ? true : price <= priceRange[1]);
-    const meetsSale = showSaleOnly ? product.sale_price !== null : true;
+    
+    const meetsSale = showSaleOnly ? isProductOnSale(product) : true;
     const meetsBrand = selectedBrand ? product.brand === selectedBrand : true;
     
     const isNewArrival = product.created_at 
@@ -122,8 +155,8 @@ const Shop = () => {
 
   const sortedProducts = [...(filteredProducts || [])].sort((a, b) => {
     if (sortOrder === "default") return 0;
-    const priceA = a.sale_price || a.price;
-    const priceB = b.sale_price || b.price;
+    const priceA = isProductOnSale(a) ? a.sale_price : a.price;
+    const priceB = isProductOnSale(b) ? b.sale_price : b.price;
     return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
   });
 
