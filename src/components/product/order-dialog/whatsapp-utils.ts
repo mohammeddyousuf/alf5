@@ -7,7 +7,7 @@ export const constructWhatsAppMessage = (data: {
   email: string;
   mobile: string;
   address: string;
-  message: string;
+  comments: string;
   paymentMode: string;
 }) => {
   const messageLines = [
@@ -24,7 +24,7 @@ export const constructWhatsAppMessage = (data: {
     `Mobile: ${data.mobile}`,
     `Address: ${data.address || "N/A"}`,
     `Payment Mode: ${data.paymentMode}`,
-    `Comments: ${data.message || "N/A"}`,
+    `Comments: ${data.comments || "N/A"}`,
     "",
     "Please reply back."
   ];
