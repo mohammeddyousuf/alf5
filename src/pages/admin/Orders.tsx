@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import {
   Table,
   TableBody,
@@ -10,7 +11,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Download } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function Orders() {
@@ -46,47 +46,6 @@ export default function Orders() {
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(amount);
-  };
-
-  const downloadCSV = () => {
-    if (!orders) return;
-
-    const headers = [
-      "Order Date",
-      "Product Name",
-      "Brand",
-      "Price",
-      "Customer Name",
-      "Email",
-      "Mobile",
-      "Address",
-      "Payment Mode",
-    ];
-
-    const csvData = orders.map((order) => [
-      format(new Date(order.created_at), "yyyy-MM-dd HH:mm:ss"),
-      order.product_name,
-      order.product_brand || "",
-      formatPrice(order.product_price),
-      order.customer_name,
-      order.customer_email,
-      order.customer_mobile,
-      order.customer_address,
-      order.payment_mode,
-    ]);
-
-    const csvContent =
-      [headers, ...csvData].map((row) => row.join(",")).join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `orders-${format(new Date(), "yyyy-MM-dd")}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
   };
 
   if (error) {
@@ -125,11 +84,11 @@ export default function Orders() {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Orders</h1>
-        <Button onClick={downloadCSV}>
-          <Download className="mr-2 h-4 w-4" />
-          Download Report
-        </Button>
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold">Orders</h1>
+          <p className="text-sm text-muted-foreground">View and manage orders</p>
+        </div>
+        <BackToDashboard />
       </div>
 
       <div className="border rounded-lg">

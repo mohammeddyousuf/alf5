@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductList } from "@/components/admin/product/ProductList";
 import { useProducts } from "@/hooks/useProducts";
+import { BackToDashboard } from "@/components/admin/BackToDashboard";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -85,9 +86,10 @@ const Products = () => {
             Manage your products ({products?.length || 0} of {systemLimits?.product_limit || '...'} allowed)
           </p>
         </div>
-        <Button onClick={handleAddProduct}>
-          Add Product
-        </Button>
+        <div className="flex items-center gap-4">
+          <BackToDashboard />
+          <Button onClick={handleAddProduct}>Add Product</Button>
+        </div>
       </div>
 
       <ProductFilters

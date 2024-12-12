@@ -1,39 +1,49 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
-import { Database } from "@/integrations/supabase/types";
-import { CollectionForm } from "@/components/admin/CollectionForm";
+import { BackToDashboard } from "@/components/admin/BackToDashboard";
+import { CategoryForm } from "@/components/admin/category/CategoryForm";
+import { SubcategoryForm } from "@/components/admin/category/SubcategoryForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
-import { Pencil } from "lucide-react";
-
-type CollectionRow = Database["public"]["Tables"]["collections"]["Row"];
+import { useToast } from "@/components/ui/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card } from "@/components/ui/card";
 
 export default function Collections() {
-  const [search, setSearch] = useState("");
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("categories");
   
-  const { data: collections, refetch } = useQuery({
-    queryKey: ["admin-collections"],
+  const { data: categories, refetch: refetchCategories } = useQuery({
+    queryKey: ["admin-categories"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("collections")
+        .from("categories")
         .select("*")
-        .order("created_at", { ascending: true }); // Changed to ascending order
+        .order("name");
       if (error) throw error;
-      return data as CollectionRow[];
+      return data;
     },
   });
 
-  const filteredCollections = collections?.filter(collection =>
-    collection.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const { data: subcategories, refetch: refetchSubcategories } = useQuery({
+    queryKey: ["admin-subcategories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subcategories")
+        .select(`
+          *,
+          categories (
+            name
+          )
+        `)
+        .order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
 
-  const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("collections").delete().eq("id", id);
+  const handleDeleteCategory = async (id: string) => {
+    const { error } = await supabase.from("categories").delete().eq("id", id);
     if (error) {
       toast({
         variant: "destructive",
@@ -43,86 +53,108 @@ export default function Collections() {
     } else {
       toast({
         title: "Success",
-        description: "Collection deleted successfully",
+        description: "Category deleted successfully",
       });
-      refetch();
+      refetchCategories();
+      refetchSubcategories();
     }
+  };
+
+  const handleDeleteSubcategory = async (id: string) => {
+    const { error } = await supabase.from("subcategories").delete().eq("id", id);
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Subcategory deleted successfully",
+      });
+      refetchSubcategories();
+    }
+  };
+
+  const handleSuccess = () => {
+    refetchCategories();
+    refetchSubcategories();
   };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Collections</h1>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>Add Collection</Button>
-          </DialogTrigger>
-          <DialogContent className="max-h-[90vh] overflow-y-auto p-6">
-            <DialogHeader>
-              <DialogTitle>Add New Collection</DialogTitle>
-            </DialogHeader>
-            <div className="mt-4">
-              <CollectionForm onSuccess={() => refetch()} />
-            </div>
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center gap-4">
+          <BackToDashboard />
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Add Collection</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Collection</DialogTitle>
+              </DialogHeader>
+              <div className="mt-4">
+                <CollectionForm onSuccess={handleSuccess} />
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
-      <Input
-        placeholder="Search collections..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="max-w-sm"
-      />
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="categories">Categories</TabsTrigger>
+          <TabsTrigger value="subcategories">Subcategories</TabsTrigger>
+        </TabsList>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCollections?.map((collection) => (
-          <Card key={collection.id} className="p-4">
-            <div className="aspect-square mb-4 overflow-hidden rounded-lg">
-              {collection.image_url ? (
-                <img
-                  src={collection.image_url}
-                  alt={collection.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="h-full w-full bg-muted flex items-center justify-center">
-                  No image
-                </div>
-              )}
-            </div>
-            <h3 className="font-semibold mb-2">{collection.name}</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              {collection.description}
-            </p>
-            <div className="flex gap-2">
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="default" className="flex-1">
-                    <Pencil className="h-4 w-4 mr-2" />
-                    Edit
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-h-[90vh] overflow-y-auto p-6">
-                  <DialogHeader>
-                    <DialogTitle>Edit Collection</DialogTitle>
-                  </DialogHeader>
-                  <div className="mt-4">
-                    <CollectionForm collection={collection} onSuccess={() => refetch()} />
-                  </div>
-                </DialogContent>
-              </Dialog>
-              <Button 
-                variant="destructive"
-                className="flex-1"
-                onClick={() => handleDelete(collection.id)}
-              >
-                Delete
-              </Button>
-            </div>
-          </Card>
-        ))}
-      </div>
+        <TabsContent value="categories">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categories?.map((category) => (
+              <Card key={category.id} className="p-4">
+                <h3 className="font-semibold mb-2">{category.name}</h3>
+                {category.description && (
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {category.description}
+                  </p>
+                )}
+                <Button 
+                  variant="destructive"
+                  onClick={() => handleDeleteCategory(category.id)}
+                >
+                  Delete
+                </Button>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="subcategories">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {subcategories?.map((subcategory) => (
+              <Card key={subcategory.id} className="p-4">
+                <h3 className="font-semibold mb-2">{subcategory.name}</h3>
+                <p className="text-sm text-muted-foreground">
+                  Category: {subcategory.categories?.name}
+                </p>
+                {subcategory.description && (
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {subcategory.description}
+                  </p>
+                )}
+                <Button 
+                  variant="destructive"
+                  onClick={() => handleDeleteSubcategory(subcategory.id)}
+                >
+                  Delete
+                </Button>
+              </Card>
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

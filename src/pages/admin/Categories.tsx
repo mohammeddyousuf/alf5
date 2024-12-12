@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { CategoryForm } from "@/components/admin/category/CategoryForm";
 import { SubcategoryForm } from "@/components/admin/category/SubcategoryForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BackToDashboard } from "@/components/admin/BackToDashboard";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Categories() {
   const { toast } = useToast();
@@ -86,21 +86,24 @@ export default function Categories() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Categories & Subcategories</h1>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>Add {activeTab === "categories" ? "Category" : "Subcategory"}</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New {activeTab === "categories" ? "Category" : "Subcategory"}</DialogTitle>
-            </DialogHeader>
-            {activeTab === "categories" ? (
-              <CategoryForm onSuccess={handleSuccess} />
-            ) : (
-              <SubcategoryForm onSuccess={handleSuccess} />
-            )}
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center gap-4">
+          <BackToDashboard />
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Add {activeTab === "categories" ? "Category" : "Subcategory"}</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New {activeTab === "categories" ? "Category" : "Subcategory"}</DialogTitle>
+              </DialogHeader>
+              {activeTab === "categories" ? (
+                <CategoryForm onSuccess={handleSuccess} />
+              ) : (
+                <SubcategoryForm onSuccess={handleSuccess} />
+              )}
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>

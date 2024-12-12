@@ -6,6 +6,7 @@ import { Loader2, Pencil, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { Pages } from "@/integrations/supabase/types/pages";
 import { useState, useEffect } from "react";
+import { BackToDashboard } from "@/components/admin/BackToDashboard";
 
 const Pages = () => {
   const navigate = useNavigate();
@@ -44,12 +45,15 @@ const Pages = () => {
     <div className="container py-12">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Pages</h1>
-        {isSuperAdmin && (
-          <Button onClick={() => navigate("/admin/pages/new")}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add New Page
-          </Button>
-        )}
+        <div className="flex items-center gap-4">
+          <BackToDashboard />
+          {isSuperAdmin && (
+            <Button onClick={() => navigate("/admin/pages/new")}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add New Page
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="grid gap-4">

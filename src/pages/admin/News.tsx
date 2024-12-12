@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import {
   Table,
   TableBody,
@@ -43,23 +43,26 @@ const News = () => {
     <div className="container mx-auto p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">News Ticker</h1>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => setSelectedNews(null)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add News
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{selectedNews ? "Edit News" : "Add News Item"}</DialogTitle>
-            </DialogHeader>
-            <NewsForm 
-              news={selectedNews} 
-              onSuccess={() => setOpen(false)} 
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex items-center gap-4">
+          <BackToDashboard />
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button onClick={() => setSelectedNews(null)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add News
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{selectedNews ? "Edit News" : "Add News Item"}</DialogTitle>
+              </DialogHeader>
+              <NewsForm 
+                news={selectedNews} 
+                onSuccess={() => setOpen(false)} 
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Table>
