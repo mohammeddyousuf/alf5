@@ -15,8 +15,6 @@ export const constructWhatsAppMessage = (data: {
   const messageLines = [
     `Hi, ${data.websiteName}`,
     "",
-    `*${data.websiteName}*`,
-    "",
     "*Order Details:*",
     `Product: ${data.productName}`,
     `Brand: ${data.productBrand || "N/A"}`,
@@ -46,7 +44,6 @@ export const createWhatsAppUrl = (message: string) => {
     app_absent: '0'
   });
   
-  // Change from /send to /send/
   const url = `https://api.whatsapp.com/send/?${params.toString()}`;
   
   console.log('WhatsApp URL parameters:', {
