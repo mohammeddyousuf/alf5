@@ -43,7 +43,7 @@ export function OrderDialog({
       email: "",
       mobile: "",
       address: "",
-      paymentMode: "cash", // Set default value to "cash"
+      paymentMode: "bank_transfer", // Changed default value to "bank_transfer"
     },
   });
 
