@@ -14,6 +14,11 @@ export function GlobalSaleControls() {
   const [endDate, setEndDate] = useState("");
   const [endTime, setEndTime] = useState("");
 
+  // Get current date and time in the required format
+  const today = new Date();
+  const minDate = today.toISOString().split('T')[0];
+  const currentTime = today.toTimeString().slice(0, 5);
+
   // Fetch current settings
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -36,8 +41,14 @@ export function GlobalSaleControls() {
       setIsGlobalSaleEnabled(settings.clearance_sale_active || false);
       if (settings.clearance_sale_end_date) {
         const endDateTime = new Date(settings.clearance_sale_end_date);
-        setEndDate(endDateTime.toISOString().split('T')[0]);
-        setEndTime(endDateTime.toISOString().split('T')[1].substring(0, 5));
+        const dateStr = endDateTime.toISOString().split('T')[0];
+        const timeStr = endDateTime.toISOString().split('T')[1].substring(0, 5);
+        
+        // Only set the date and time if they're in the future
+        if (new Date(`${dateStr}T${timeStr}`) > new Date()) {
+          setEndDate(dateStr);
+          setEndTime(timeStr);
+        }
       }
     }
   }, [settings]);
@@ -48,6 +59,17 @@ export function GlobalSaleControls() {
         variant: "destructive",
         title: "Error",
         description: "Please set both date and time for the sale end",
+      });
+      return;
+    }
+
+    // Validate that the selected date and time are in the future
+    const selectedDateTime = new Date(`${endDate}T${endTime}`);
+    if (selectedDateTime <= new Date()) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please select a future date and time",
       });
       return;
     }
@@ -147,6 +169,7 @@ export function GlobalSaleControls() {
                 id="end-date"
                 type="date"
                 value={endDate}
+                min={minDate}
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </div>
@@ -156,6 +179,7 @@ export function GlobalSaleControls() {
                 id="end-time"
                 type="time"
                 value={endTime}
+                min={endDate === minDate ? currentTime : undefined}
                 onChange={(e) => setEndTime(e.target.value)}
               />
             </div>
