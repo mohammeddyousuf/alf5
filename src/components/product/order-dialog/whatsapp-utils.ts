@@ -25,7 +25,8 @@ export const constructWhatsAppMessage = (data: {
     `Email: ${data.email}`,
     `Mobile: ${data.mobile}`,
     `Address: ${data.address || "N/A"}`,
-    `Payment Mode: ${data.paymentMode}`
+    `Payment Mode: ${data.paymentMode}`,
+    `Comments: ${data.comments || "N/A"}`
   ];
 
   const finalMessage = messageLines.join('\n');
