@@ -8,6 +8,7 @@ import { Sliders, SlidersInsert, SlidersUpdate } from './sliders';
 import { Subcategories, SubcategoriesInsert, SubcategoriesUpdate } from './subcategories';
 import { Orders, OrdersInsert, OrdersUpdate } from './orders';
 import { SystemLimits, SystemLimitsInsert, SystemLimitsUpdate } from './systemLimits';
+import { Enquiries, EnquiriesInsert, EnquiriesUpdate } from './enquiries';
 
 export interface Database {
   public: {
@@ -93,6 +94,12 @@ export interface Database {
         Row: SystemLimits;
         Insert: SystemLimitsInsert;
         Update: SystemLimitsUpdate;
+        Relationships: [];
+      };
+      enquiries: {
+        Row: Enquiries;
+        Insert: EnquiriesInsert;
+        Update: EnquiriesUpdate;
         Relationships: [];
       };
     };
