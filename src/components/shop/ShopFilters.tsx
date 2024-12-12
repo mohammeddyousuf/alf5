@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Label } from "@/components/ui/label";
@@ -12,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PriceRangeFilter } from "./filters/PriceRangeFilter";
+import { BrandFilter } from "./filters/BrandFilter";
 
 interface ShopFiltersProps {
   priceRange: number[];
@@ -106,25 +106,11 @@ export function ShopFilters({
         <h2 className="font-semibold text-lg">Filters</h2>
         <Separator />
 
-        <div className="space-y-2">
-          <Label>Brand</Label>
-          <Select
-            value={selectedBrand || "all"}
-            onValueChange={(value) => setSelectedBrand(value === "all" ? null : value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select brand" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Brands</SelectItem>
-              {brands?.map((brand) => (
-                <SelectItem key={brand} value={brand}>
-                  {brand}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <BrandFilter
+          selectedBrand={selectedBrand}
+          setSelectedBrand={setSelectedBrand}
+          brands={brands}
+        />
 
         <Separator />
 

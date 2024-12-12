@@ -9,47 +9,45 @@ import { ProductGrid } from "@/components/shop/ProductGrid";
 import { SearchBar } from "@/components/shop/SearchBar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useShopUrlParams } from "@/hooks/useShopUrlParams";
 
 const Shop = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { getUrlParam, updateUrlParams } = useShopUrlParams();
   const { toast } = useToast();
 
   // Initialize state from URL parameters
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+  const [searchQuery, setSearchQuery] = useState(getUrlParam("search") || "");
   const [priceRange, setPriceRange] = useState([
-    Number(searchParams.get("minPrice")) || 0,
-    Number(searchParams.get("maxPrice")) || 0
+    Number(getUrlParam("minPrice")) || 0,
+    Number(getUrlParam("maxPrice")) || 0
   ]);
-  const [showSaleOnly, setShowSaleOnly] = useState(searchParams.get("sale") === "true");
-  const [showFeaturedOnly, setShowFeaturedOnly] = useState(searchParams.get("featured") === "true");
-  const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(searchParams.get("newArrivals") === "true");
+  const [showSaleOnly, setShowSaleOnly] = useState(getUrlParam("sale") === "true");
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(getUrlParam("featured") === "true");
+  const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(getUrlParam("newArrivals") === "true");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">(
-    (searchParams.get("sort") as "asc" | "desc" | "default") || "default"
+    (getUrlParam("sort") as "asc" | "desc" | "default") || "default"
   );
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(searchParams.get("category"));
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(searchParams.get("subcategory"));
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(searchParams.get("brand"));
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(getUrlParam("category"));
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(getUrlParam("subcategory"));
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(getUrlParam("brand"));
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Update URL when filters change
   useEffect(() => {
-    const params = new URLSearchParams();
-    
-    if (searchQuery) params.set("search", searchQuery);
-    if (priceRange[0] > 0) params.set("minPrice", priceRange[0].toString());
-    if (priceRange[1] > 0) params.set("maxPrice", priceRange[1].toString());
-    if (showSaleOnly) params.set("sale", "true");
-    if (showFeaturedOnly) params.set("featured", "true");
-    if (showNewArrivalsOnly) params.set("newArrivals", "true");
-    if (sortOrder !== "default") params.set("sort", sortOrder);
-    if (selectedCategory) params.set("category", selectedCategory);
-    if (selectedSubcategory) params.set("subcategory", selectedSubcategory);
-    if (selectedBrand) params.set("brand", selectedBrand);
-
-    // Update URL without reloading the page
-    setSearchParams(params);
+    updateUrlParams({
+      search: searchQuery || null,
+      minPrice: priceRange[0] > 0 ? priceRange[0].toString() : null,
+      maxPrice: priceRange[1] > 0 ? priceRange[1].toString() : null,
+      sale: showSaleOnly ? "true" : null,
+      featured: showFeaturedOnly ? "true" : null,
+      newArrivals: showNewArrivalsOnly ? "true" : null,
+      sort: sortOrder !== "default" ? sortOrder : null,
+      category: selectedCategory,
+      subcategory: selectedSubcategory,
+      brand: selectedBrand
+    });
   }, [
     searchQuery,
     priceRange,
@@ -60,7 +58,6 @@ const Shop = () => {
     selectedCategory,
     selectedSubcategory,
     selectedBrand,
-    setSearchParams
   ]);
 
   const { data: settings } = useQuery({
