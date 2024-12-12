@@ -47,7 +47,7 @@ export function OrderDialog({
       mobile: "",
       address: "",
       paymentMode: "bank_transfer",
-      message: "",
+      message: "Enquiry",
     },
   });
 
