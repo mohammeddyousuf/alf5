@@ -33,7 +33,7 @@ export const Footer = () => {
   const handleWhatsAppSubmit = async (name: string, mobile: string, email: string, comments?: string) => {
     if (!settings?.whatsapp_number) return;
     
-    const message = `Hi am ${name}, just visited ${settings.website_name || 'your website'}. Have few queries. ${comments ? `\n\nComments: ${comments}` : ''}\nPlease reply back on ${mobile}, ${email}`;
+    const message = `Hi ${settings.website_name || 'your website'},\n${name}\n${mobile}\n${email}${comments ? `\n${comments}` : ''}`;
     
     // Log the enquiry with the new fields
     await logEnquiry(message, name, mobile, email);
