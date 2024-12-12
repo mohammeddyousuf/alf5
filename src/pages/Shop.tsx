@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Filter } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ShopFilters } from "@/components/shop/ShopFilters";
@@ -12,19 +12,57 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Shop = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 0]);
-  const [showSaleOnly, setShowSaleOnly] = useState(false);
-  const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
-  const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(false);
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">("default");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
+
+  // Initialize state from URL parameters
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+  const [priceRange, setPriceRange] = useState([
+    Number(searchParams.get("minPrice")) || 0,
+    Number(searchParams.get("maxPrice")) || 0
+  ]);
+  const [showSaleOnly, setShowSaleOnly] = useState(searchParams.get("sale") === "true");
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(searchParams.get("featured") === "true");
+  const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(searchParams.get("newArrivals") === "true");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">(
+    (searchParams.get("sort") as "asc" | "desc" | "default") || "default"
+  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(searchParams.get("category"));
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(searchParams.get("subcategory"));
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(searchParams.get("brand"));
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  // Get settings for global sale timer
+  // Update URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    
+    if (searchQuery) params.set("search", searchQuery);
+    if (priceRange[0] > 0) params.set("minPrice", priceRange[0].toString());
+    if (priceRange[1] > 0) params.set("maxPrice", priceRange[1].toString());
+    if (showSaleOnly) params.set("sale", "true");
+    if (showFeaturedOnly) params.set("featured", "true");
+    if (showNewArrivalsOnly) params.set("newArrivals", "true");
+    if (sortOrder !== "default") params.set("sort", sortOrder);
+    if (selectedCategory) params.set("category", selectedCategory);
+    if (selectedSubcategory) params.set("subcategory", selectedSubcategory);
+    if (selectedBrand) params.set("brand", selectedBrand);
+
+    // Update URL without reloading the page
+    setSearchParams(params);
+  }, [
+    searchQuery,
+    priceRange,
+    showSaleOnly,
+    showFeaturedOnly,
+    showNewArrivalsOnly,
+    sortOrder,
+    selectedCategory,
+    selectedSubcategory,
+    selectedBrand,
+    setSearchParams
+  ]);
+
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
@@ -39,20 +77,6 @@ const Shop = () => {
       return data;
     },
   });
-
-  useEffect(() => {
-    if (location.state) {
-      const { showFeaturedOnly: featured, showNewArrivalsOnly: newArrivals } = location.state;
-      setShowFeaturedOnly(featured || false);
-      setShowNewArrivalsOnly(newArrivals || false);
-      setShowSaleOnly(false);
-      setSelectedCategory(null);
-      setSelectedSubcategory(null);
-      setSelectedBrand(null);
-      setPriceRange([0, 0]);
-      setSortOrder("default");
-    }
-  }, [location.state]);
 
   const { data: products, isLoading, error } = useQuery({
     queryKey: ["shop-products", selectedCategory, selectedSubcategory, showFeaturedOnly, showSaleOnly, showNewArrivalsOnly],
@@ -106,7 +130,6 @@ const Shop = () => {
     },
   });
 
-  // Helper function to check if a sale is valid
   const isSaleValid = () => {
     if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
       return true; // If no global sale timer, individual sale prices are valid
@@ -241,7 +264,7 @@ const Shop = () => {
 
         <div className="flex-1">
           <SearchBar value={searchQuery} onChange={setSearchQuery} />
-          <ProductGrid products={sortedProducts} />
+          <ProductGrid products={filteredProducts} />
         </div>
       </div>
     </div>
