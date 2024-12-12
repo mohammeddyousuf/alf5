@@ -13,6 +13,8 @@ export const constructWhatsAppMessage = (data: {
   console.log("Constructing WhatsApp message with data:", data);
   
   const messageLines = [
+    `Hi, ${data.websiteName}`,
+    "",
     `*${data.websiteName}*`,
     "",
     "*Order Details:*",
@@ -30,16 +32,15 @@ export const constructWhatsAppMessage = (data: {
   ];
 
   const finalMessage = messageLines.join('\n');
-  console.log("Final constructed message:", finalMessage);
+  console.log("Final WhatsApp message:", finalMessage);
   return finalMessage;
 };
 
 export const createWhatsAppUrl = (message: string) => {
-  const phoneNumber = "+919900981857"; // With the + sign
   const baseUrl = 'https://api.whatsapp.com/send/';
   
   const params = new URLSearchParams({
-    phone: phoneNumber,
+    phone: '+919900981857',
     text: message,
     type: 'phone_number',
     app_absent: '0'
@@ -49,7 +50,7 @@ export const createWhatsAppUrl = (message: string) => {
   const url = `https://api.whatsapp.com/send/?${params.toString()}`;
   
   console.log('WhatsApp URL parameters:', {
-    phone: phoneNumber,
+    phone: '+919900981857',
     text: message,
     rawMessage: message
   });
