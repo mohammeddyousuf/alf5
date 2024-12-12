@@ -14,7 +14,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { FormFields } from "./order-dialog/FormFields";
 import { ProductInfo } from "./order-dialog/ProductInfo";
 import { formSchema, type OrderFormData, type ExtendedOrderFormData } from "./order-dialog/types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface OrderDialogProps {
   open: boolean;
@@ -36,6 +36,9 @@ export function OrderDialog({
   onSubmit,
 }: OrderDialogProps) {
   const { toast } = useToast();
+  const [ipAddress, setIpAddress] = useState<string>("");
+  const [location, setLocation] = useState<string>("");
+  
   const form = useForm<OrderFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,12 +46,13 @@ export function OrderDialog({
       email: "",
       mobile: "",
       address: "",
-      paymentMode: "bank_transfer", // Changed default value to "bank_transfer"
+      paymentMode: "bank_transfer",
+      message: "",
     },
   });
 
   useEffect(() => {
-    const fetchLocation = async () => {
+    const fetchLocationAndIP = async () => {
       try {
         const response = await fetch('https://ipapi.co/json/');
         const data = await response.json();
@@ -58,6 +62,10 @@ export function OrderDialog({
           return;
         }
 
+        const locationStr = `${data.city}${data.region ? `, ${data.region}` : ''}, ${data.country_name}`;
+        setLocation(locationStr);
+        setIpAddress(data.ip);
+        
         const address = `${data.city}${data.region ? `, ${data.region}` : ''}, ${data.country_name}`;
         form.setValue('address', address);
       } catch (error) {
@@ -66,7 +74,7 @@ export function OrderDialog({
     };
 
     if (open) {
-      fetchLocation();
+      fetchLocationAndIP();
     }
   }, [open, form]);
 
@@ -85,7 +93,10 @@ export function OrderDialog({
         product_name: productName,
         product_brand: productBrand,
         product_price: productPrice,
-        ...data
+        ...data,
+        location,
+        ip_address: ipAddress,
+        source: window.location.href,
       });
 
       const { error } = await supabase
@@ -98,8 +109,12 @@ export function OrderDialog({
           customer_name: data.name,
           customer_email: data.email,
           customer_mobile: data.mobile,
-          customer_address: data.address || "", // Ensure empty string if undefined
-          payment_mode: data.paymentMode || "cash", // Ensure default value if undefined
+          customer_address: data.address || "",
+          payment_mode: data.paymentMode || "cash",
+          message: data.message || "",
+          location: location || "",
+          ip_address: ipAddress || "",
+          source: window.location.href || "",
         })
         .single();
 

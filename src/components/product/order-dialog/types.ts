@@ -5,6 +5,7 @@ export const formSchema = z.object({
   email: z.string().email("Invalid email address"),
   mobile: z.string().min(10, "Mobile number must be at least 10 digits"),
   address: z.string().optional(),
+  message: z.string().optional(),
   paymentMode: z.enum(["cash", "upi", "bank_transfer"]).optional(),
 });
 
