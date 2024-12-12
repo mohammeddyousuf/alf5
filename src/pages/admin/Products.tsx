@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProductList } from "@/components/admin/product/ProductList";
 import { useProducts } from "@/hooks/useProducts";
 import { BackToDashboard } from "@/components/admin/BackToDashboard";
+import { GlobalSaleControls } from "@/components/admin/product/GlobalSaleControls";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -91,6 +92,8 @@ const Products = () => {
           <Button onClick={handleAddProduct}>Add Product</Button>
         </div>
       </div>
+
+      <GlobalSaleControls />
 
       <ProductFilters
         search={search}
