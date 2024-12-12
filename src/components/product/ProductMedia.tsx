@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { SaleCountdown } from "./SaleCountdown";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from "react";
 
 interface ProductMediaProps {
   images?: string[];
