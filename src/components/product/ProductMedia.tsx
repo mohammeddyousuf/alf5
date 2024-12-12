@@ -18,9 +18,10 @@ interface ProductMediaProps {
   productName: string;
   getYouTubeVideoId: (url: string) => string | null;
   salePrice?: number | null;
+  price: number;
 }
 
-export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId, salePrice }: ProductMediaProps) {
+export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId, salePrice, price }: ProductMediaProps) {
   const { toast } = useToast();
   const mediaItems = [...(images || []), ...(videoUrls || [])];
 
@@ -40,7 +41,9 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
   });
 
   const isValidSale = () => {
-    if (!settings?.clearance_sale_end_date) return false;
+    if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
+      return true; // If no global sale timer, individual sale prices are valid
+    }
     const endDate = new Date(settings.clearance_sale_end_date);
     const now = new Date();
     return endDate > now;
@@ -70,7 +73,18 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
     );
   }
 
-  const showSaleLabel = salePrice && isValidSale();
+  // Show sale price if it exists, is less than regular price, and either:
+  // 1. There's no global sale timer (regular product discount)
+  // 2. There's a global sale timer and it hasn't expired
+  const showSaleLabel = salePrice && 
+    salePrice < price && 
+    (!settings?.clearance_sale_active || isValidSale());
+
+  // Only show timer if global sale is active and not expired
+  const showSaleTimer = settings?.clearance_sale_active && 
+    settings?.clearance_sale_end_date && 
+    isValidSale() && 
+    showSaleLabel;
 
   return (
     <div className="relative group">
@@ -79,7 +93,7 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
           <span className="font-semibold text-sm">SALE</span>
         </div>
       )}
-      {showSaleLabel && settings?.clearance_sale_end_date && (
+      {showSaleTimer && settings?.clearance_sale_end_date && (
         <div className="absolute top-4 right-4 z-10">
           <SaleCountdown 
             endDate={settings.clearance_sale_end_date}
