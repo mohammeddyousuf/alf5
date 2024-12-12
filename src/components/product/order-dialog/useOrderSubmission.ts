@@ -68,13 +68,16 @@ export const useOrderSubmission = ({
         mobile: data.mobile,
         address: data.address || "",
         comments: data.comments || "",
-        paymentMode: data.paymentMode || "bank_transfer"
+        paymentMode: data.paymentMode
       };
       
       console.log("Message Data:", messageData);
       
       const whatsappMessage = constructWhatsAppMessage(messageData);
       console.log("WhatsApp Message:", whatsappMessage);
+      
+      const whatsappUrl = createWhatsAppUrl(whatsappMessage);
+      console.log("Generated WhatsApp URL:", whatsappUrl);
       
       const { error } = await supabase
         .from("orders")
@@ -87,7 +90,7 @@ export const useOrderSubmission = ({
           customer_email: data.email,
           customer_mobile: data.mobile,
           customer_address: data.address || "",
-          payment_mode: data.paymentMode || "bank_transfer",
+          payment_mode: data.paymentMode,
           message: data.comments || "",
           location: location || "",
           ip_address: ipAddress || "",
@@ -106,8 +109,6 @@ export const useOrderSubmission = ({
       }
 
       console.log("Order saved successfully");
-      
-      const whatsappUrl = createWhatsAppUrl(whatsappMessage);
       
       onSubmit({
         ...data,
