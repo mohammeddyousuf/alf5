@@ -34,9 +34,16 @@ export const constructWhatsAppMessage = (data: {
 
 export const createWhatsAppUrl = (messageLines: string) => {
   const phoneNumber = "+919900981857";
-  const baseUrl = 'https://api.whatsapp.com/send';
-  const encodedText = encodeURIComponent(messageLines);
-  const url = `${baseUrl}?phone=${phoneNumber}&text=${encodedText}`;
+  // Use the web version URL which handles encoding better
+  const baseUrl = 'https://web.whatsapp.com/send';
+  
+  // Create URLSearchParams to properly handle the encoding
+  const params = new URLSearchParams();
+  params.append('phone', phoneNumber);
+  params.append('text', messageLines);
+  
+  const url = `${baseUrl}?${params.toString()}`;
+  console.log('Raw message:', messageLines);
   console.log('Generated WhatsApp URL:', url);
   return url;
 };
