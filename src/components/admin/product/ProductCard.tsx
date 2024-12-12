@@ -50,7 +50,13 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
 
   const isSaleValid = () => {
     try {
-      if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
+      // If clearance sale is not active, show regular product-specific sale prices
+      if (!settings?.clearance_sale_active) {
+        return true;
+      }
+
+      // If clearance sale is active but no end date, don't show sale
+      if (!settings?.clearance_sale_end_date) {
         return false;
       }
 
@@ -64,7 +70,8 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
   };
 
   const shouldShowSaleTimer = () => {
-    if (!isSaleValid()) {
+    // Only show timer if global sale is active
+    if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
       return false;
     }
 
@@ -72,7 +79,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
       return false;
     }
 
-    return true;
+    return isSaleValid();
   };
 
   const getStatusBadgeVariant = (status: string | null) => {
@@ -88,19 +95,12 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
     }
   };
 
-  const getEffectivePrice = () => {
-    if (isSaleValid() && product.sale_price && product.sale_price < product.price) {
-      return product.sale_price;
-    }
-    return product.price;
-  };
-
   return (
     <Card key={product.id} className="p-4">
       <ProductImage 
         images={product.images}
         name={product.name}
-        salePrice={isSaleValid() ? product.sale_price : null}
+        salePrice={product.sale_price}
         price={product.price}
         showSaleTimer={shouldShowSaleTimer()}
         saleEndDate={settings?.clearance_sale_end_date || null}
@@ -125,7 +125,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
 
       <ProductPrice 
         price={product.price} 
-        salePrice={isSaleValid() ? product.sale_price : null} 
+        salePrice={product.sale_price} 
       />
 
       <div className="flex gap-2">
