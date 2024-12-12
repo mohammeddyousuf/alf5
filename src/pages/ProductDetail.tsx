@@ -147,24 +147,24 @@ Payment Mode: ${formData.paymentMode}`;
         {absoluteProductImage && <meta name="twitter:image" content={absoluteProductImage} />}
       </Helmet>
 
-      <div className="-mt-16">
-        <div className="mb-6 container relative z-10 pt-20">
+      <div className="container py-8">
+        <div className="mb-6">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
-                <Link to="/" className="transition-colors hover:text-foreground text-white">
+                <Link to="/" className="transition-colors hover:text-foreground">
                   Home
                 </Link>
               </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-white" />
+              <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <Link to="/shop" className="transition-colors hover:text-foreground text-white">
+                <Link to="/shop" className="transition-colors hover:text-foreground">
                   Shop
                 </Link>
               </BreadcrumbItem>
-              <BreadcrumbSeparator className="text-white" />
+              <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage className="text-white">{product.name}</BreadcrumbPage>
+                <BreadcrumbPage>{product.name}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
