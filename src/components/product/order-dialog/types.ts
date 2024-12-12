@@ -6,7 +6,7 @@ export const formSchema = z.object({
   mobile: z.string().min(10, "Mobile number must be at least 10 digits"),
   address: z.string().optional(),
   paymentMode: z.enum(["cash", "upi", "bank_transfer"]).optional(),
-  message: z.string().optional(),
+  comments: z.string().optional(),
 });
 
 export type OrderFormData = z.infer<typeof formSchema>;

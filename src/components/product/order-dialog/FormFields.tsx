@@ -107,10 +107,10 @@ export function FormFields({ form }: FormFieldsProps) {
 
       <FormField
         control={form.control}
-        name="message"
+        name="comments"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-foreground">Message (Optional)</FormLabel>
+            <FormLabel className="text-foreground">Comments (Optional)</FormLabel>
             <FormControl>
               <Textarea {...field} className="bg-background text-foreground" />
             </FormControl>
