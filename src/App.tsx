@@ -19,6 +19,7 @@ import EditPage from "@/pages/admin/pages/[id]";
 import Categories from "@/pages/admin/Categories";
 import ProductDetail from "@/pages/ProductDetail";
 import Orders from "@/pages/admin/Orders";
+import Enquiries from "@/pages/admin/Enquiries";
 import Auth from "@/pages/Auth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -117,6 +118,7 @@ function App() {
             <Route path="/admin/pages/:id" element={<EditPage />} />
             <Route path="/admin/categories" element={<Categories />} />
             <Route path="/admin/orders" element={<Orders />} />
+            <Route path="/admin/enquiries" element={<Enquiries />} />
             <Route path="/sa83ms" element={<SuperAdmin />} />
           </Routes>
         </Layout>
