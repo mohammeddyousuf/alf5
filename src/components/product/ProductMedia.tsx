@@ -54,16 +54,17 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
 
         return () => clearTimeout(timer);
       } else {
-        // If timer has already expired, trigger an immediate refetch
         refetch();
       }
     }
   }, [settings?.clearance_sale_end_date, settings?.clearance_sale_active, refetch]);
 
   const isValidSale = () => {
+    // If there's no global sale settings, show product-specific sale price
     if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
-      return true; // If no global sale timer, individual sale prices are valid
+      return true;
     }
+    // If there is a global sale, check if it's still valid
     const endDate = new Date(settings.clearance_sale_end_date);
     const now = new Date();
     return endDate > now;
@@ -93,14 +94,10 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
     );
   }
 
-  // Show sale price if it exists, is less than regular price, and either:
-  // 1. There's no global sale timer (regular product discount)
-  // 2. There's a global sale timer and it hasn't expired
   const showSaleLabel = salePrice && 
     salePrice < price && 
-    (!settings?.clearance_sale_active || isValidSale());
+    isValidSale();
 
-  // Only show timer if global sale is active and not expired
   const showSaleTimer = settings?.clearance_sale_active && 
     settings?.clearance_sale_end_date && 
     isValidSale() && 
