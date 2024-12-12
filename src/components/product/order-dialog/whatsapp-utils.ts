@@ -32,16 +32,8 @@ export const constructWhatsAppMessage = (data: {
   return messageLines.join('\n');
 };
 
-export const createWhatsAppUrl = (message: string, phoneNumber?: string) => {
-  const baseUrl = 'https://api.whatsapp.com/send';
+export const createWhatsAppUrl = (message: string) => {
+  const baseUrl = 'https://wa.me';
   const encodedMessage = encodeURIComponent(message);
-  const phone = phoneNumber ? encodeURIComponent(phoneNumber) : '';
-  
-  const params = new URLSearchParams();
-  if (phone) {
-    params.append('phone', phone);
-  }
-  params.append('text', encodedMessage);
-  
-  return `${baseUrl}?${params.toString()}`;
+  return `${baseUrl}/?text=${encodedMessage}`;
 };
