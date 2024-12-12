@@ -53,6 +53,14 @@ export function SaleCountdown({ endDate }: SaleCountdownProps) {
     return () => clearInterval(timer);
   }, [endDate]);
 
+  // Don't render if all values are 0
+  if (timeLeft.days === 0 && 
+      timeLeft.hours === 0 && 
+      timeLeft.minutes === 0 && 
+      timeLeft.seconds === 0) {
+    return null;
+  }
+
   return (
     <div className="bg-black/70 text-white px-2 py-1 rounded-md backdrop-blur-sm text-xs">
       {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
