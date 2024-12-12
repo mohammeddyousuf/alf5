@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
-import { AdminHeader } from "@/components/admin/AdminHeader";
 import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
@@ -84,19 +83,21 @@ const Enquiries = () => {
   return (
     <ProtectedRoute>
       <div className="container mx-auto p-6 space-y-6">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold">Enquiries</h1>
-          <p className="text-sm text-muted-foreground">View and manage enquiries</p>
+        <div className="flex justify-between items-center">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold">Enquiries</h1>
+            <p className="text-sm text-muted-foreground">View and manage enquiries</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button onClick={downloadCSV} variant="outline">
+              <Download className="mr-2 h-4 w-4" />
+              Download CSV
+            </Button>
+            <BackToDashboard />
+          </div>
         </div>
-        <div className="flex items-center justify-end gap-4">
-          <Button onClick={downloadCSV} variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Download CSV
-          </Button>
-          <BackToDashboard />
-        </div>
-        <AdminHeader />
-        <div className="rounded-md border">
+
+        <div className="border rounded-lg">
           <Table>
             <TableHeader>
               <TableRow>
