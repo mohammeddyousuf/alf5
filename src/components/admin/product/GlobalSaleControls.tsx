@@ -21,8 +21,9 @@ export function GlobalSaleControls() {
       const { data, error } = await supabase
         .from("settings")
         .select("*")
-        .is('id', null)
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
       
       if (error) throw error;
       return data;
@@ -62,7 +63,7 @@ export function GlobalSaleControls() {
           clearance_sale_active: isGlobalSaleEnabled,
           clearance_sale_end_date: endDateTime
         })
-        .is('id', null);
+        .eq('id', settings?.id);
 
       if (error) throw error;
 
