@@ -37,11 +37,12 @@ export const createWhatsAppUrl = (message: string) => {
   const baseUrl = 'https://api.whatsapp.com/send';
   const encodedMessage = encodeURIComponent(message);
   
-  const params = new URLSearchParams();
-  params.append('phone', phoneNumber);
-  params.append('text', encodedMessage);
-  params.append('type', 'phone_number');
-  params.append('app_absent', '0');
+  const params = new URLSearchParams({
+    phone: phoneNumber,
+    text: encodedMessage,
+    type: 'phone_number',
+    app_absent: '0'
+  });
   
   return `${baseUrl}/?${params.toString()}`;
 };
