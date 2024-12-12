@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { AdminHeader } from "@/components/admin/AdminHeader";
+import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import {
   Table,
   TableBody,
@@ -28,6 +29,10 @@ const Enquiries = () => {
   return (
     <ProtectedRoute>
       <div className="container mx-auto p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Enquiries</h1>
+          <BackToDashboard />
+        </div>
         <AdminHeader />
         <div className="rounded-md border">
           <Table>
