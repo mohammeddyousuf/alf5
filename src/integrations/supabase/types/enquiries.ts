@@ -1,5 +1,8 @@
 export interface Enquiries {
   id: string;
+  name: string | null;
+  email: string | null;
+  mobile: string | null;
   message: string;
   location: string | null;
   ip_address: string | null;

@@ -43,6 +43,9 @@ const Enquiries = () => {
     // Create CSV headers
     const headers = [
       "Date",
+      "Name",
+      "Mobile",
+      "Email",
       "Message",
       "Location",
       "IP Address",
@@ -52,6 +55,9 @@ const Enquiries = () => {
     // Format enquiries data for CSV
     const csvData = enquiries.map(enquiry => [
       format(new Date(enquiry.created_at), "MMM d, yyyy HH:mm"),
+      enquiry.name || "",
+      enquiry.mobile || "",
+      enquiry.email || "",
       enquiry.message || "",
       enquiry.location || "",
       enquiry.ip_address || "",
@@ -101,23 +107,29 @@ const Enquiries = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Mobile</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Message</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>IP Address</TableHead>
                 <TableHead>Source</TableHead>
-                <TableHead>Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {enquiries?.map((enquiry) => (
                 <TableRow key={enquiry.id}>
+                  <TableCell>
+                    {format(new Date(enquiry.created_at), "PPpp")}
+                  </TableCell>
+                  <TableCell>{enquiry.name || '-'}</TableCell>
+                  <TableCell>{enquiry.mobile || '-'}</TableCell>
+                  <TableCell>{enquiry.email || '-'}</TableCell>
                   <TableCell>{enquiry.message}</TableCell>
                   <TableCell>{enquiry.location}</TableCell>
                   <TableCell>{enquiry.ip_address}</TableCell>
                   <TableCell>{enquiry.source}</TableCell>
-                  <TableCell>
-                    {format(new Date(enquiry.created_at), "PPpp")}
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

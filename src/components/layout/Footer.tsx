@@ -1,11 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { queryClient } from "@/lib/react-query";
 import { logEnquiry } from "@/utils/enquiryUtils";
+import { WhatsAppEnquiryDialog } from "./WhatsAppEnquiryDialog";
 
 export const Footer = () => {
   const navigate = useNavigate();
+  const [isWhatsAppDialogOpen, setIsWhatsAppDialogOpen] = useState(false);
+
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
@@ -22,13 +26,23 @@ export const Footer = () => {
     },
   });
 
-  const handleWhatsAppClick = async () => {
+  const handleWhatsAppClick = () => {
+    setIsWhatsAppDialogOpen(true);
+  };
+
+  const handleWhatsAppSubmit = async (name: string, mobile: string, email: string) => {
     if (!settings?.whatsapp_number) return;
-    const message = encodeURIComponent(`Hi, Just visited ${settings.website_name || 'your website'}.`);
-    // Log the enquiry before opening WhatsApp
-    await logEnquiry(`Hi, Just visited ${settings.website_name || 'your website'}.`);
+    
+    const message = `Hi am ${name}, just visited ${settings.website_name || 'your website'}. Have few queries. please reply back on ${mobile}, ${email}`;
+    
+    // Log the enquiry with the new fields
+    await logEnquiry(message, name, mobile, email);
+    
     // Open WhatsApp with the message
-    window.open(`https://wa.me/${settings.whatsapp_number.replace(/\D/g, '')}?text=${message}`, '_blank');
+    window.open(
+      `https://wa.me/${settings.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`,
+      '_blank'
+    );
   };
 
   const formatSocialLink = (url: string | null) => {
@@ -62,6 +76,12 @@ export const Footer = () => {
 
   return (
     <footer className="border-t bg-background">
+      <WhatsAppEnquiryDialog
+        isOpen={isWhatsAppDialogOpen}
+        onClose={() => setIsWhatsAppDialogOpen(false)}
+        onSubmit={handleWhatsAppSubmit}
+      />
+      
       <div className="container py-8 md:py-12">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div className="flex flex-col items-start gap-2">

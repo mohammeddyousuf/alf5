@@ -7,7 +7,12 @@ interface LocationData {
   ip?: string;
 }
 
-export const logEnquiry = async (message: string) => {
+export const logEnquiry = async (
+  message: string,
+  name?: string | null,
+  mobile?: string | null,
+  email?: string | null
+) => {
   try {
     // Fetch location data
     const locationResponse = await fetch('https://ipapi.co/json/');
@@ -16,10 +21,13 @@ export const logEnquiry = async (message: string) => {
     const { city, region, country_name, ip } = locationData;
     const location = [city, region, country_name].filter(Boolean).join(', ');
     
-    // Log the enquiry to Supabase
+    // Log the enquiry to Supabase with the new fields
     const { error } = await supabase
       .from('enquiries')
       .insert({
+        name,
+        email,
+        mobile,
         message,
         location,
         ip_address: ip,
