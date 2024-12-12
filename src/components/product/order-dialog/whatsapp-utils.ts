@@ -33,7 +33,15 @@ export const constructWhatsAppMessage = (data: {
 };
 
 export const createWhatsAppUrl = (message: string) => {
-  const baseUrl = 'https://wa.me';
+  const phoneNumber = "+919900981857"; // Adding the phone number back
+  const baseUrl = 'https://api.whatsapp.com/send';
   const encodedMessage = encodeURIComponent(message);
-  return `${baseUrl}/?text=${encodedMessage}`;
+  
+  const params = new URLSearchParams();
+  params.append('phone', phoneNumber);
+  params.append('text', encodedMessage);
+  params.append('type', 'phone_number');
+  params.append('app_absent', '0');
+  
+  return `${baseUrl}/?${params.toString()}`;
 };
