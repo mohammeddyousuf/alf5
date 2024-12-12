@@ -134,7 +134,7 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
         <Link to={productUrl} className="w-full">
           <Button className="w-full gap-2" variant="default">
             <MessageCircle className="h-4 w-4" />
-            Contact on WhatsApp
+            Contact Now
           </Button>
         </Link>
       </CardFooter>
