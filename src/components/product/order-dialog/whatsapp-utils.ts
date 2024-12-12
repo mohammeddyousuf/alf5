@@ -11,11 +11,7 @@ export const constructWhatsAppMessage = (data: {
   paymentMode: string;
 }) => {
   console.log("Constructing WhatsApp message with data:", data);
-  console.log("Comments value:", data.comments);
-
-  // Ensure comments is never undefined
-  const comments = data.comments || "N/A";
-
+  
   const messageLines = [
     `*${data.websiteName}*`,
     "",
@@ -29,10 +25,7 @@ export const constructWhatsAppMessage = (data: {
     `Email: ${data.email}`,
     `Mobile: ${data.mobile}`,
     `Address: ${data.address || "N/A"}`,
-    `Payment Mode: ${data.paymentMode}`,
-    `Comments: ${comments}`,
-    "",
-    "Please reply back."
+    `Payment Mode: ${data.paymentMode}`
   ];
 
   const finalMessage = messageLines.join('\n');
@@ -41,11 +34,17 @@ export const constructWhatsAppMessage = (data: {
 };
 
 export const createWhatsAppUrl = (message: string) => {
-  const phoneNumber = "919900981857"; // Without the + sign
-  const baseUrl = 'https://api.whatsapp.com/send';
+  const phoneNumber = "+919900981857"; // With the + sign
+  const baseUrl = 'https://api.whatsapp.com/send/';
   
-  // Create URL without any additional parameters
-  const url = `${baseUrl}?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+  const params = new URLSearchParams({
+    phone: phoneNumber,
+    text: message,
+    type: 'phone_number',
+    app_absent: '0'
+  });
+  
+  const url = `${baseUrl}?${params.toString()}`;
   
   console.log('WhatsApp URL parameters:', {
     phone: phoneNumber,
