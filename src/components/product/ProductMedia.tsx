@@ -94,9 +94,7 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
     );
   }
 
-  const showSaleLabel = salePrice && 
-    salePrice < price && 
-    isValidSale();
+  const showSaleLabel = salePrice && salePrice < price && isValidSale();
 
   const showSaleTimer = settings?.clearance_sale_active && 
     settings?.clearance_sale_end_date && 
