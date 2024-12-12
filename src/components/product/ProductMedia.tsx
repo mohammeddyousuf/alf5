@@ -39,6 +39,13 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
     },
   });
 
+  const isValidSale = () => {
+    if (!settings?.clearance_sale_end_date) return false;
+    const endDate = new Date(settings.clearance_sale_end_date);
+    const now = new Date();
+    return endDate > now;
+  };
+
   const handleCopyLink = () => {
     const currentUrl = window.location.href;
     navigator.clipboard.writeText(currentUrl).then(() => {
@@ -63,14 +70,16 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
     );
   }
 
+  const showSaleLabel = salePrice && isValidSale();
+
   return (
     <div className="relative group">
-      {salePrice && (
+      {showSaleLabel && (
         <div className="absolute top-4 left-4 z-10 bg-destructive text-destructive-foreground px-3 py-1 rounded-md">
           <span className="font-semibold text-sm">SALE</span>
         </div>
       )}
-      {salePrice && settings?.clearance_sale_end_date && (
+      {showSaleLabel && settings?.clearance_sale_end_date && (
         <div className="absolute top-4 right-4 z-10">
           <SaleCountdown 
             endDate={settings.clearance_sale_end_date}
