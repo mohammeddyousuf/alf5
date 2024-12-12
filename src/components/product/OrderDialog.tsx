@@ -42,7 +42,7 @@ export function OrderDialog({
       email: "",
       mobile: "",
       address: "",
-      paymentMode: undefined,
+      paymentMode: "cash", // Set default value to "cash"
     },
   });
 
@@ -74,8 +74,8 @@ export function OrderDialog({
           customer_name: data.name,
           customer_email: data.email,
           customer_mobile: data.mobile,
-          customer_address: data.address,
-          payment_mode: data.paymentMode,
+          customer_address: data.address || "", // Ensure empty string if undefined
+          payment_mode: data.paymentMode || "cash", // Ensure default value if undefined
         })
         .single();
 
