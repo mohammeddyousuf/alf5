@@ -34,23 +34,19 @@ export const constructWhatsAppMessage = (data: {
 
 export const createWhatsAppUrl = (messageLines: string) => {
   const phoneNumber = "+919900981857";
-  
-  // Create a clean URL by properly encoding components
-  const encodedMessage = encodeURIComponent(messageLines)
-    .replace(/'/g, "%27")
-    .replace(/"/g, "%22")
-    .replace(/\(/g, "%28")
-    .replace(/\)/g, "%29")
-    .replace(/\*/g, "%2A")
-    .replace(/\n/g, "%0A");
-    
   const baseUrl = 'https://api.whatsapp.com/send';
-  const params = new URLSearchParams({
-    phone: phoneNumber,
-    text: encodedMessage,
-    type: 'phone_number',
-    app_absent: '0'
-  });
   
-  return `${baseUrl}?${params.toString()}`;
+  // Manually construct the URL to avoid double encoding
+  const encodedPhone = encodeURIComponent(phoneNumber);
+  const encodedText = encodeURIComponent(messageLines)
+    .replace(/%20/g, ' ')  // Decode spaces back for readability
+    .replace(/%0A/g, '\n') // Decode newlines back
+    .replace(/%2A/g, '*')  // Decode asterisks back
+    .replace(/%3A/g, ':')  // Decode colons back
+    .replace(/%2C/g, ','); // Decode commas back
+    
+  // Re-encode with proper escaping
+  const finalEncodedText = encodeURIComponent(encodedText);
+  
+  return `${baseUrl}?phone=${encodedPhone}&text=${finalEncodedText}&type=phone_number&app_absent=0`;
 };
