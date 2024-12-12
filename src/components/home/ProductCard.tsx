@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SaleCountdown } from "@/components/product/SaleCountdown";
-import { MessageCircle } from "lucide-react";
 
 interface ProductCardProps {
   id: string;
@@ -132,9 +131,8 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
           )}
         </div>
         <Link to={productUrl} className="w-full">
-          <Button className="w-full gap-2" variant="default">
-            <MessageCircle className="h-4 w-4" />
-            Contact on WhatsApp
+          <Button className="w-full" variant="default">
+            Order Now
           </Button>
         </Link>
       </CardFooter>

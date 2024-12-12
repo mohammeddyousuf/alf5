@@ -1,127 +1,188 @@
-import { WhatsAppButton } from "@/components/product/WhatsAppButton";
-import { OrderDialog } from "@/components/product/OrderDialog";
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ProductInfoProps {
   name: string;
-  brand: string | null;
-  description: string | null;
+  brand?: string | null;
+  description?: string | null;
   price: number;
-  salePrice: number | null;
+  salePrice?: number | null;
   productId: string;
   onOrderSubmit: (formData: any) => void;
 }
 
-export function ProductInfo({ 
-  name, 
+export function ProductInfo({
+  name,
   brand,
-  description, 
-  price, 
+  description,
+  price,
   salePrice,
   productId,
-  onOrderSubmit 
+  onOrderSubmit,
 }: ProductInfoProps) {
-  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
-
-  const { data: settings, refetch } = useQuery({
-    queryKey: ["settings"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("settings")
-        .select("*")
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      
-      if (error) throw error;
-      return data;
-    },
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    address: "",
+    paymentMode: "cash_on_delivery",
+    message: "",
   });
 
-  useEffect(() => {
-    if (settings?.clearance_sale_active && settings?.clearance_sale_end_date) {
-      const endTime = new Date(settings.clearance_sale_end_date).getTime();
-      const now = new Date().getTime();
-      const timeUntilEnd = endTime - now;
-
-      if (timeUntilEnd > 0) {
-        const timer = setTimeout(() => {
-          refetch();
-        }, timeUntilEnd);
-
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [settings?.clearance_sale_end_date, settings?.clearance_sale_active, refetch]);
-
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(amount);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onOrderSubmit({
+      productId,
+      productName: name,
+      productBrand: brand,
+      productPrice: salePrice || price,
+      ...formData,
+    });
+    setIsDialogOpen(false);
   };
 
-  const calculateDiscount = (originalPrice: number, discountedPrice: number) => {
-    return Math.round(((originalPrice - discountedPrice) / originalPrice) * 100);
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const isValidSale = () => {
-    if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
-      return true;
-    }
-    const endDate = new Date(settings.clearance_sale_end_date);
-    const now = new Date();
-    return endDate > now;
+  const handlePaymentModeChange = (value: string) => {
+    setFormData((prev) => ({ ...prev, paymentMode: value }));
   };
-
-  const showSalePrice = salePrice && salePrice < price && isValidSale();
 
   return (
-    <div className="space-y-6 text-center">
-      <h1 className="text-3xl font-bold text-foreground">{name}</h1>
-      
-      {brand && (
-        <p className="text-lg text-muted-foreground">{brand}</p>
-      )}
-      
-      <div className="space-y-2">
-        <div className="flex items-center justify-center gap-4">
-          <p className={`text-2xl font-bold ${showSalePrice ? 'text-destructive' : 'text-foreground'}`}>
-            {formatPrice(showSalePrice ? salePrice! : price)}
-          </p>
-        </div>
-        {showSalePrice && (
-          <div className="flex items-center justify-center gap-2">
-            <p className="text-lg text-muted-foreground line-through">
-              {formatPrice(price)}
-            </p>
-            <p className="text-destructive">
-              ({calculateDiscount(price, salePrice!)}%)
-            </p>
-          </div>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">{name}</h1>
+        {brand && (
+          <p className="text-lg text-muted-foreground mt-1">{brand}</p>
         )}
       </div>
 
       {description && (
-        <p className="text-muted-foreground">{description}</p>
+        <div className="prose max-w-none">
+          <p>{description}</p>
+        </div>
       )}
 
-      <div className="flex justify-center">
-        <WhatsAppButton onClick={() => setOrderDialogOpen(true)} />
+      <div className="flex items-baseline gap-4">
+        {salePrice ? (
+          <>
+            <span className="text-3xl font-bold">₹{salePrice}</span>
+            <span className="text-xl text-muted-foreground line-through">
+              ₹{price}
+            </span>
+          </>
+        ) : (
+          <span className="text-3xl font-bold">₹{price}</span>
+        )}
       </div>
 
-      <OrderDialog
-        open={orderDialogOpen}
-        onOpenChange={setOrderDialogOpen}
-        productName={name}
-        productBrand={brand}
-        productPrice={showSalePrice ? salePrice! : price}
-        productId={productId}
-        onSubmit={onOrderSubmit}
-      />
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button size="lg" className="w-full">
+            Order Now
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Place Order</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="mobile">Mobile</Label>
+              <Input
+                id="mobile"
+                name="mobile"
+                value={formData.mobile}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="address">Address</Label>
+              <Textarea
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="message">Message (Optional)</Label>
+              <Textarea
+                id="message"
+                name="message"
+                value={formData.message}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <Label htmlFor="paymentMode">Payment Mode</Label>
+              <Select
+                value={formData.paymentMode}
+                onValueChange={handlePaymentModeChange}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cash_on_delivery">
+                    Cash on Delivery
+                  </SelectItem>
+                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="upi">UPI</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button type="submit" className="w-full">
+              Place Order
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
