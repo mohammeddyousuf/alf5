@@ -163,7 +163,7 @@ export function OrderDialog({
         <DialogHeader>
           <DialogTitle className="text-foreground">Contact on WhatsApp</DialogTitle>
           <DialogDescription>
-            Fill in your details and ensure you keep your Whatsapp open to start a conversation
+            Fill in your details and ensure you keep your WhatsApp open to start an conversation
           </DialogDescription>
         </DialogHeader>
 
