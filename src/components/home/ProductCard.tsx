@@ -132,7 +132,7 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
         </div>
         <Link to={productUrl} className="w-full">
           <Button className="w-full" variant="default">
-            Order Now
+            Contact Now
           </Button>
         </Link>
       </CardFooter>
