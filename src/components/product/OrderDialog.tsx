@@ -14,6 +14,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { FormFields } from "./order-dialog/FormFields";
 import { ProductInfo } from "./order-dialog/ProductInfo";
 import { formSchema, type OrderFormData, type ExtendedOrderFormData } from "./order-dialog/types";
+import { useEffect } from "react";
 
 interface OrderDialogProps {
   open: boolean;
@@ -45,6 +46,29 @@ export function OrderDialog({
       paymentMode: "cash", // Set default value to "cash"
     },
   });
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        
+        if (data.error) {
+          console.error('Error fetching location:', data.error);
+          return;
+        }
+
+        const address = `${data.city}${data.region ? `, ${data.region}` : ''}, ${data.country_name}`;
+        form.setValue('address', address);
+      } catch (error) {
+        console.error('Failed to fetch location:', error);
+      }
+    };
+
+    if (open) {
+      fetchLocation();
+    }
+  }, [open, form]);
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
