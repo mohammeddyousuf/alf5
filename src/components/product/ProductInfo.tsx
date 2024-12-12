@@ -48,6 +48,10 @@ export function ProductInfo({
     }).format(amount);
   };
 
+  const calculateDiscount = (originalPrice: number, discountedPrice: number) => {
+    return Math.round(((originalPrice - discountedPrice) / originalPrice) * 100);
+  };
+
   const isValidSale = () => {
     if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
       return true;
@@ -69,14 +73,19 @@ export function ProductInfo({
       
       <div className="space-y-2">
         <div className="flex items-center justify-center gap-4">
-          <p className="text-2xl font-bold text-foreground">
+          <p className={`text-2xl font-bold ${showSalePrice ? 'text-destructive' : 'text-foreground'}`}>
             {formatPrice(showSalePrice ? salePrice! : price)}
           </p>
         </div>
         {showSalePrice && (
-          <p className="text-lg text-muted-foreground line-through">
-            {formatPrice(price)}
-          </p>
+          <div className="flex items-center justify-center gap-2">
+            <p className="text-lg text-muted-foreground line-through">
+              {formatPrice(price)}
+            </p>
+            <p className="text-destructive">
+              ({calculateDiscount(price, salePrice!)}%)
+            </p>
+          </div>
         )}
       </div>
 
