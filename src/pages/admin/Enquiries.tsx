@@ -13,7 +13,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+
+const extractComments = (message: string) => {
+  const commentsMatch = message.match(/Comments:\s*([^\n]+)/);
+  return commentsMatch ? commentsMatch[1] : null;
+};
 
 const Enquiries = () => {
   const { toast } = useToast();
@@ -60,7 +65,7 @@ const Enquiries = () => {
       enquiry.name || "",
       enquiry.mobile || "",
       enquiry.email || "",
-      enquiry.comments || "",
+      extractComments(enquiry.message) || "",
       enquiry.message || "",
       enquiry.location || "",
       enquiry.ip_address || "",
@@ -130,7 +135,7 @@ const Enquiries = () => {
                   <TableCell>{enquiry.name || '-'}</TableCell>
                   <TableCell>{enquiry.mobile || '-'}</TableCell>
                   <TableCell>{enquiry.email || '-'}</TableCell>
-                  <TableCell>{enquiry.comments || '-'}</TableCell>
+                  <TableCell>{extractComments(enquiry.message) || '-'}</TableCell>
                   <TableCell>{enquiry.message}</TableCell>
                   <TableCell>{enquiry.location || '-'}</TableCell>
                   <TableCell>{enquiry.ip_address || '-'}</TableCell>
