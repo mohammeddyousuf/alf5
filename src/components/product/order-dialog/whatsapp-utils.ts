@@ -34,12 +34,12 @@ export const constructWhatsAppMessage = (data: {
 
 export const createWhatsAppUrl = (messageLines: string) => {
   const phoneNumber = "+919900981857";
-  // Use the web version URL which handles encoding better
-  const baseUrl = 'https://web.whatsapp.com/send';
+  // Use the mobile API URL which handles encoding better
+  const baseUrl = 'https://api.whatsapp.com/send';
   
   // Create URLSearchParams to properly handle the encoding
   const params = new URLSearchParams();
-  params.append('phone', phoneNumber);
+  params.append('phone', phoneNumber.replace('+', '')); // Remove + from phone number
   params.append('text', messageLines);
   
   const url = `${baseUrl}?${params.toString()}`;
