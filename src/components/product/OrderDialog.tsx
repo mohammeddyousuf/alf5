@@ -91,8 +91,8 @@ export function OrderDialog({
     try {
       const messageContent = data.message ?? "Enquiry";
       
-      // Create WhatsApp message with proper line breaks
-      const whatsappMessage = [
+      // Create WhatsApp message with proper line breaks and explicit message field
+      const messageLines = [
         `*${websiteName}*`,
         "",
         "*Order Details:*",
@@ -109,7 +109,10 @@ export function OrderDialog({
         `Payment Mode: ${data.paymentMode}`,
         "",
         "Please reply back."
-      ].join('\n');
+      ];
+
+      // Join lines with explicit newline characters
+      const whatsappMessage = messageLines.join('\n');
       
       console.log("WhatsApp message:", whatsappMessage);
 
