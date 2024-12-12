@@ -45,7 +45,7 @@ export function FormFields({ form }: FormFieldsProps) {
           <FormItem>
             <FormLabel className="text-foreground">Email</FormLabel>
             <FormControl>
-              <Input type="email" {...field} className="bg-background text-foreground" />
+              <Input {...field} className="bg-background text-foreground" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -59,7 +59,7 @@ export function FormFields({ form }: FormFieldsProps) {
           <FormItem>
             <FormLabel className="text-foreground">Mobile</FormLabel>
             <FormControl>
-              <Input type="tel" {...field} className="bg-background text-foreground" />
+              <Input {...field} className="bg-background text-foreground" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -73,7 +73,7 @@ export function FormFields({ form }: FormFieldsProps) {
           <FormItem>
             <FormLabel className="text-foreground">Address (Optional)</FormLabel>
             <FormControl>
-              <Textarea {...field} className="bg-background text-foreground" />
+              <Input {...field} className="bg-background text-foreground" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -85,19 +85,35 @@ export function FormFields({ form }: FormFieldsProps) {
         name="paymentMode"
         render={({ field }) => (
           <FormItem>
-            <FormLabel className="text-foreground">Preferred Payment Mode (Optional)</FormLabel>
+            <FormLabel className="text-foreground">
+              Preferred Payment Mode (Optional)
+            </FormLabel>
             <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
                 <SelectTrigger className="bg-background text-foreground">
-                  <SelectValue placeholder="Select payment mode" className="text-foreground" />
+                  <SelectValue placeholder="Select payment mode" />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>
-                <SelectItem value="cash" className="bg-background text-foreground hover:bg-accent hover:text-white">Cash</SelectItem>
-                <SelectItem value="upi" className="bg-background text-foreground hover:bg-accent hover:text-white">UPI</SelectItem>
-                <SelectItem value="bank_transfer" className="bg-background text-foreground hover:bg-accent hover:text-white">Bank Transfer</SelectItem>
+                <SelectItem value="cash">Cash</SelectItem>
+                <SelectItem value="upi">UPI</SelectItem>
+                <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
               </SelectContent>
             </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="message"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-foreground">Message (Optional)</FormLabel>
+            <FormControl>
+              <Textarea {...field} className="bg-background text-foreground" />
+            </FormControl>
             <FormMessage />
           </FormItem>
         )}

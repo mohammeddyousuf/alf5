@@ -49,7 +49,7 @@ export function OrderDialog({
       mobile: "",
       address: "",
       paymentMode: "bank_transfer",
-      message: "Enquiry",
+      message: "",
     },
   });
 
@@ -90,7 +90,7 @@ export function OrderDialog({
 
   const handleSubmit = async (data: OrderFormData) => {
     try {
-      const messageContent = data.message ?? "Enquiry";
+      const messageContent = data.message ?? "";
       
       const whatsappMessage = constructWhatsAppMessage({
         websiteName,
