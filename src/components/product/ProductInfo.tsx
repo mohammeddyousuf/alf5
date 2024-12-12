@@ -52,8 +52,6 @@ export function ProductInfo({
         }, timeUntilEnd);
 
         return () => clearTimeout(timer);
-      } else {
-        refetch();
       }
     }
   }, [settings?.clearance_sale_end_date, settings?.clearance_sale_active, refetch]);
@@ -71,11 +69,9 @@ export function ProductInfo({
   };
 
   const isValidSale = () => {
-    // If there's no global sale settings, show product-specific sale price
     if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
       return true;
     }
-    // If there is a global sale, check if it's still valid
     const endDate = new Date(settings.clearance_sale_end_date);
     const now = new Date();
     return endDate > now;

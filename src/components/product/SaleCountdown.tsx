@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SaleCountdownProps {
   endDate: string;
@@ -12,6 +13,8 @@ export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
     minutes: number;
     seconds: number;
   }>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -42,17 +45,19 @@ export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
       const newTimeLeft = calculateTimeLeft();
       setTimeLeft(newTimeLeft);
       
-      // If timer has expired, clear the interval
+      // If timer has expired, clear the interval and invalidate queries
       if (newTimeLeft.days === 0 && 
           newTimeLeft.hours === 0 && 
           newTimeLeft.minutes === 0 && 
           newTimeLeft.seconds === 0) {
         clearInterval(timer);
+        // Invalidate settings query to trigger a refetch
+        queryClient.invalidateQueries({ queryKey: ["settings"] });
       }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [endDate]);
+  }, [endDate, queryClient]);
 
   // Don't render if all values are 0
   if (timeLeft.days === 0 && 

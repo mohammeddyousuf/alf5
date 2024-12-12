@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Carousel,
   CarouselContent,
@@ -11,7 +12,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { SaleCountdown } from "./SaleCountdown";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
 
 interface ProductMediaProps {
   images?: string[];
@@ -22,7 +22,14 @@ interface ProductMediaProps {
   price: number;
 }
 
-export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId, salePrice, price }: ProductMediaProps) {
+export function ProductMedia({ 
+  images, 
+  videoUrls, 
+  productName, 
+  getYouTubeVideoId, 
+  salePrice, 
+  price 
+}: ProductMediaProps) {
   const { toast } = useToast();
   const mediaItems = [...(images || []), ...(videoUrls || [])];
 
@@ -53,18 +60,14 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
         }, timeUntilEnd);
 
         return () => clearTimeout(timer);
-      } else {
-        refetch();
       }
     }
   }, [settings?.clearance_sale_end_date, settings?.clearance_sale_active, refetch]);
 
   const isValidSale = () => {
-    // If there's no global sale settings, show product-specific sale price
     if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
       return true;
     }
-    // If there is a global sale, check if it's still valid
     const endDate = new Date(settings.clearance_sale_end_date);
     const now = new Date();
     return endDate > now;
