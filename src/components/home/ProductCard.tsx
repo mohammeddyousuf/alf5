@@ -50,17 +50,14 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
   const shortId = id.split('-')[0];
   const productUrl = `/products/${formatUrlSlug(name)}-${shortId}`;
 
-  // Check if sale is active and timer hasn't expired
+  // Check if sale timer should be shown
   const showSaleTimer = settings?.clearance_sale_active && 
     settings?.clearance_sale_end_date && 
     salePrice && 
     salePrice < price;
 
-  // Check if sale price should be shown (either no timer or timer not expired)
-  const showSalePrice = salePrice && salePrice < price && 
-    (!settings?.clearance_sale_active || 
-      (settings?.clearance_sale_active && settings?.clearance_sale_end_date && 
-       new Date(settings.clearance_sale_end_date) > new Date()));
+  // Show sale price if it exists and is less than regular price
+  const showSalePrice = salePrice && salePrice < price;
 
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
