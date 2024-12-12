@@ -101,7 +101,7 @@ export function OrderDialog({
         email: data.email,
         mobile: data.mobile,
         address: data.address || "",
-        message: messageContent,
+        comments: messageContent,
         paymentMode: data.paymentMode || "bank_transfer"
       });
       
