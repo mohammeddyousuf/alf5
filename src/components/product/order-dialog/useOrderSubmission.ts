@@ -56,10 +56,7 @@ export const useOrderSubmission = ({
 
   const handleSubmit = async (data: OrderFormData) => {
     try {
-      console.log("Form Data Received:", data);
-      
-      const messageContent = data.comments ?? "";
-      console.log("Message Content:", messageContent);
+      console.log("Form Data:", data);
       
       const messageData = {
         websiteName,
@@ -70,14 +67,14 @@ export const useOrderSubmission = ({
         email: data.email,
         mobile: data.mobile,
         address: data.address || "",
-        comments: messageContent,
+        comments: data.comments || "",
         paymentMode: data.paymentMode || "bank_transfer"
       };
       
-      console.log("Data being passed to constructWhatsAppMessage:", messageData);
+      console.log("Message Data:", messageData);
       
       const whatsappMessage = constructWhatsAppMessage(messageData);
-      console.log("Constructed WhatsApp message:", whatsappMessage);
+      console.log("WhatsApp Message:", whatsappMessage);
       
       const { error } = await supabase
         .from("orders")
@@ -90,8 +87,8 @@ export const useOrderSubmission = ({
           customer_email: data.email,
           customer_mobile: data.mobile,
           customer_address: data.address || "",
-          payment_mode: data.paymentMode || "cash",
-          message: messageContent,
+          payment_mode: data.paymentMode || "bank_transfer",
+          message: data.comments || "",
           location: location || "",
           ip_address: ipAddress || "",
           source: window.location.href || "",
@@ -100,16 +97,10 @@ export const useOrderSubmission = ({
 
       if (error) {
         console.error("Error saving order:", error);
-        let errorMessage = "Failed to save order. Please try again.";
-        
-        if (error.code === '42501') {
-          errorMessage = "Authorization error. Please try again or contact support.";
-        }
-        
         toast({
           variant: "destructive",
           title: "Error",
-          description: errorMessage,
+          description: "Failed to save order. Please try again.",
         });
         return;
       }
@@ -124,8 +115,6 @@ export const useOrderSubmission = ({
       });
       
       const whatsappUrl = createWhatsAppUrl(whatsappMessage);
-      console.log("Generated WhatsApp URL:", whatsappUrl);
-      
       window.open(whatsappUrl, '_blank');
       
       toast({

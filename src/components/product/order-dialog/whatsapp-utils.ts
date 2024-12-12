@@ -10,6 +10,9 @@ export const constructWhatsAppMessage = (data: {
   comments: string;
   paymentMode: string;
 }) => {
+  console.log("Constructing WhatsApp message with data:", data);
+  console.log("Comments value:", data.comments);
+
   const messageLines = [
     `*${data.websiteName}*`,
     "",
@@ -29,21 +32,24 @@ export const constructWhatsAppMessage = (data: {
     "Please reply back."
   ];
 
-  return messageLines.join('\n');
+  const finalMessage = messageLines.join('\n');
+  console.log("Final constructed message:", finalMessage);
+  return finalMessage;
 };
 
-export const createWhatsAppUrl = (messageLines: string) => {
-  const phoneNumber = "+919900981857";
-  // Use the mobile API URL which handles encoding better
+export const createWhatsAppUrl = (message: string) => {
+  const phoneNumber = "919900981857"; // Removed the + sign
   const baseUrl = 'https://api.whatsapp.com/send';
   
-  // Create URLSearchParams to properly handle the encoding
   const params = new URLSearchParams();
-  params.append('phone', phoneNumber.replace('+', '')); // Remove + from phone number
-  params.append('text', messageLines);
+  params.append('phone', phoneNumber);
+  params.append('text', message);
   
   const url = `${baseUrl}?${params.toString()}`;
-  console.log('Raw message:', messageLines);
-  console.log('Generated WhatsApp URL:', url);
+  console.log('WhatsApp URL parameters:', {
+    phone: phoneNumber,
+    text: message
+  });
+  console.log('Final WhatsApp URL:', url);
   return url;
 };
