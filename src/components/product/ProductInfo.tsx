@@ -1,6 +1,9 @@
 import { WhatsAppButton } from "@/components/product/WhatsAppButton";
 import { OrderDialog } from "@/components/product/OrderDialog";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { SaleCountdown } from "./SaleCountdown";
 
 interface ProductInfoProps {
   name: string;
@@ -23,6 +26,21 @@ export function ProductInfo({
 }: ProductInfoProps) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -30,6 +48,17 @@ export function ProductInfo({
       maximumFractionDigits: 0,
     }).format(amount);
   };
+
+  const isValidSale = () => {
+    if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
+      return true;
+    }
+    const endDate = new Date(settings.clearance_sale_end_date);
+    const now = new Date();
+    return endDate > now;
+  };
+
+  const showSalePrice = salePrice && isValidSale();
 
   return (
     <div className="space-y-6">
@@ -40,10 +69,18 @@ export function ProductInfo({
       )}
       
       <div className="space-y-2">
-        <p className="text-2xl font-bold text-foreground">
-          {formatPrice(salePrice || price)}
-        </p>
-        {salePrice && (
+        <div className="flex items-center gap-4">
+          <p className="text-2xl font-bold text-foreground">
+            {formatPrice(showSalePrice ? salePrice! : price)}
+          </p>
+          {showSalePrice && settings?.clearance_sale_end_date && (
+            <SaleCountdown 
+              endDate={settings.clearance_sale_end_date} 
+              className="ml-2"
+            />
+          )}
+        </div>
+        {showSalePrice && (
           <p className="text-lg text-muted-foreground line-through">
             {formatPrice(price)}
           </p>
@@ -61,7 +98,7 @@ export function ProductInfo({
         onOpenChange={setOrderDialogOpen}
         productName={name}
         productBrand={brand}
-        productPrice={salePrice || price}
+        productPrice={showSalePrice ? salePrice! : price}
         productId={productId}
         onSubmit={onOrderSubmit}
       />
