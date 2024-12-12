@@ -26,7 +26,7 @@ const Enquiries = () => {
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      console.log("Enquiries data:", data); // Added for debugging
+      console.log("Enquiries data:", data);
       return data;
     },
   });
@@ -47,6 +47,7 @@ const Enquiries = () => {
       "Name",
       "Mobile",
       "Email",
+      "Comments",
       "Message",
       "Location",
       "IP Address",
@@ -59,6 +60,7 @@ const Enquiries = () => {
       enquiry.name || "",
       enquiry.mobile || "",
       enquiry.email || "",
+      enquiry.comments || "",
       enquiry.message || "",
       enquiry.location || "",
       enquiry.ip_address || "",
@@ -112,6 +114,7 @@ const Enquiries = () => {
                 <TableHead>Name</TableHead>
                 <TableHead>Mobile</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Comments</TableHead>
                 <TableHead>Message</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>IP Address</TableHead>
@@ -127,6 +130,7 @@ const Enquiries = () => {
                   <TableCell>{enquiry.name || '-'}</TableCell>
                   <TableCell>{enquiry.mobile || '-'}</TableCell>
                   <TableCell>{enquiry.email || '-'}</TableCell>
+                  <TableCell>{enquiry.comments || '-'}</TableCell>
                   <TableCell>{enquiry.message}</TableCell>
                   <TableCell>{enquiry.location}</TableCell>
                   <TableCell>{enquiry.ip_address}</TableCell>
