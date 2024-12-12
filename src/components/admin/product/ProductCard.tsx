@@ -1,121 +1,160 @@
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Database } from "@/integrations/supabase/types";
+import { Pencil } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ProductForm } from "./ProductForm";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
 import { ProductImage } from "./ProductImage";
 import { ProductPrice } from "./ProductPrice";
-import { useSettings } from "@/hooks/useSettings";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Link } from "react-router-dom";
-import { Edit, Trash } from "lucide-react";
 
-type Product = Database["public"]["Tables"]["products"]["Row"];
+type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
 interface ProductCardProps {
-  product: Product;
-  onStatusChange: (id: string, status: string | null) => void;
-  onDelete: (id: string) => void;
+  product: ProductRow;
+  onStatusChange: (id: string, currentStatus: string | null) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
   onSuccess: () => void;
 }
 
-export function ProductCard({ product, onStatusChange, onDelete }: ProductCardProps) {
-  const { data: settings } = useSettings();
+export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: ProductCardProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  // Check if sale is still valid
-  const isSaleValid = () => {
-    if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const shouldShowSaleTimer = () => {
+    try {
+      if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
+        return false;
+      }
+
+      if (!product.sale_price || product.sale_price >= product.price) {
+        return false;
+      }
+
+      const endDate = new Date(settings.clearance_sale_end_date);
+      const now = new Date();
+      return endDate > now;
+    } catch (error) {
+      console.error("Error in shouldShowSaleTimer:", error);
       return false;
     }
-    const endDate = new Date(settings.clearance_sale_end_date);
-    const now = new Date();
-    return endDate > now;
   };
 
-  // Show sale price if it exists, is less than regular price, and either:
-  // 1. There's no global sale timer (regular product discount)
-  // 2. There's a global sale timer and it hasn't expired
-  const showSalePrice = product.sale_price && 
-    product.sale_price < product.price && 
-    (!settings?.clearance_sale_active || isSaleValid());
-
-  // Only show timer if global sale is active and not expired
-  const showSaleTimer = settings?.clearance_sale_active && 
-    settings?.clearance_sale_end_date && 
-    isSaleValid() && 
-    showSalePrice;
+  const getStatusBadgeVariant = (status: string | null) => {
+    switch (status) {
+      case "published":
+        return "default";
+      case "draft":
+        return "secondary";
+      case "archived":
+        return "destructive";
+      default:
+        return "secondary";
+    }
+  };
 
   return (
-    <Card className="overflow-hidden">
+    <Card key={product.id} className="p-4">
       <ProductImage 
-        images={product.images} 
+        images={product.images}
         name={product.name}
-        salePrice={showSalePrice ? product.sale_price : null}
+        salePrice={product.sale_price}
         price={product.price}
-        showSaleTimer={showSaleTimer}
+        showSaleTimer={shouldShowSaleTimer()}
         saleEndDate={settings?.clearance_sale_end_date || null}
       />
       
-      <div className="p-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="font-semibold">{product.name}</h3>
-          <Badge variant={product.status === "published" ? "default" : "secondary"}>
-            {product.status}
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-semibold">{product.name}</h3>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onStatusChange(product.id, product.status)}
+          className="hover:bg-transparent"
+        >
+          <Badge
+            variant={getStatusBadgeVariant(product.status)}
+            className="cursor-pointer"
+          >
+            {product.status || "draft"}
           </Badge>
-        </div>
+        </Button>
+      </div>
 
-        {product.brand && (
-          <p className="text-sm text-muted-foreground mb-2">{product.brand}</p>
-        )}
+      <ProductPrice price={product.price} salePrice={product.sale_price} />
 
-        <ProductPrice 
-          price={product.price} 
-          salePrice={showSalePrice ? product.sale_price : null} 
-        />
-
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onStatusChange(product.id, product.status)}
-          >
-            {product.status === "published" ? "Unpublish" : "Publish"}
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            asChild
-          >
-            <Link to={`/admin/products/${product.id}`}>
-              <Edit className="h-4 w-4 mr-1" />
+      <div className="flex gap-2">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="default" className="flex-1">
+              <Pencil className="h-4 w-4 mr-2" />
               Edit
-            </Link>
-          </Button>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Edit Product</DialogTitle>
+            </DialogHeader>
+            <ProductForm product={product} onSuccess={onSuccess} />
+          </DialogContent>
+        </Dialog>
 
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm">
-                <Trash className="h-4 w-4 mr-1" />
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <Button
+            variant="destructive"
+            className="flex-1"
+            onClick={() => setShowDeleteDialog(true)}
+          >
+            Delete
+          </Button>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete the product
+                and remove its data from our servers.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  onDelete(product.id);
+                  setShowDeleteDialog(false);
+                }}
+              >
                 Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the product
-                  and all associated images.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={() => onDelete(product.id)}>
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </Card>
   );

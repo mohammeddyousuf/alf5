@@ -65,12 +65,9 @@ export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
     return null;
   }
 
-  // Format numbers to always have two digits
-  const formatNumber = (num: number) => num.toString().padStart(2, '0');
-
   return (
-    <div className={`bg-destructive text-destructive-foreground px-2 py-1 rounded-md text-xs font-mono tabular-nums ${className}`}>
-      {timeLeft.days}d {formatNumber(timeLeft.hours)}h {formatNumber(timeLeft.minutes)}m {formatNumber(timeLeft.seconds)}s
+    <div className={`bg-destructive text-destructive-foreground px-2 py-1 rounded-md text-xs font-medium ${className}`}>
+      {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
     </div>
   );
 }
