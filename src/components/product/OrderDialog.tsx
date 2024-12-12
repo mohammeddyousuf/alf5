@@ -88,6 +88,8 @@ export function OrderDialog({
 
   const handleSubmit = async (data: OrderFormData) => {
     try {
+      const whatsappMessage = `*ALFragrance*\n\n*Order Details:*\nProduct: ${productName}\nBrand: ${productBrand}\nPrice: ${formatPrice(productPrice)}\n\n*Customer Details:*\nName: ${data.name}\nEmail: ${data.email}\nMobile: ${data.mobile}\nAddress: ${data.address || ""}\nPayment Mode: ${data.paymentMode}\n\nPlease reply back.`;
+      
       console.log("Attempting to save order:", {
         product_id: productId,
         product_name: productName,
