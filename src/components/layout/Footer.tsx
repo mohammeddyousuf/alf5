@@ -30,10 +30,10 @@ export const Footer = () => {
     setIsWhatsAppDialogOpen(true);
   };
 
-  const handleWhatsAppSubmit = async (name: string, mobile: string, email: string) => {
+  const handleWhatsAppSubmit = async (name: string, mobile: string, email: string, comments?: string) => {
     if (!settings?.whatsapp_number) return;
     
-    const message = `Hi am ${name}, just visited ${settings.website_name || 'your website'}. Have few queries. please reply back on ${mobile}, ${email}`;
+    const message = `Hi am ${name}, just visited ${settings.website_name || 'your website'}. Have few queries. ${comments ? `\n\nComments: ${comments}` : ''}\nPlease reply back on ${mobile}, ${email}`;
     
     // Log the enquiry with the new fields
     await logEnquiry(message, name, mobile, email);
