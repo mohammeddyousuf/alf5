@@ -89,7 +89,10 @@ export function OrderDialog({
 
   const handleSubmit = async (data: OrderFormData) => {
     try {
-      const whatsappMessage = `*${websiteName}*\n\n*Order Details:*\nProduct: ${productName}\nBrand: ${productBrand || "N/A"}\nPrice: ${formatPrice(productPrice)}\n\n*Customer Details:*\nName: ${data.name}\nEmail: ${data.email}\nMobile: ${data.mobile}\nAddress: ${data.address || ""}\nMessage: ${data.message || ""}\nPayment Mode: ${data.paymentMode}\n\nPlease reply back.`;
+      // Ensure message is included by using nullish coalescing
+      const messageContent = data.message ?? "Enquiry";
+      
+      const whatsappMessage = `*${websiteName}*\n\n*Order Details:*\nProduct: ${productName}\nBrand: ${productBrand || "N/A"}\nPrice: ${formatPrice(productPrice)}\n\n*Customer Details:*\nName: ${data.name}\nEmail: ${data.email}\nMobile: ${data.mobile}\nAddress: ${data.address || ""}\nMessage: ${messageContent}\nPayment Mode: ${data.paymentMode}\n\nPlease reply back.`;
       
       console.log("WhatsApp message:", whatsappMessage);
 
@@ -105,7 +108,7 @@ export function OrderDialog({
           customer_mobile: data.mobile,
           customer_address: data.address || "",
           payment_mode: data.paymentMode || "cash",
-          message: data.message || "",
+          message: messageContent,
           location: location || "",
           ip_address: ipAddress || "",
           source: window.location.href || "",
