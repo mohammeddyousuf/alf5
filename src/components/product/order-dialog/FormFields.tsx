@@ -82,20 +82,6 @@ export function FormFields({ form }: FormFieldsProps) {
 
       <FormField
         control={form.control}
-        name="message"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-foreground">Message (Optional)</FormLabel>
-            <FormControl>
-              <Textarea {...field} className="bg-background text-foreground" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
         name="paymentMode"
         render={({ field }) => (
           <FormItem>
