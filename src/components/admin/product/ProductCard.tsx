@@ -72,17 +72,22 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
   };
 
   const shouldShowSaleTimer = () => {
-    if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
+    try {
+      if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
+        return false;
+      }
+
+      if (!product.sale_price || product.sale_price >= product.price) {
+        return false;
+      }
+
+      const endDate = new Date(settings.clearance_sale_end_date);
+      const now = new Date();
+      return endDate > now;
+    } catch (error) {
+      console.error("Error in shouldShowSaleTimer:", error);
       return false;
     }
-
-    if (!product.sale_price || product.sale_price >= product.price) {
-      return false;
-    }
-
-    const endDate = new Date(settings.clearance_sale_end_date);
-    const now = new Date();
-    return endDate > now;
   };
 
   return (
@@ -101,7 +106,9 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
               </div>
             )}
             {shouldShowSaleTimer() && settings?.clearance_sale_end_date && (
-              <SaleCountdown endDate={settings.clearance_sale_end_date} />
+              <div className="absolute top-2 right-2">
+                <SaleCountdown endDate={settings.clearance_sale_end_date} />
+              </div>
             )}
           </>
         ) : (
@@ -110,6 +117,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
           </div>
         )}
       </div>
+      
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-semibold">{product.name}</h3>
         <Button

@@ -14,18 +14,23 @@ export function SaleCountdown({ endDate }: SaleCountdownProps) {
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const difference = new Date(endDate).getTime() - new Date().getTime();
-      
-      if (difference <= 0) {
+      try {
+        const difference = new Date(endDate).getTime() - new Date().getTime();
+        
+        if (difference <= 0) {
+          return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+        }
+
+        return {
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60),
+        };
+      } catch (error) {
+        console.error("Error calculating time left:", error);
         return { days: 0, hours: 0, minutes: 0, seconds: 0 };
       }
-
-      return {
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / 1000 / 60) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
-      };
     };
 
     // Initial calculation
@@ -36,12 +41,11 @@ export function SaleCountdown({ endDate }: SaleCountdownProps) {
       const newTimeLeft = calculateTimeLeft();
       setTimeLeft(newTimeLeft);
       
-      // If timer has expired, trigger a refetch of the settings
+      // If timer has expired, clear the interval
       if (newTimeLeft.days === 0 && 
           newTimeLeft.hours === 0 && 
           newTimeLeft.minutes === 0 && 
           newTimeLeft.seconds === 0) {
-        // The parent component will handle the price update through its own query
         clearInterval(timer);
       }
     }, 1000);
@@ -50,7 +54,7 @@ export function SaleCountdown({ endDate }: SaleCountdownProps) {
   }, [endDate]);
 
   return (
-    <div className="absolute top-2 right-2 z-10 bg-black/70 text-white px-2 py-1 rounded-md backdrop-blur-sm text-xs">
+    <div className="bg-black/70 text-white px-2 py-1 rounded-md backdrop-blur-sm text-xs">
       {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
     </div>
   );
