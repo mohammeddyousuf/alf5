@@ -3,7 +3,6 @@ import { OrderDialog } from "@/components/product/OrderDialog";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { SaleCountdown } from "./SaleCountdown";
 
 interface ProductInfoProps {
   name: string;
@@ -73,12 +72,6 @@ export function ProductInfo({
           <p className="text-2xl font-bold text-foreground">
             {formatPrice(showSalePrice ? salePrice! : price)}
           </p>
-          {showSalePrice && settings?.clearance_sale_end_date && (
-            <SaleCountdown 
-              endDate={settings.clearance_sale_end_date} 
-              className="ml-2"
-            />
-          )}
         </div>
         {showSalePrice && (
           <p className="text-lg text-muted-foreground line-through">

@@ -8,6 +8,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Share2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { SaleCountdown } from "./SaleCountdown";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductMediaProps {
   images?: string[];
@@ -20,6 +23,21 @@ interface ProductMediaProps {
 export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId, salePrice }: ProductMediaProps) {
   const { toast } = useToast();
   const mediaItems = [...(images || []), ...(videoUrls || [])];
+
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const handleCopyLink = () => {
     const currentUrl = window.location.href;
@@ -50,6 +68,13 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
       {salePrice && (
         <div className="absolute top-4 left-4 z-10 bg-destructive text-destructive-foreground px-3 py-1 rounded-md">
           <span className="font-semibold text-sm">SALE</span>
+        </div>
+      )}
+      {salePrice && settings?.clearance_sale_end_date && (
+        <div className="absolute top-4 right-4 z-10">
+          <SaleCountdown 
+            endDate={settings.clearance_sale_end_date}
+          />
         </div>
       )}
       <Carousel className="w-full">
