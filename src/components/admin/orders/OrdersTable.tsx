@@ -26,12 +26,12 @@ export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
             <TableHead>Email</TableHead>
             <TableHead>Mobile</TableHead>
             <TableHead>Address</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Payment</TableHead>
             <TableHead>Message</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>IP Address</TableHead>
             <TableHead>Source</TableHead>
-            <TableHead>Price</TableHead>
-            <TableHead>Payment</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -62,6 +62,10 @@ export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
                   {order.customer_address}
                 </div>
               </TableCell>
+              <TableCell>{formatPrice(order.product_price)}</TableCell>
+              <TableCell>
+                <div className="capitalize">{order.payment_mode}</div>
+              </TableCell>
               <TableCell>
                 <div className="text-sm">{order.message || '-'}</div>
               </TableCell>
@@ -73,10 +77,6 @@ export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
               </TableCell>
               <TableCell>
                 <div className="text-sm">{order.source || '-'}</div>
-              </TableCell>
-              <TableCell>{formatPrice(order.product_price)}</TableCell>
-              <TableCell>
-                <div className="capitalize">{order.payment_mode}</div>
               </TableCell>
             </TableRow>
           ))}
