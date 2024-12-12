@@ -79,7 +79,9 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
                 </div>
               )}
               {showSaleTimer && settings?.clearance_sale_end_date && (
-                <SaleCountdown endDate={settings.clearance_sale_end_date} />
+                <div className="absolute top-2 right-2">
+                  <SaleCountdown endDate={settings.clearance_sale_end_date} />
+                </div>
               )}
             </>
           ) : (

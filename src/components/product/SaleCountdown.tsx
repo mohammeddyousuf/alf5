@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 
 interface SaleCountdownProps {
   endDate: string;
+  className?: string;
 }
 
-export function SaleCountdown({ endDate }: SaleCountdownProps) {
+export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
   const [timeLeft, setTimeLeft] = useState<{
     days: number;
     hours: number;
@@ -62,7 +63,7 @@ export function SaleCountdown({ endDate }: SaleCountdownProps) {
   }
 
   return (
-    <div className="bg-black/70 text-white px-2 py-1 rounded-md backdrop-blur-sm text-xs">
+    <div className={`bg-destructive text-destructive-foreground px-2 py-1 rounded-md text-xs font-medium ${className}`}>
       {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
     </div>
   );
