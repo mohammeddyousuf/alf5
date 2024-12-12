@@ -24,6 +24,7 @@ export function ProductInfo({
   onOrderSubmit 
 }: ProductInfoProps) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
+  const [whatsappUrl, setWhatsappUrl] = useState<string | undefined>();
 
   const { data: settings, refetch } = useQuery({
     queryKey: ["settings"],
@@ -79,6 +80,12 @@ export function ProductInfo({
 
   const showSalePrice = salePrice && salePrice < price && isValidSale();
 
+  const handleWhatsAppClick = () => {
+    if (!whatsappUrl) {
+      setOrderDialogOpen(true);
+    }
+  };
+
   return (
     <div className="space-y-6 text-center">
       <h1 className="text-3xl font-bold text-foreground">{name}</h1>
@@ -110,7 +117,10 @@ export function ProductInfo({
       )}
 
       <div className="flex justify-center">
-        <WhatsAppButton onClick={() => setOrderDialogOpen(true)} />
+        <WhatsAppButton 
+          onClick={handleWhatsAppClick} 
+          whatsappUrl={whatsappUrl}
+        />
       </div>
 
       <OrderDialog
@@ -120,7 +130,10 @@ export function ProductInfo({
         productBrand={brand}
         productPrice={showSalePrice ? salePrice! : price}
         productId={productId}
-        onSubmit={onOrderSubmit}
+        onSubmit={(data) => {
+          onOrderSubmit(data);
+          setWhatsappUrl(undefined); // Reset URL after submission
+        }}
       />
     </div>
   );
