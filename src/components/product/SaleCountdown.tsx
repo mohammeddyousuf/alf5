@@ -48,9 +48,6 @@ export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
           newTimeLeft.minutes === 0 && 
           newTimeLeft.seconds === 0) {
         clearInterval(timer);
-        
-        // Force a page reload when the timer expires
-        window.location.reload();
       }
     }, 1000);
 
