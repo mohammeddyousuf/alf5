@@ -10,6 +10,10 @@ export interface Orders {
   customer_mobile: string;
   customer_address: string;
   payment_mode: string;
+  message: string | null;
+  location: string | null;
+  ip_address: string | null;
+  source: string | null;
 }
 
 export interface OrdersInsert extends Partial<Omit<Orders, 'created_at'>> {

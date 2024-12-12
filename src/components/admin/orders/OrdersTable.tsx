@@ -26,6 +26,10 @@ export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
             <TableHead>Email</TableHead>
             <TableHead>Mobile</TableHead>
             <TableHead>Address</TableHead>
+            <TableHead>Message</TableHead>
+            <TableHead>Location</TableHead>
+            <TableHead>IP Address</TableHead>
+            <TableHead>Source</TableHead>
             <TableHead>Price</TableHead>
             <TableHead>Payment</TableHead>
           </TableRow>
@@ -57,6 +61,18 @@ export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
                 <div className="text-sm max-w-[200px] break-words">
                   {order.customer_address}
                 </div>
+              </TableCell>
+              <TableCell>
+                <div className="text-sm">{order.message || '-'}</div>
+              </TableCell>
+              <TableCell>
+                <div className="text-sm">{order.location || '-'}</div>
+              </TableCell>
+              <TableCell>
+                <div className="text-sm">{order.ip_address || '-'}</div>
+              </TableCell>
+              <TableCell>
+                <div className="text-sm">{order.source || '-'}</div>
               </TableCell>
               <TableCell>{formatPrice(order.product_price)}</TableCell>
               <TableCell>
