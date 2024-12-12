@@ -131,8 +131,9 @@ export function ProductInfo({
         productPrice={showSalePrice ? salePrice! : price}
         productId={productId}
         onSubmit={(data) => {
-          onOrderSubmit(data);
-          setWhatsappUrl(undefined); // Reset URL after submission
+          const { whatsappUrl: generatedUrl, ...formData } = data;
+          setWhatsappUrl(generatedUrl);
+          onOrderSubmit(formData);
         }}
       />
     </div>

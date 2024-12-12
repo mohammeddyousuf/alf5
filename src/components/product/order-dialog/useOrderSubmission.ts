@@ -107,15 +107,15 @@ export const useOrderSubmission = ({
 
       console.log("Order saved successfully");
       
+      const whatsappUrl = createWhatsAppUrl(whatsappMessage);
+      
       onSubmit({
         ...data,
         productName,
         productBrand,
-        productPrice: formatPrice(productPrice)
+        productPrice: formatPrice(productPrice),
+        whatsappUrl
       });
-      
-      const whatsappUrl = createWhatsAppUrl(whatsappMessage);
-      window.open(whatsappUrl, '_blank');
       
       toast({
         title: "Order Saved",
