@@ -1,95 +1,71 @@
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Button } from "@/components/ui/button";
-import { Share2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
 
 interface ProductMediaProps {
-  images?: string[];
+  images: string[];
   videoUrls?: string[];
   productName: string;
   getYouTubeVideoId: (url: string) => string | null;
-  salePrice?: number | null;
+  salePrice?: number;
 }
 
-export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId, salePrice }: ProductMediaProps) {
-  const { toast } = useToast();
-  const mediaItems = [...(images || []), ...(videoUrls || [])];
-
-  const handleCopyLink = () => {
-    const currentUrl = window.location.href;
-    navigator.clipboard.writeText(currentUrl).then(() => {
-      toast({
-        title: "Link Copied!",
-        description: "Product link has been copied to clipboard",
-      });
-    }).catch(() => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to copy link",
-      });
-    });
-  };
-
-  if (mediaItems.length === 0) {
-    return (
-      <div className="w-full rounded-lg bg-muted aspect-square flex items-center justify-center">
-        <p className="text-muted-foreground">No media available</p>
-      </div>
-    );
-  }
-
+export function ProductMedia({
+  images,
+  videoUrls,
+  productName,
+  getYouTubeVideoId,
+  salePrice,
+}: ProductMediaProps) {
   return (
-    <div className="relative group">
+    <div className="relative">
       {salePrice && (
-        <div className="absolute top-4 left-4 z-10 bg-destructive text-destructive-foreground px-3 py-1 rounded-md">
-          <span className="font-semibold text-sm">SALE</span>
+        <div className="absolute top-4 left-4 z-10">
+          <span className="bg-red-500 text-white px-3 py-1 rounded-md text-sm font-medium">
+            SALE
+          </span>
         </div>
       )}
-      <Carousel className="w-full">
-        <CarouselContent>
-          {mediaItems.map((item, index) => (
-            <CarouselItem key={index}>
-              {images?.includes(item) ? (
-                <img
-                  src={item}
-                  alt={`${productName} - ${index + 1}`}
-                  className="w-full rounded-lg object-cover aspect-square"
-                />
-              ) : (
-                <div className="aspect-square w-full">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${getYouTubeVideoId(item)}`}
-                    title={`${productName} - Video ${index + 1}`}
-                    className="w-full h-full rounded-lg"
-                    allowFullScreen
-                  />
-                </div>
-              )}
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        {mediaItems.length > 1 && (
-          <>
-            <CarouselPrevious />
-            <CarouselNext />
-          </>
+      <div className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+        {images && images.length > 0 && (
+          <img
+            src={images[0]}
+            alt={productName}
+            className="h-full w-full object-cover object-center"
+          />
         )}
-      </Carousel>
-      <Button
-        variant="secondary"
-        size="icon"
-        className="absolute bottom-4 left-4 z-10 bg-black/20 hover:bg-black/40 backdrop-blur-sm transition-all hover:scale-105 text-white"
-        onClick={handleCopyLink}
-      >
-        <Share2 className="h-4 w-4" />
-      </Button>
+      </div>
+      {videoUrls && videoUrls.length > 0 && (
+        <div className="mt-4 grid grid-cols-4 gap-4">
+          {videoUrls.map((url, index) => {
+            const videoId = getYouTubeVideoId(url);
+            if (!videoId) return null;
+            
+            return (
+              <div key={index} className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+                <iframe
+                  src={`https://www.youtube.com/embed/${videoId}`}
+                  title={`${productName} video ${index + 1}`}
+                  className="h-full w-full object-cover"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {images && images.length > 1 && (
+        <div className="mt-4 grid grid-cols-4 gap-4">
+          {images.slice(1).map((image, index) => (
+            <div key={index} className="relative aspect-square overflow-hidden rounded-lg bg-gray-100">
+              <img
+                src={image}
+                alt={`${productName} ${index + 2}`}
+                className="h-full w-full object-cover object-center"
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
