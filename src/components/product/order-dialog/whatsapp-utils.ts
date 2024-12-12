@@ -23,8 +23,10 @@ export const constructWhatsAppMessage = (data: {
     `Email: ${data.email}`,
     `Mobile: ${data.mobile}`,
     `Address: ${data.address || "N/A"}`,
-    `Message: ${data.message || "N/A"}`,
     `Payment Mode: ${data.paymentMode}`,
+    "",
+    `*Message:*`,
+    `${data.message || "N/A"}`,
     "",
     "Please reply back."
   ];
