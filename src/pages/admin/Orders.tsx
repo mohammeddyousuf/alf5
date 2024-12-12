@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
+import { Download } from "lucide-react";
 
 export default function Orders() {
   const { toast } = useToast();
@@ -46,6 +47,64 @@ export default function Orders() {
       currency: 'INR',
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  const downloadCSV = () => {
+    if (!orders || orders.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "No orders to export",
+        description: "There are no orders available to download",
+      });
+      return;
+    }
+
+    // Create CSV headers
+    const headers = [
+      "Date",
+      "Product",
+      "Brand",
+      "Customer",
+      "Email",
+      "Mobile",
+      "Address",
+      "Price",
+      "Payment Mode"
+    ];
+
+    // Format orders data for CSV
+    const csvData = orders.map(order => [
+      format(new Date(order.created_at), "MMM d, yyyy HH:mm"),
+      order.product_name,
+      order.product_brand || "",
+      order.customer_name,
+      order.customer_email,
+      order.customer_mobile,
+      order.customer_address,
+      order.product_price,
+      order.payment_mode
+    ]);
+
+    // Combine headers and data
+    const csvContent = [
+      headers.join(","),
+      ...csvData.map(row => row.map(cell => `"${cell}"`).join(","))
+    ].join("\n");
+
+    // Create and download the file
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `orders-${format(new Date(), "yyyy-MM-dd")}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast({
+      title: "Download started",
+      description: "Your orders report is being downloaded",
+    });
   };
 
   if (error) {
@@ -88,7 +147,13 @@ export default function Orders() {
           <h1 className="text-3xl font-bold">Orders</h1>
           <p className="text-sm text-muted-foreground">View and manage orders</p>
         </div>
-        <BackToDashboard />
+        <div className="flex items-center gap-4">
+          <Button onClick={downloadCSV} variant="outline">
+            <Download className="mr-2 h-4 w-4" />
+            Download CSV
+          </Button>
+          <BackToDashboard />
+        </div>
       </div>
 
       <div className="border rounded-lg">
