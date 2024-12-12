@@ -52,6 +52,9 @@ export function ProductInfo({
         }, timeUntilEnd);
 
         return () => clearTimeout(timer);
+      } else {
+        // If timer has already expired, trigger an immediate refetch
+        refetch();
       }
     }
   }, [settings?.clearance_sale_end_date, settings?.clearance_sale_active, refetch]);
@@ -70,7 +73,7 @@ export function ProductInfo({
 
   const isValidSale = () => {
     if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
-      return true;
+      return false;
     }
     const endDate = new Date(settings.clearance_sale_end_date);
     const now = new Date();

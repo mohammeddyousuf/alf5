@@ -25,7 +25,7 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
   const { toast } = useToast();
   const mediaItems = [...(images || []), ...(videoUrls || [])];
 
-  const { data: settings } = useQuery({
+  const { data: settings, refetch } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -39,6 +39,25 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
       return data;
     },
   });
+
+  useEffect(() => {
+    if (settings?.clearance_sale_active && settings?.clearance_sale_end_date) {
+      const endTime = new Date(settings.clearance_sale_end_date).getTime();
+      const now = new Date().getTime();
+      const timeUntilEnd = endTime - now;
+
+      if (timeUntilEnd > 0) {
+        const timer = setTimeout(() => {
+          refetch();
+        }, timeUntilEnd);
+
+        return () => clearTimeout(timer);
+      } else {
+        // If timer has already expired, trigger an immediate refetch
+        refetch();
+      }
+    }
+  }, [settings?.clearance_sale_end_date, settings?.clearance_sale_active, refetch]);
 
   const isValidSale = () => {
     if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
