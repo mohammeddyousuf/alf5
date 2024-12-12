@@ -69,8 +69,17 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
     }
   };
 
+  const shouldShowSalePrice = () => {
+    // Show sale price if it exists and is less than regular price, and either:
+    // 1. There's no global sale timer (regular product discount)
+    // 2. There's a global sale timer and it hasn't expired
+    return product.sale_price && 
+      product.sale_price < product.price && 
+      (!settings?.clearance_sale_active || isSaleValid());
+  };
+
   const shouldShowSaleTimer = () => {
-    // Only show timer if global sale is active
+    // Only show timer if global sale is active and product has valid sale price
     if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
       return false;
     }
@@ -100,7 +109,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
       <ProductImage 
         images={product.images}
         name={product.name}
-        salePrice={product.sale_price}
+        salePrice={shouldShowSalePrice() ? product.sale_price : null}
         price={product.price}
         showSaleTimer={shouldShowSaleTimer()}
         saleEndDate={settings?.clearance_sale_end_date || null}
@@ -125,7 +134,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
 
       <ProductPrice 
         price={product.price} 
-        salePrice={product.sale_price} 
+        salePrice={shouldShowSalePrice() ? product.sale_price : null}
       />
 
       <div className="flex gap-2">
