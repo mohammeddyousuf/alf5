@@ -38,6 +38,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
       const { data, error } = await supabase
         .from("settings")
         .select("*")
+        .is('id', null)
         .single();
       
       if (error) throw error;
@@ -70,10 +71,19 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
     }
   };
 
-  const showSaleTimer = settings?.clearance_sale_active && 
-    settings?.clearance_sale_end_date && 
-    product.sale_price && 
-    product.sale_price < product.price;
+  const shouldShowSaleTimer = () => {
+    if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
+      return false;
+    }
+
+    if (!product.sale_price || product.sale_price >= product.price) {
+      return false;
+    }
+
+    const endDate = new Date(settings.clearance_sale_end_date);
+    const now = new Date();
+    return endDate > now;
+  };
 
   return (
     <Card key={product.id} className="p-4">
@@ -90,7 +100,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
                 <Badge variant="destructive">SALE</Badge>
               </div>
             )}
-            {showSaleTimer && settings?.clearance_sale_end_date && (
+            {shouldShowSaleTimer() && settings?.clearance_sale_end_date && (
               <SaleCountdown endDate={settings.clearance_sale_end_date} />
             )}
           </>
