@@ -47,14 +47,6 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
 
   return (
     <div className="relative group">
-      <Button
-        variant="secondary"
-        size="icon"
-        className="absolute top-4 right-4 z-10 bg-black/20 hover:bg-black/40 backdrop-blur-sm transition-all hover:scale-105 text-white"
-        onClick={handleCopyLink}
-      >
-        <Share2 className="h-4 w-4" />
-      </Button>
       {salePrice && (
         <div className="absolute top-4 left-4 z-10 bg-destructive text-destructive-foreground px-3 py-1 rounded-md">
           <span className="font-semibold text-sm">SALE</span>
@@ -90,6 +82,14 @@ export function ProductMedia({ images, videoUrls, productName, getYouTubeVideoId
           </>
         )}
       </Carousel>
+      <Button
+        variant="secondary"
+        size="icon"
+        className="absolute bottom-4 left-4 z-10 bg-black/20 hover:bg-black/40 backdrop-blur-sm transition-all hover:scale-105 text-white"
+        onClick={handleCopyLink}
+      >
+        <Share2 className="h-4 w-4" />
+      </Button>
     </div>
   );
 }
