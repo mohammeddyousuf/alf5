@@ -87,6 +87,14 @@ export function ProductInfo({
     }
   };
 
+  const handleOrderSubmit = (data: any) => {
+    const { whatsappUrl: generatedUrl, ...formData } = data;
+    console.log('Generated WhatsApp URL:', generatedUrl);
+    setWhatsappUrl(generatedUrl);
+    onOrderSubmit(formData);
+    setOrderDialogOpen(false);
+  };
+
   return (
     <div className="space-y-6 text-center">
       <h1 className="text-3xl font-bold text-foreground">{name}</h1>
@@ -131,13 +139,7 @@ export function ProductInfo({
         productBrand={brand}
         productPrice={showSalePrice ? salePrice! : price}
         productId={productId}
-        onSubmit={(data) => {
-          const { whatsappUrl: generatedUrl, ...formData } = data;
-          console.log('Generated WhatsApp URL:', generatedUrl);
-          setWhatsappUrl(generatedUrl);
-          onOrderSubmit(formData);
-          setOrderDialogOpen(false);
-        }}
+        onSubmit={handleOrderSubmit}
       />
     </div>
   );
