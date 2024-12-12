@@ -13,6 +13,7 @@ import {
 import { Loader2, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { SliderForm } from "@/components/admin/slider/SliderForm";
+import { supabase } from "@/integrations/supabase/client";
 
 const Sliders = () => {
   const [open, setOpen] = useState(false);

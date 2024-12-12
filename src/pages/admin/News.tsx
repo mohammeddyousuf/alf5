@@ -13,6 +13,7 @@ import {
 import { Loader2, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { NewsForm } from "@/components/admin/news/NewsForm";
+import { supabase } from "@/integrations/supabase/client";
 
 const News = () => {
   const [open, setOpen] = useState(false);

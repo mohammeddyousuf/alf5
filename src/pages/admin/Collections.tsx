@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { CollectionForm } from "@/components/admin/CollectionForm";
 
 export default function Collections() {
   const { toast } = useToast();
@@ -158,3 +160,4 @@ export default function Collections() {
     </div>
   );
 }
+
