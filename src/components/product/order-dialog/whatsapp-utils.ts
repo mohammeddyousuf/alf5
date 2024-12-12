@@ -34,9 +34,17 @@ export const constructWhatsAppMessage = (data: {
 
 export const createWhatsAppUrl = (messageLines: string) => {
   const phoneNumber = "+919900981857";
-  const baseUrl = 'https://api.whatsapp.com/send';
-  const encodedMessage = encodeURIComponent(messageLines);
   
+  // Create a clean URL by properly encoding components
+  const encodedMessage = encodeURIComponent(messageLines)
+    .replace(/'/g, "%27")
+    .replace(/"/g, "%22")
+    .replace(/\(/g, "%28")
+    .replace(/\)/g, "%29")
+    .replace(/\*/g, "%2A")
+    .replace(/\n/g, "%0A");
+    
+  const baseUrl = 'https://api.whatsapp.com/send';
   const params = new URLSearchParams({
     phone: phoneNumber,
     text: encodedMessage,
@@ -44,5 +52,5 @@ export const createWhatsAppUrl = (messageLines: string) => {
     app_absent: '0'
   });
   
-  return `${baseUrl}/?${params.toString()}`;
+  return `${baseUrl}?${params.toString()}`;
 };
