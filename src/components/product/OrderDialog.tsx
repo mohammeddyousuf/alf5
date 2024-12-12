@@ -15,6 +15,7 @@ import { FormFields } from "./order-dialog/FormFields";
 import { ProductInfo } from "./order-dialog/ProductInfo";
 import { formSchema, type OrderFormData, type ExtendedOrderFormData } from "./order-dialog/types";
 import { useEffect, useState } from "react";
+import { constructWhatsAppMessage, createWhatsAppUrl } from "./order-dialog/whatsapp-utils";
 
 interface OrderDialogProps {
   open: boolean;
@@ -91,28 +92,18 @@ export function OrderDialog({
     try {
       const messageContent = data.message ?? "Enquiry";
       
-      // Create WhatsApp message with proper line breaks and explicit message field
-      const messageLines = [
-        `*${websiteName}*`,
-        "",
-        "*Order Details:*",
-        `Product: ${productName}`,
-        `Brand: ${productBrand || "N/A"}`,
-        `Price: ${formatPrice(productPrice)}`,
-        "",
-        "*Customer Details:*",
-        `Name: ${data.name}`,
-        `Email: ${data.email}`,
-        `Mobile: ${data.mobile}`,
-        `Address: ${data.address || ""}`,
-        `Message: ${messageContent}`,
-        `Payment Mode: ${data.paymentMode}`,
-        "",
-        "Please reply back."
-      ];
-
-      // Join lines with explicit newline characters
-      const whatsappMessage = messageLines.join('\n');
+      const whatsappMessage = constructWhatsAppMessage({
+        websiteName,
+        productName,
+        productBrand,
+        productPrice: formatPrice(productPrice),
+        name: data.name,
+        email: data.email,
+        mobile: data.mobile,
+        address: data.address || "",
+        message: messageContent,
+        paymentMode: data.paymentMode || "bank_transfer"
+      });
       
       console.log("WhatsApp message:", whatsappMessage);
 
@@ -160,9 +151,8 @@ export function OrderDialog({
         productPrice: formatPrice(productPrice)
       });
       
-      // Properly encode the message for WhatsApp URL
-      const encodedMessage = encodeURIComponent(whatsappMessage);
-      window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+      const whatsappUrl = createWhatsAppUrl(whatsappMessage);
+      window.open(whatsappUrl, '_blank');
       
       toast({
         title: "Order Saved",
