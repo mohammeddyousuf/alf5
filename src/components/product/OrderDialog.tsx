@@ -88,8 +88,7 @@ export function OrderDialog({
 
   const handleSubmit = async (data: OrderFormData) => {
     try {
-      const messageText = data.message ? `\nMessage: ${data.message}` : '';
-      const whatsappMessage = `*ALFragrance*\n\n*Order Details:*\nProduct: ${productName}\nBrand: ${productBrand}\nPrice: ${formatPrice(productPrice)}\n\n*Customer Details:*\nName: ${data.name}\nEmail: ${data.email}\nMobile: ${data.mobile}\nAddress: ${data.address || ""}\n${data.message ? `Message: ${data.message}\n` : ''}Payment Mode: ${data.paymentMode}\n\nPlease reply back.`;
+      const whatsappMessage = `*ALFragrance*\n\n*Order Details:*\nProduct: ${productName}\nBrand: ${productBrand}\nPrice: ${formatPrice(productPrice)}\n\n*Customer Details:*\nName: ${data.name}\nEmail: ${data.email}\nMobile: ${data.mobile}\nAddress: ${data.address || ""}\nMessage: ${data.message}\nPayment Mode: ${data.paymentMode}\n\nPlease reply back.`;
       
       console.log("WhatsApp message:", whatsappMessage);
 
