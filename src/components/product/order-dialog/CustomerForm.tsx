@@ -21,7 +21,7 @@ export const CustomerForm = ({ form, onSubmit }: CustomerFormProps) => {
         <FormFields form={form} />
         <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
           <MessageCircle className="mr-2 h-5 w-5" />
-          Submit Enquiry
+          Submit
         </Button>
       </form>
     </Form>
