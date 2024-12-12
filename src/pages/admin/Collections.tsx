@@ -2,24 +2,20 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { BackToDashboard } from "@/components/admin/BackToDashboard";
-import { CategoryForm } from "@/components/admin/category/CategoryForm";
-import { SubcategoryForm } from "@/components/admin/category/SubcategoryForm";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useToast } from "@/components/ui/use-toast";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { CollectionForm } from "@/components/admin/CollectionForm";
 
 export default function Collections() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("categories");
   
-  const { data: categories, refetch: refetchCategories } = useQuery({
-    queryKey: ["admin-categories"],
+  const { data: collections, refetch: refetchCollections } = useQuery({
+    queryKey: ["admin-collections"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("categories")
+        .from("collections")
         .select("*")
         .order("name");
       if (error) throw error;
@@ -27,25 +23,8 @@ export default function Collections() {
     },
   });
 
-  const { data: subcategories, refetch: refetchSubcategories } = useQuery({
-    queryKey: ["admin-subcategories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("subcategories")
-        .select(`
-          *,
-          categories (
-            name
-          )
-        `)
-        .order("name");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const handleDeleteCategory = async (id: string) => {
-    const { error } = await supabase.from("categories").delete().eq("id", id);
+  const handleDeleteCollection = async (id: string) => {
+    const { error } = await supabase.from("collections").delete().eq("id", id);
     if (error) {
       toast({
         variant: "destructive",
@@ -55,33 +34,14 @@ export default function Collections() {
     } else {
       toast({
         title: "Success",
-        description: "Category deleted successfully",
+        description: "Collection deleted successfully",
       });
-      refetchCategories();
-      refetchSubcategories();
-    }
-  };
-
-  const handleDeleteSubcategory = async (id: string) => {
-    const { error } = await supabase.from("subcategories").delete().eq("id", id);
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    } else {
-      toast({
-        title: "Success",
-        description: "Subcategory deleted successfully",
-      });
-      refetchSubcategories();
+      refetchCollections();
     }
   };
 
   const handleSuccess = () => {
-    refetchCategories();
-    refetchSubcategories();
+    refetchCollections();
   };
 
   return (
@@ -106,58 +66,40 @@ export default function Collections() {
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList>
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-          <TabsTrigger value="subcategories">Subcategories</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="categories">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories?.map((category) => (
-              <Card key={category.id} className="p-4">
-                <h3 className="font-semibold mb-2">{category.name}</h3>
-                {category.description && (
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {category.description}
-                  </p>
-                )}
-                <Button 
-                  variant="destructive"
-                  onClick={() => handleDeleteCategory(category.id)}
-                >
-                  Delete
-                </Button>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="subcategories">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {subcategories?.map((subcategory) => (
-              <Card key={subcategory.id} className="p-4">
-                <h3 className="font-semibold mb-2">{subcategory.name}</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {collections?.map((collection) => (
+          <Card key={collection.id} className="p-4">
+            <div className="space-y-4">
+              {collection.image_url && (
+                <img 
+                  src={collection.image_url} 
+                  alt={collection.name}
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+              )}
+              <h3 className="font-semibold text-lg">{collection.name}</h3>
+              {collection.description && (
                 <p className="text-sm text-muted-foreground">
-                  Category: {subcategory.categories?.name}
+                  {collection.description}
                 </p>
-                {subcategory.description && (
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {subcategory.description}
-                  </p>
-                )}
+              )}
+              {collection.link_url && (
+                <p className="text-sm text-muted-foreground">
+                  Link: {collection.link_url}
+                </p>
+              )}
+              <div className="pt-2">
                 <Button 
                   variant="destructive"
-                  onClick={() => handleDeleteSubcategory(subcategory.id)}
+                  onClick={() => handleDeleteCollection(collection.id)}
                 >
                   Delete
                 </Button>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }
-
