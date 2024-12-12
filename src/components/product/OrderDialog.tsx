@@ -88,18 +88,10 @@ export function OrderDialog({
 
   const handleSubmit = async (data: OrderFormData) => {
     try {
-      const whatsappMessage = `*ALFragrance*\n\n*Order Details:*\nProduct: ${productName}\nBrand: ${productBrand}\nPrice: ${formatPrice(productPrice)}\n\n*Customer Details:*\nName: ${data.name}\nEmail: ${data.email}\nMobile: ${data.mobile}\nAddress: ${data.address || ""}\nPayment Mode: ${data.paymentMode}\nMessage: ${data.message || ""}\n\nPlease reply back.`;
+      const messageText = data.message ? `\nMessage: ${data.message}` : '';
+      const whatsappMessage = `*ALFragrance*\n\n*Order Details:*\nProduct: ${productName}\nBrand: ${productBrand}\nPrice: ${formatPrice(productPrice)}\n\n*Customer Details:*\nName: ${data.name}\nEmail: ${data.email}\nMobile: ${data.mobile}\nAddress: ${data.address || ""}${messageText}\nPayment Mode: ${data.paymentMode}\n\nPlease reply back.`;
       
-      console.log("Attempting to save order:", {
-        product_id: productId,
-        product_name: productName,
-        product_brand: productBrand,
-        product_price: productPrice,
-        ...data,
-        location,
-        ip_address: ipAddress,
-        source: window.location.href,
-      });
+      console.log("WhatsApp message:", whatsappMessage);
 
       const { error } = await supabase
         .from("orders")
@@ -145,6 +137,9 @@ export function OrderDialog({
         productPrice: formatPrice(productPrice)
       });
       
+      const encodedMessage = encodeURIComponent(whatsappMessage);
+      window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+      
       toast({
         title: "Order Saved",
         description: "Your order has been saved successfully",
@@ -165,7 +160,7 @@ export function OrderDialog({
         <DialogHeader>
           <DialogTitle className="text-foreground">Contact on WhatsApp</DialogTitle>
           <DialogDescription>
-            Fill in your details and ensure you keep your WhatsApp open to start an conversation
+            Fill in your details and ensure you keep your WhatsApp open to start a conversation
           </DialogDescription>
         </DialogHeader>
 
