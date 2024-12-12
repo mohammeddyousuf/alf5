@@ -64,11 +64,58 @@ const ProductDetail = () => {
     return match && match[2].length === 11 ? match[2] : null;
   };
 
-  const handleOrderSubmit = (formData: any) => {
+  const handleOrderSubmit = async (formData: any) => {
     const whatsappNumber = settings?.whatsapp_number || "+1234567890";
     const websiteName = settings?.website_name || "Our Store";
     
     if (!product) return;
+
+    try {
+      // Get user's IP address using a public API
+      const ipResponse = await fetch('https://api.ipify.org?format=json');
+      const ipData = await ipResponse.json();
+      
+      // Get location using IP-API
+      const locationResponse = await fetch(`http://ip-api.com/json/${ipData.ip}`);
+      const locationData = await locationResponse.json();
+      
+      // Create the order with the new fields
+      const { data: orderData, error: orderError } = await supabase
+        .from("orders")
+        .insert([
+          {
+            product_id: product.id,
+            product_name: formData.productName,
+            product_brand: formData.productBrand,
+            product_price: formData.productPrice,
+            customer_name: formData.name,
+            customer_email: formData.email,
+            customer_mobile: formData.mobile,
+            customer_address: formData.address,
+            payment_mode: formData.paymentMode,
+            message: formData.message || null,
+            location: locationData.city ? `${locationData.city}, ${locationData.country}` : null,
+            ip_address: ipData.ip,
+            source: window.location.href
+          }
+        ])
+        .select()
+        .single();
+
+      if (orderError) {
+        console.error("Error saving order:", orderError);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to save order. Please try again.",
+        });
+        return;
+      }
+
+      console.log("Order saved successfully");
+    } catch (error) {
+      console.error("Error in order submission:", error);
+    }
     
     const message = `*${websiteName}*
 
@@ -81,7 +128,8 @@ Name: ${formData.name}
 Email: ${formData.email}
 Mobile: ${formData.mobile}
 Address: ${formData.address}
-Payment Mode: ${formData.paymentMode}`;
+Payment Mode: ${formData.paymentMode}
+${formData.message ? `Message: ${formData.message}` : ''}`;
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
