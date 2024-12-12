@@ -61,7 +61,7 @@ export function ProductInfo({
   const showSalePrice = salePrice && isValidSale();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-center">
       <h1 className="text-3xl font-bold text-foreground">{name}</h1>
       
       {brand && (
@@ -69,7 +69,7 @@ export function ProductInfo({
       )}
       
       <div className="space-y-2">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-center gap-4">
           <p className="text-2xl font-bold text-foreground">
             {formatPrice(showSalePrice ? salePrice! : price)}
           </p>
@@ -91,7 +91,9 @@ export function ProductInfo({
         <p className="text-muted-foreground">{description}</p>
       )}
 
-      <WhatsAppButton onClick={() => setOrderDialogOpen(true)} />
+      <div className="flex justify-center">
+        <WhatsAppButton onClick={() => setOrderDialogOpen(true)} />
+      </div>
 
       <OrderDialog
         open={orderDialogOpen}
