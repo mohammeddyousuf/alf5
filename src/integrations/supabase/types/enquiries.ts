@@ -4,6 +4,7 @@ export interface Enquiries {
   email: string | null;
   mobile: string | null;
   message: string;
+  comments: string | null;
   location: string | null;
   ip_address: string | null;
   source: string;
