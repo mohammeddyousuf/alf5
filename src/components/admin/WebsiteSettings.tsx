@@ -12,12 +12,14 @@ export const WebsiteSettings = () => {
     queryFn: async () => {
       try {
         // First try to get existing settings
-        const { data: existingSettings } = await supabase
+        const { data: existingSettings, error } = await supabase
           .from("settings")
           .select("*")
           .order('created_at', { ascending: false })
           .limit(1)
           .maybeSingle();
+        
+        if (error) throw error;
         
         // If settings exist, return them
         if (existingSettings) {
