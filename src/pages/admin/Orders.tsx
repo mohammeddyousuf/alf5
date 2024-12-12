@@ -28,6 +28,16 @@ export default function Orders() {
       }
       
       console.log("Orders fetched successfully:", data);
+      // Log each order's new fields to verify they exist
+      data?.forEach(order => {
+        console.log("Order details:", {
+          id: order.id,
+          message: order.message,
+          location: order.location,
+          ip_address: order.ip_address,
+          source: order.source
+        });
+      });
       return data;
     },
   });
