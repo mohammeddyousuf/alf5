@@ -41,24 +41,16 @@ export const constructWhatsAppMessage = (data: {
 };
 
 export const createWhatsAppUrl = (message: string) => {
-  const phoneNumber = "919900981857"; // Without the + sign as per WhatsApp API requirements
+  const phoneNumber = "919900981857"; // Without the + sign
   const baseUrl = 'https://api.whatsapp.com/send';
   
-  // Create a new URLSearchParams object
-  const params = new URLSearchParams();
+  // Create URL without any additional parameters
+  const url = `${baseUrl}?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
   
-  // Add parameters ensuring proper encoding
-  params.append('phone', phoneNumber);
-  params.append('text', message);
-  
-  // Construct the final URL
-  const url = `${baseUrl}?${params.toString()}`;
-  
-  // Log the parameters and final URL for debugging
   console.log('WhatsApp URL parameters:', {
     phone: phoneNumber,
     text: message,
-    rawMessage: message // Log raw message to verify content
+    rawMessage: message
   });
   console.log('Final WhatsApp URL:', url);
   
