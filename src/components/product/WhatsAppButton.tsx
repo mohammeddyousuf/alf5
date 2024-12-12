@@ -9,8 +9,10 @@ interface WhatsAppButtonProps {
 export const WhatsAppButton = ({ onClick, whatsappUrl }: WhatsAppButtonProps) => {
   const handleClick = () => {
     if (whatsappUrl) {
-      window.open(whatsappUrl, '_blank');
+      console.log('Opening WhatsApp URL:', whatsappUrl);
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     } else {
+      console.log('No WhatsApp URL provided, triggering onClick');
       onClick();
     }
   };

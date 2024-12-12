@@ -81,10 +81,9 @@ export function ProductInfo({
   const showSalePrice = salePrice && salePrice < price && isValidSale();
 
   const handleWhatsAppClick = () => {
+    console.log('WhatsApp button clicked, URL:', whatsappUrl);
     if (!whatsappUrl) {
       setOrderDialogOpen(true);
-    } else {
-      window.open(whatsappUrl, '_blank');
     }
   };
 
@@ -134,6 +133,7 @@ export function ProductInfo({
         productId={productId}
         onSubmit={(data) => {
           const { whatsappUrl: generatedUrl, ...formData } = data;
+          console.log('Generated WhatsApp URL:', generatedUrl);
           setWhatsappUrl(generatedUrl);
           onOrderSubmit(formData);
           setOrderDialogOpen(false);
