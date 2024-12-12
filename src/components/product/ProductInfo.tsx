@@ -83,6 +83,8 @@ export function ProductInfo({
   const handleWhatsAppClick = () => {
     if (!whatsappUrl) {
       setOrderDialogOpen(true);
+    } else {
+      window.open(whatsappUrl, '_blank');
     }
   };
 
@@ -134,6 +136,7 @@ export function ProductInfo({
           const { whatsappUrl: generatedUrl, ...formData } = data;
           setWhatsappUrl(generatedUrl);
           onOrderSubmit(formData);
+          setOrderDialogOpen(false);
         }}
       />
     </div>
