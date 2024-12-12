@@ -45,7 +45,8 @@ export const createWhatsAppUrl = (message: string) => {
     app_absent: '0'
   });
   
-  const url = `${baseUrl}?${params.toString()}`;
+  // Change from /send to /send/
+  const url = `https://api.whatsapp.com/send/?${params.toString()}`;
   
   console.log('WhatsApp URL parameters:', {
     phone: phoneNumber,
