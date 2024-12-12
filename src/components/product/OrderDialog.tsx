@@ -90,9 +90,12 @@ export function OrderDialog({
 
   const handleSubmit = async (data: OrderFormData) => {
     try {
-      const messageContent = data.comments ?? "";
+      console.log("Form Data Received:", data);
       
-      const whatsappMessage = constructWhatsAppMessage({
+      const messageContent = data.comments ?? "";
+      console.log("Message Content:", messageContent);
+      
+      const messageData = {
         websiteName,
         productName,
         productBrand,
@@ -103,10 +106,13 @@ export function OrderDialog({
         address: data.address || "",
         comments: messageContent,
         paymentMode: data.paymentMode || "bank_transfer"
-      });
+      };
       
-      console.log("WhatsApp message:", whatsappMessage);
-
+      console.log("Data being passed to constructWhatsAppMessage:", messageData);
+      
+      const whatsappMessage = constructWhatsAppMessage(messageData);
+      console.log("Constructed WhatsApp message:", whatsappMessage);
+      
       const { error } = await supabase
         .from("orders")
         .insert({
@@ -152,6 +158,8 @@ export function OrderDialog({
       });
       
       const whatsappUrl = createWhatsAppUrl(whatsappMessage);
+      console.log("Generated WhatsApp URL:", whatsappUrl);
+      
       window.open(whatsappUrl, '_blank');
       
       toast({
