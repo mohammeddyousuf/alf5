@@ -132,9 +132,9 @@ const Enquiries = () => {
                   <TableCell>{enquiry.email || '-'}</TableCell>
                   <TableCell>{enquiry.comments || '-'}</TableCell>
                   <TableCell>{enquiry.message}</TableCell>
-                  <TableCell>{enquiry.location}</TableCell>
-                  <TableCell>{enquiry.ip_address}</TableCell>
-                  <TableCell>{enquiry.source}</TableCell>
+                  <TableCell>{enquiry.location || '-'}</TableCell>
+                  <TableCell>{enquiry.ip_address || '-'}</TableCell>
+                  <TableCell>{enquiry.source || '-'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
