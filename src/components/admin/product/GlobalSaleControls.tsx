@@ -52,17 +52,19 @@ export function GlobalSaleControls() {
       return;
     }
 
-    const endDateTime = isGlobalSaleEnabled 
-      ? new Date(`${endDate}T${endTime}`).toISOString()
-      : null;
-
     try {
+      const endDateTime = isGlobalSaleEnabled 
+        ? new Date(`${endDate}T${endTime}`).toISOString()
+        : null;
+
+      const updates = {
+        clearance_sale_active: isGlobalSaleEnabled,
+        clearance_sale_end_date: endDateTime
+      };
+
       const { error } = await supabase
         .from('settings')
-        .update({ 
-          clearance_sale_active: isGlobalSaleEnabled,
-          clearance_sale_end_date: endDateTime
-        })
+        .update(updates)
         .eq('id', settings?.id);
 
       if (error) throw error;
@@ -83,6 +85,44 @@ export function GlobalSaleControls() {
     }
   };
 
+  const handleToggleSale = async (checked: boolean) => {
+    setIsGlobalSaleEnabled(checked);
+    
+    if (!checked) {
+      try {
+        const { error } = await supabase
+          .from('settings')
+          .update({
+            clearance_sale_active: false,
+            clearance_sale_end_date: null
+          })
+          .eq('id', settings?.id);
+
+        if (error) throw error;
+
+        // Clear the date and time inputs
+        setEndDate("");
+        setEndTime("");
+
+        // Invalidate and refetch settings
+        await queryClient.invalidateQueries({ queryKey: ["settings"] });
+
+        toast({
+          title: "Success",
+          description: "Global sale disabled successfully",
+        });
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to disable global sale: " + error.message,
+        });
+        // Revert the switch state if there was an error
+        setIsGlobalSaleEnabled(true);
+      }
+    }
+  };
+
   return (
     <div className="bg-card p-4 rounded-lg border mb-6">
       <div className="flex items-center justify-between mb-4">
@@ -94,7 +134,7 @@ export function GlobalSaleControls() {
         </div>
         <Switch
           checked={isGlobalSaleEnabled}
-          onCheckedChange={setIsGlobalSaleEnabled}
+          onCheckedChange={handleToggleSale}
         />
       </div>
 
