@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
@@ -16,6 +17,55 @@ interface ProductListProps {
 export const ProductList = ({ search, showSaleProducts, showNonSaleProducts }: ProductListProps) => {
   const { data: products, refetch, isLoading } = useProducts();
   const { toast } = useToast();
+
+  // Fetch current settings for global sale timer
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const isSaleValid = () => {
+    try {
+      if (!settings?.clearance_sale_active) {
+        return true;
+      }
+
+      if (!settings?.clearance_sale_end_date) {
+        return false;
+      }
+
+      const endDate = new Date(settings.clearance_sale_end_date);
+      const now = new Date();
+      return endDate > now;
+    } catch (error) {
+      console.error("Error in isSaleValid:", error);
+      return false;
+    }
+  };
+
+  const isProductOnSale = (product: ProductRow) => {
+    const hasValidSalePrice = product.sale_price !== null && 
+                            product.sale_price > 0 && 
+                            product.sale_price < product.price;
+
+    // If global sale is not active, show product-specific sale prices
+    if (!settings?.clearance_sale_active) {
+      return hasValidSalePrice;
+    }
+
+    // If global sale is active, check if it's still valid
+    return hasValidSalePrice && isSaleValid();
+  };
 
   const handleStatusChange = async (id: string, currentStatus: string | null) => {
     const newStatus = currentStatus === "published" ? "draft" : "published";
@@ -92,12 +142,12 @@ export const ProductList = ({ search, showSaleProducts, showNonSaleProducts }: P
   // Filter products based on search and sale status
   const filteredProducts = products?.filter((product: ProductRow) => {
     const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
-    const isSaleProduct = product.sale_price !== null && product.sale_price > 0;
+    const isOnSale = isProductOnSale(product);
     
     // Check if product should be shown based on sale status filters
     const showBasedOnSaleStatus = (
-      (isSaleProduct && showSaleProducts) || 
-      (!isSaleProduct && showNonSaleProducts)
+      (isOnSale && showSaleProducts) || 
+      (!isOnSale && showNonSaleProducts)
     );
 
     return matchesSearch && showBasedOnSaleStatus;
