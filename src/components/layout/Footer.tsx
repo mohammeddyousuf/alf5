@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { queryClient } from "@/lib/react-query";
+import { logEnquiry } from "@/utils/enquiryUtils";
 
 export const Footer = () => {
   const navigate = useNavigate();
@@ -21,11 +22,13 @@ export const Footer = () => {
     },
   });
 
-  const getWhatsAppLink = () => {
-    if (!settings?.whatsapp_number) return "#";
-    const cleanNumber = settings.whatsapp_number.replace(/\D/g, '');
+  const handleWhatsAppClick = async () => {
+    if (!settings?.whatsapp_number) return;
     const message = encodeURIComponent(`Hi, Just visited ${settings.website_name || 'your website'}.`);
-    return `https://wa.me/${cleanNumber}?text=${message}`;
+    // Log the enquiry before opening WhatsApp
+    await logEnquiry(`Hi, Just visited ${settings.website_name || 'your website'}.`);
+    // Open WhatsApp with the message
+    window.open(`https://wa.me/${settings.whatsapp_number.replace(/\D/g, '')}?text=${message}`, '_blank');
   };
 
   const formatSocialLink = (url: string | null) => {
@@ -105,14 +108,12 @@ export const Footer = () => {
           </div>
           <div className="flex flex-col items-start gap-2">
             <h3 className="text-lg font-semibold">Connect</h3>
-            <a 
-              href={getWhatsAppLink()} 
-              target="_blank" 
-              rel="noopener noreferrer"
+            <button 
+              onClick={handleWhatsAppClick}
               className="text-sm text-muted-foreground hover:text-foreground"
             >
               WhatsApp
-            </a>
+            </button>
             {settings?.whatsapp_group_url && (
               <a 
                 href={settings.whatsapp_group_url}
