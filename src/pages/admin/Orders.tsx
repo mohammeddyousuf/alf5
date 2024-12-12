@@ -1,18 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { BackToDashboard } from "@/components/admin/BackToDashboard";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
-import { Download } from "lucide-react";
+import { format } from "date-fns";
+import { OrdersHeader } from "@/components/admin/orders/OrdersHeader";
+import { OrdersTable } from "@/components/admin/orders/OrdersTable";
 
 export default function Orders() {
   const { toast } = useToast();
@@ -142,70 +133,8 @@ export default function Orders() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold">Orders</h1>
-          <p className="text-sm text-muted-foreground">View and manage orders</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Button onClick={downloadCSV} variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Download CSV
-          </Button>
-          <BackToDashboard />
-        </div>
-      </div>
-
-      <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Product</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Contact</TableHead>
-              <TableHead>Address</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Payment</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {orders?.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell>
-                  {format(new Date(order.created_at), "MMM d, yyyy HH:mm")}
-                </TableCell>
-                <TableCell>
-                  <div>
-                    <div className="font-medium">{order.product_name}</div>
-                    {order.product_brand && (
-                      <div className="text-sm text-muted-foreground">
-                        {order.product_brand}
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>{order.customer_name}</TableCell>
-                <TableCell>
-                  <div className="text-sm">
-                    <div>{order.customer_email}</div>
-                    <div>{order.customer_mobile}</div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm max-w-[200px] break-words">
-                    {order.customer_address}
-                  </div>
-                </TableCell>
-                <TableCell>{formatPrice(order.product_price)}</TableCell>
-                <TableCell>
-                  <div className="capitalize">{order.payment_mode}</div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <OrdersHeader onDownloadCSV={downloadCSV} />
+      <OrdersTable orders={orders} formatPrice={formatPrice} />
     </div>
   );
 }
