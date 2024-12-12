@@ -26,6 +26,7 @@ const Enquiries = () => {
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
+      console.log("Enquiries data:", data); // Added for debugging
       return data;
     },
   });
