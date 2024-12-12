@@ -48,13 +48,9 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
     },
   });
 
-  const shouldShowSaleTimer = () => {
+  const isSaleValid = () => {
     try {
       if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
-        return false;
-      }
-
-      if (!product.sale_price || product.sale_price >= product.price) {
         return false;
       }
 
@@ -62,9 +58,21 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
       const now = new Date();
       return endDate > now;
     } catch (error) {
-      console.error("Error in shouldShowSaleTimer:", error);
+      console.error("Error in isSaleValid:", error);
       return false;
     }
+  };
+
+  const shouldShowSaleTimer = () => {
+    if (!isSaleValid()) {
+      return false;
+    }
+
+    if (!product.sale_price || product.sale_price >= product.price) {
+      return false;
+    }
+
+    return true;
   };
 
   const getStatusBadgeVariant = (status: string | null) => {
@@ -80,12 +88,19 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
     }
   };
 
+  const getEffectivePrice = () => {
+    if (isSaleValid() && product.sale_price && product.sale_price < product.price) {
+      return product.sale_price;
+    }
+    return product.price;
+  };
+
   return (
     <Card key={product.id} className="p-4">
       <ProductImage 
         images={product.images}
         name={product.name}
-        salePrice={product.sale_price}
+        salePrice={isSaleValid() ? product.sale_price : null}
         price={product.price}
         showSaleTimer={shouldShowSaleTimer()}
         saleEndDate={settings?.clearance_sale_end_date || null}
@@ -108,7 +123,10 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
         </Button>
       </div>
 
-      <ProductPrice price={product.price} salePrice={product.sale_price} />
+      <ProductPrice 
+        price={product.price} 
+        salePrice={isSaleValid() ? product.sale_price : null} 
+      />
 
       <div className="flex gap-2">
         <Dialog>
