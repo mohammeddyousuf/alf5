@@ -1,9 +1,6 @@
 import { WhatsAppButton } from "@/components/product/WhatsAppButton";
 import { OrderDialog } from "@/components/product/OrderDialog";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { SaleCountdown } from "@/components/product/SaleCountdown";
 
 interface ProductInfoProps {
   name: string;
@@ -26,22 +23,6 @@ export function ProductInfo({
 }: ProductInfoProps) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
-  // Fetch settings for global sale timer
-  const { data: settings } = useQuery({
-    queryKey: ["settings"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("settings")
-        .select("*")
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      
-      if (error) throw error;
-      return data;
-    },
-  });
-
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
@@ -49,29 +30,6 @@ export function ProductInfo({
       maximumFractionDigits: 0,
     }).format(amount);
   };
-
-  // Check if sale is still valid
-  const isSaleValid = () => {
-    if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
-      return false;
-    }
-    const endDate = new Date(settings.clearance_sale_end_date);
-    const now = new Date();
-    return endDate > now;
-  };
-
-  // Show sale price if it exists, is less than regular price, and either:
-  // 1. There's no global sale timer (regular product discount)
-  // 2. There's a global sale timer and it hasn't expired
-  const showSalePrice = salePrice && 
-    salePrice < price && 
-    (!settings?.clearance_sale_active || isSaleValid());
-
-  // Only show timer if global sale is active and not expired
-  const showSaleTimer = settings?.clearance_sale_active && 
-    settings?.clearance_sale_end_date && 
-    isSaleValid() && 
-    showSalePrice;
 
   return (
     <div className="space-y-6">
@@ -82,20 +40,13 @@ export function ProductInfo({
       )}
       
       <div className="space-y-2">
-        <div className="flex items-center gap-4">
-          <p className="text-2xl font-bold text-foreground">
-            {formatPrice(showSalePrice ? salePrice! : price)}
+        <p className="text-2xl font-bold text-foreground">
+          {formatPrice(salePrice || price)}
+        </p>
+        {salePrice && (
+          <p className="text-lg text-muted-foreground line-through">
+            {formatPrice(price)}
           </p>
-          {showSalePrice && (
-            <p className="text-lg text-muted-foreground line-through">
-              {formatPrice(price)}
-            </p>
-          )}
-        </div>
-        {showSaleTimer && settings?.clearance_sale_end_date && (
-          <div>
-            <SaleCountdown endDate={settings.clearance_sale_end_date} />
-          </div>
         )}
       </div>
 
@@ -110,7 +61,7 @@ export function ProductInfo({
         onOpenChange={setOrderDialogOpen}
         productName={name}
         productBrand={brand}
-        productPrice={showSalePrice ? salePrice! : price}
+        productPrice={salePrice || price}
         productId={productId}
         onSubmit={onOrderSubmit}
       />
