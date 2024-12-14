@@ -20,6 +20,9 @@ export interface Settings {
   whatsapp_group_url: string | null;
   whatsapp_number: string;
   social_media_links: SocialMediaLink[] | null;
+  lock_enabled: boolean | null;
+  lock_datetime: string | null;
+  lock_message: string | null;
 }
 
 export interface SettingsInsert extends Partial<Omit<Settings, 'whatsapp_number' | 'created_at' | 'updated_at'>> {

@@ -3,10 +3,28 @@ import { Card } from "@/components/ui/card";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { Button } from "@/components/ui/button";
 import { SystemLimits } from "@/components/admin/settings/SystemLimits";
+import { SubscriptionLockSection } from "@/components/admin/settings/SubscriptionLockSection";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const SuperAdmin = () => {
   const navigate = useNavigate();
+
+  const { data: settings, refetch } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   return (
     <ProtectedRoute>
@@ -21,6 +39,19 @@ const SuperAdmin = () => {
             Back to Admin Dashboard
           </Button>
         </div>
+
+        <Card className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Lock className="h-5 w-5" />
+            <h2 className="text-xl font-semibold">Subscription Lock</h2>
+          </div>
+          <SubscriptionLockSection
+            initialLockEnabled={settings?.lock_enabled || false}
+            initialLockDatetime={settings?.lock_datetime}
+            initialLockMessage={settings?.lock_message}
+            refetch={refetch}
+          />
+        </Card>
 
         <Card className="p-6">
           <div className="flex items-center justify-between mb-4">
