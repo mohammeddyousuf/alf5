@@ -26,7 +26,10 @@ export const SubscriptionLockSection = ({
   const [lockEnabled, setLockEnabled] = useState(initialLockEnabled);
   const [lockDatetime, setLockDatetime] = useState(initialLockDatetime || "");
   const [lockMessage, setLockMessage] = useState(initialLockMessage || "");
-  const [checkInterval, setCheckInterval] = useState(initialCheckInterval || 60000);
+  // Convert milliseconds to minutes for the UI
+  const [checkInterval, setCheckInterval] = useState(
+    initialCheckInterval ? Math.floor(initialCheckInterval / 60000) : 1
+  );
 
   const handleSave = async () => {
     try {
@@ -34,7 +37,8 @@ export const SubscriptionLockSection = ({
         lock_enabled: lockEnabled,
         lock_datetime: lockDatetime || null,
         lock_message: lockMessage || null,
-        lock_check_interval: checkInterval
+        // Convert minutes back to milliseconds for storage
+        lock_check_interval: checkInterval * 60000
       });
       await refetch();
       toast({
@@ -90,18 +94,18 @@ export const SubscriptionLockSection = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="checkInterval">Check Interval (milliseconds)</Label>
+            <Label htmlFor="checkInterval">Check Interval (minutes)</Label>
             <Input
               id="checkInterval"
               type="number"
-              min="1000"
-              step="1000"
+              min="1"
+              step="1"
               value={checkInterval}
               onChange={(e) => setCheckInterval(Number(e.target.value))}
-              placeholder="Enter check interval in milliseconds (e.g., 60000 for 1 minute)"
+              placeholder="Enter check interval in minutes (e.g., 1 for every minute)"
             />
             <p className="text-sm text-muted-foreground">
-              How often to check if the app should be locked (in milliseconds). Minimum 1000ms (1 second)
+              How often to check if the app should be locked (in minutes). Minimum 1 minute
             </p>
           </div>
           
