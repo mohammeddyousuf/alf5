@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -26,21 +26,33 @@ export const SubscriptionLockSection = ({
   const [lockEnabled, setLockEnabled] = useState(initialLockEnabled);
   const [lockDatetime, setLockDatetime] = useState(initialLockDatetime || "");
   const [lockMessage, setLockMessage] = useState(initialLockMessage || "");
-  // Convert milliseconds to minutes for the UI
   const [checkInterval, setCheckInterval] = useState(
     initialCheckInterval ? Math.floor(initialCheckInterval / 60000) : 1
   );
 
+  // Update local state when props change
+  useEffect(() => {
+    setLockEnabled(initialLockEnabled);
+    setLockDatetime(initialLockDatetime || "");
+    setLockMessage(initialLockMessage || "");
+    setCheckInterval(initialCheckInterval ? Math.floor(initialCheckInterval / 60000) : 1);
+  }, [initialLockEnabled, initialLockDatetime, initialLockMessage, initialCheckInterval]);
+
   const handleSave = async () => {
     try {
-      await updateSettings({
+      const updates = {
         lock_enabled: lockEnabled,
         lock_datetime: lockDatetime || null,
         lock_message: lockMessage || null,
-        // Convert minutes back to milliseconds for storage
+        // Convert minutes to milliseconds for storage
         lock_check_interval: checkInterval * 60000
-      });
+      };
+
+      console.log('Saving lock settings:', updates);
+      
+      await updateSettings(updates);
       await refetch();
+      
       toast({
         title: "Success",
         description: "Subscription lock settings updated successfully",
