@@ -30,7 +30,6 @@ export const SubscriptionLockSection = ({
     initialCheckInterval ? Math.floor(initialCheckInterval / 60000) : 1
   );
 
-  // Update local state when props change
   useEffect(() => {
     setLockEnabled(initialLockEnabled);
     setLockDatetime(initialLockDatetime || "");
@@ -40,9 +39,13 @@ export const SubscriptionLockSection = ({
 
   const handleSave = async () => {
     try {
+      // Convert local datetime to UTC before saving
+      const localDate = new Date(lockDatetime);
+      const utcDate = new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000));
+      
       const updates = {
         lock_enabled: lockEnabled,
-        lock_datetime: lockEnabled ? lockDatetime : null,
+        lock_datetime: lockEnabled ? utcDate.toISOString() : null,
         lock_message: lockEnabled ? lockMessage : null,
         lock_check_interval: checkInterval * 60000
       };
@@ -71,7 +74,6 @@ export const SubscriptionLockSection = ({
     if (!checked) {
       setLockDatetime("");
       setLockMessage("");
-      // Immediately save when disabling
       try {
         const updates = {
           lock_enabled: false,
