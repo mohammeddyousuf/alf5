@@ -106,6 +106,15 @@ export const SubscriptionLockSection = ({
     }
   };
 
+  // Get timezone offset in hours and minutes
+  const getTimezoneInfo = () => {
+    const offset = new Date().getTimezoneOffset();
+    const hours = Math.abs(Math.floor(offset / 60));
+    const minutes = Math.abs(offset % 60);
+    const sign = offset < 0 ? '+' : '-';
+    return `${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -131,6 +140,9 @@ export const SubscriptionLockSection = ({
               value={lockDatetime}
               onChange={(e) => setLockDatetime(e.target.value)}
             />
+            <p className="text-sm text-muted-foreground">
+              Your current timezone is GMT{getTimezoneInfo()} (IST). The time you set will be used exactly as entered.
+            </p>
           </div>
           
           <div className="space-y-2">
