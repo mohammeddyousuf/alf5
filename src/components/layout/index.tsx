@@ -4,12 +4,14 @@ import { Footer } from "./Footer";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LockOverlay } from "../LockOverlay";
+import { useLocation } from "react-router-dom";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 const Layout = ({ children }: LayoutProps) => {
+  const location = useLocation();
   const { data: settings, refetch } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
@@ -55,6 +57,9 @@ const Layout = ({ children }: LayoutProps) => {
     settings?.lock_datetime && 
     new Date(settings.lock_datetime) <= new Date();
 
+  // Don't show lock overlay on super admin page
+  const showLockOverlay = isLocked && location.pathname !== '/sa83ms';
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -62,7 +67,7 @@ const Layout = ({ children }: LayoutProps) => {
         {children}
       </main>
       <Footer />
-      {isLocked && <LockOverlay message={settings.lock_message || "This app is currently locked. Please contact support."} />}
+      {showLockOverlay && <LockOverlay message={settings.lock_message || "This app is currently locked. Please contact support."} />}
     </div>
   );
 };
