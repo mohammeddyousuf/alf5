@@ -34,9 +34,10 @@ export const SubscriptionLockSection = ({
   useEffect(() => {
     setLockEnabled(initialLockEnabled);
     if (initialLockDatetime) {
-      // Convert UTC to local time for input
       const date = new Date(initialLockDatetime);
-      setLockDatetime(date.toISOString().slice(0, 16));
+      // Format the date to local datetime-local format
+      const localDatetime = date.toISOString().slice(0, 16);
+      setLockDatetime(localDatetime);
     }
     setLockMessage(initialLockMessage || "");
     setCheckInterval(initialCheckInterval ? Math.floor(initialCheckInterval / 60000) : 1);
@@ -48,8 +49,8 @@ export const SubscriptionLockSection = ({
       let messageToSave = null;
       
       if (lockEnabled && lockDatetime) {
-        // Keep the datetime as is - no timezone conversion needed
-        formattedDateTime = new Date(lockDatetime).toISOString();
+        // Preserve the exact datetime input by the user
+        formattedDateTime = lockDatetime;
         messageToSave = lockMessage || null;
       }
 
