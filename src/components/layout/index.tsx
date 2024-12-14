@@ -37,9 +37,10 @@ const Layout = ({ children }: LayoutProps) => {
       
       // Only log and refetch if we've passed the lock time
       if (now >= lockDateTime) {
-        console.log('Website is locked:', {
+        console.log('Website lock status check:', {
           now: now.toISOString(),
           lockDateTime: lockDateTime.toISOString(),
+          shouldLock: now >= lockDateTime,
           message: settings.lock_message
         });
         refetch(); // Refresh settings to ensure we have latest lock status

@@ -24,7 +24,7 @@ export const SubscriptionLockSection = ({
 }: SubscriptionLockSectionProps) => {
   const { toast } = useToast();
   const [lockEnabled, setLockEnabled] = useState(initialLockEnabled);
-  const [lockDatetime, setLockDatetime] = useState("");
+  const [lockDatetime, setLockDatetime] = useState(initialLockDatetime || "");
   const [lockMessage, setLockMessage] = useState(initialLockMessage || "");
   const [checkInterval, setCheckInterval] = useState(
     initialCheckInterval ? Math.floor(initialCheckInterval / 60000) : 1
@@ -33,12 +33,7 @@ export const SubscriptionLockSection = ({
   // Update local state when props change
   useEffect(() => {
     setLockEnabled(initialLockEnabled);
-    if (initialLockDatetime) {
-      const date = new Date(initialLockDatetime);
-      // Format the date to local datetime-local format
-      const localDatetime = date.toISOString().slice(0, 16);
-      setLockDatetime(localDatetime);
-    }
+    setLockDatetime(initialLockDatetime || "");
     setLockMessage(initialLockMessage || "");
     setCheckInterval(initialCheckInterval ? Math.floor(initialCheckInterval / 60000) : 1);
   }, [initialLockEnabled, initialLockDatetime, initialLockMessage, initialCheckInterval]);
@@ -49,7 +44,6 @@ export const SubscriptionLockSection = ({
       let messageToSave = null;
       
       if (lockEnabled && lockDatetime) {
-        // Preserve the exact datetime input by the user
         formattedDateTime = lockDatetime;
         messageToSave = lockMessage || null;
       }
