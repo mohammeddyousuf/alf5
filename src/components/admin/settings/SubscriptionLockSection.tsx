@@ -24,7 +24,7 @@ export const SubscriptionLockSection = ({
 }: SubscriptionLockSectionProps) => {
   const { toast } = useToast();
   const [lockEnabled, setLockEnabled] = useState(initialLockEnabled);
-  const [lockDatetime, setLockDatetime] = useState(initialLockDatetime || "");
+  const [lockDatetime, setLockDatetime] = useState("");
   const [lockMessage, setLockMessage] = useState(initialLockMessage || "");
   const [checkInterval, setCheckInterval] = useState(
     initialCheckInterval ? Math.floor(initialCheckInterval / 60000) : 1
@@ -33,18 +33,28 @@ export const SubscriptionLockSection = ({
   // Update local state when props change
   useEffect(() => {
     setLockEnabled(initialLockEnabled);
-    setLockDatetime(initialLockDatetime || "");
+    if (initialLockDatetime) {
+      const date = new Date(initialLockDatetime);
+      const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+      setLockDatetime(localDate.toISOString().slice(0, 16));
+    }
     setLockMessage(initialLockMessage || "");
     setCheckInterval(initialCheckInterval ? Math.floor(initialCheckInterval / 60000) : 1);
   }, [initialLockEnabled, initialLockDatetime, initialLockMessage, initialCheckInterval]);
 
   const handleSave = async () => {
     try {
+      let formattedDateTime = null;
+      if (lockEnabled && lockDatetime) {
+        // Convert local datetime to UTC for storage
+        const localDate = new Date(lockDatetime);
+        formattedDateTime = new Date(localDate.getTime() + (localDate.getTimezoneOffset() * 60000)).toISOString();
+      }
+
       const updates = {
         lock_enabled: lockEnabled,
-        lock_datetime: lockDatetime || null,
+        lock_datetime: formattedDateTime,
         lock_message: lockMessage || null,
-        // Convert minutes to milliseconds for storage
         lock_check_interval: checkInterval * 60000
       };
 
