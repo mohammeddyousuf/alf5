@@ -25,12 +25,6 @@ export const WebsiteSettings = () => {
         // If settings exist, return them
         if (existingSettings) {
           initializeThemeColors(existingSettings);
-          // Format the lock_datetime to local datetime-local format if it exists
-          if (existingSettings.lock_datetime) {
-            const date = new Date(existingSettings.lock_datetime);
-            const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
-            existingSettings.lock_datetime = localDate.toISOString().slice(0, 16);
-          }
           return existingSettings;
         }
 
