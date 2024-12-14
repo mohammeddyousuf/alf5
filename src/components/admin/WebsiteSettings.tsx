@@ -28,7 +28,9 @@ export const WebsiteSettings = () => {
           // Format the lock_datetime to local datetime-local format if it exists
           if (existingSettings.lock_datetime) {
             const date = new Date(existingSettings.lock_datetime);
-            existingSettings.lock_datetime = date.toISOString().slice(0, 16);
+            const userTimezoneOffset = date.getTimezoneOffset() * 60000;
+            const localDate = new Date(date.getTime() + userTimezoneOffset);
+            existingSettings.lock_datetime = localDate.toISOString().slice(0, 16);
           }
           return existingSettings;
         }
