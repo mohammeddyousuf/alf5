@@ -8,14 +8,21 @@ export const getLatestSettings = async () => {
     .limit(1)
     .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching settings:', error);
+    throw error;
+  }
   return data;
 };
 
 export const updateSettings = async (updates: Partial<any>) => {
   const existingSettings = await getLatestSettings();
   
-  const { error } = await supabase
+  if (!existingSettings) {
+    throw new Error('No existing settings found');
+  }
+
+  const { data, error } = await supabase
     .from("settings")
     .upsert({
       ...existingSettings,
@@ -23,5 +30,10 @@ export const updateSettings = async (updates: Partial<any>) => {
       updated_at: new Date().toISOString()
     });
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error updating settings:', error);
+    throw error;
+  }
+
+  return data;
 };
