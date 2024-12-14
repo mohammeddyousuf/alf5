@@ -34,9 +34,9 @@ export const SubscriptionLockSection = ({
   useEffect(() => {
     setLockEnabled(initialLockEnabled);
     if (initialLockDatetime) {
+      // Convert UTC to local time for input
       const date = new Date(initialLockDatetime);
-      const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
-      setLockDatetime(localDate.toISOString().slice(0, 16));
+      setLockDatetime(date.toISOString().slice(0, 16));
     }
     setLockMessage(initialLockMessage || "");
     setCheckInterval(initialCheckInterval ? Math.floor(initialCheckInterval / 60000) : 1);
@@ -48,9 +48,8 @@ export const SubscriptionLockSection = ({
       let messageToSave = null;
       
       if (lockEnabled && lockDatetime) {
-        // Convert local datetime to UTC for storage
-        const localDate = new Date(lockDatetime);
-        formattedDateTime = new Date(localDate.getTime() + (localDate.getTimezoneOffset() * 60000)).toISOString();
+        // Keep the datetime as is - no timezone conversion needed
+        formattedDateTime = new Date(lockDatetime).toISOString();
         messageToSave = lockMessage || null;
       }
 
@@ -118,7 +117,7 @@ export const SubscriptionLockSection = ({
         <div className="space-y-0.5">
           <Label>Enable Subscription Lock</Label>
           <p className="text-sm text-muted-foreground">
-            When enabled, the app will be locked at the specified date and time
+            When enabled, the website will be locked at the specified date and time
           </p>
         </div>
         <Switch
@@ -145,7 +144,7 @@ export const SubscriptionLockSection = ({
               id="lockMessage"
               value={lockMessage}
               onChange={(e) => setLockMessage(e.target.value)}
-              placeholder="Enter the message to display when the app is locked..."
+              placeholder="Enter the message to display when the website is locked..."
               className="min-h-[100px]"
             />
           </div>
@@ -162,7 +161,7 @@ export const SubscriptionLockSection = ({
               placeholder="Enter check interval in minutes (e.g., 1 for every minute)"
             />
             <p className="text-sm text-muted-foreground">
-              How often to check if the app should be locked (in minutes). Minimum 1 minute
+              How often to check if the website should be locked (in minutes). Minimum 1 minute
             </p>
           </div>
           
