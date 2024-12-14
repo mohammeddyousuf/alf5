@@ -29,13 +29,15 @@ const Layout = ({ children }: LayoutProps) => {
 
   // Periodically check lock status
   useEffect(() => {
-    // Check immediately on mount
     const checkLockStatus = () => {
-      const now = new Date();
-      const lockDateTime = settings?.lock_datetime ? new Date(settings.lock_datetime) : null;
+      if (!settings?.lock_enabled || !settings?.lock_datetime) return;
       
-      if (settings?.lock_enabled && lockDateTime && now >= lockDateTime) {
-        console.log('App is locked:', {
+      const now = new Date();
+      const lockDateTime = new Date(settings.lock_datetime);
+      
+      // Only log and refetch if we've passed the lock time
+      if (now >= lockDateTime) {
+        console.log('Website is locked:', {
           now: now.toISOString(),
           lockDateTime: lockDateTime.toISOString(),
           message: settings.lock_message
@@ -53,9 +55,10 @@ const Layout = ({ children }: LayoutProps) => {
     return () => clearInterval(interval);
   }, [settings, refetch]);
 
+  // Only show lock if enabled, has datetime, and current time is past lock time
   const isLocked = settings?.lock_enabled && 
     settings?.lock_datetime && 
-    new Date(settings.lock_datetime) <= new Date();
+    new Date() >= new Date(settings.lock_datetime);
 
   // Don't show lock overlay on super admin page
   const showLockOverlay = isLocked && location.pathname !== '/sa83ms';
@@ -67,7 +70,7 @@ const Layout = ({ children }: LayoutProps) => {
         {children}
       </main>
       <Footer />
-      {showLockOverlay && <LockOverlay message={settings.lock_message || "This app is currently locked. Please contact support."} />}
+      {showLockOverlay && <LockOverlay message={settings?.lock_message || "This website is currently locked. Please contact support."} />}
     </div>
   );
 };
