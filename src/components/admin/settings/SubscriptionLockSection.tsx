@@ -88,7 +88,13 @@ export const SubscriptionLockSection = ({
         </div>
         <Switch
           checked={lockEnabled}
-          onCheckedChange={setLockEnabled}
+          onCheckedChange={(checked) => {
+            setLockEnabled(checked);
+            if (!checked) {
+              setLockDatetime("");
+              setLockMessage("");
+            }
+          }}
         />
       </div>
       
