@@ -40,18 +40,11 @@ export const SubscriptionLockSection = ({
 
   const handleSave = async () => {
     try {
-      let formattedDateTime = null;
-      let messageToSave = null;
-      
-      if (lockEnabled && lockDatetime) {
-        formattedDateTime = lockDatetime;
-        messageToSave = lockMessage || null;
-      }
-
+      // Save the datetime exactly as entered, without any conversion
       const updates = {
         lock_enabled: lockEnabled,
-        lock_datetime: formattedDateTime,
-        lock_message: messageToSave,
+        lock_datetime: lockEnabled ? lockDatetime : null,
+        lock_message: lockEnabled ? lockMessage : null,
         lock_check_interval: checkInterval * 60000
       };
 
