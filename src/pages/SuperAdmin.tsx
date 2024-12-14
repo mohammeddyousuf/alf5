@@ -26,8 +26,8 @@ const SuperAdmin = () => {
       // Format the lock_datetime to local datetime-local format if it exists
       if (data?.lock_datetime) {
         const date = new Date(data.lock_datetime);
-        const formattedDate = date.toISOString().split('.')[0]; // Remove milliseconds
-        data.lock_datetime = formattedDate.slice(0, 16); // Get only YYYY-MM-DDTHH:mm
+        const localDate = new Date(date.getTime() - (date.getTimezoneOffset() * 60000));
+        data.lock_datetime = localDate.toISOString().slice(0, 16);
       }
       
       return data;
