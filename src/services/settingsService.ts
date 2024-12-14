@@ -22,11 +22,14 @@ export const updateSettings = async (updates: Partial<any>) => {
     throw new Error('No existing settings found');
   }
 
+  // Remove lock_check_interval from updates if it's not supported in the database yet
+  const { lock_check_interval, ...otherUpdates } = updates;
+  
   const { data, error } = await supabase
     .from("settings")
     .upsert({
       ...existingSettings,
-      ...updates,
+      ...otherUpdates,
       updated_at: new Date().toISOString()
     });
 
