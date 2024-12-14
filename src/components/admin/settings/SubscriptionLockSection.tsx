@@ -11,6 +11,7 @@ interface SubscriptionLockSectionProps {
   initialLockEnabled: boolean;
   initialLockDatetime: string | null;
   initialLockMessage: string | null;
+  initialCheckInterval: number | null;
   refetch: () => Promise<any>;
 }
 
@@ -18,19 +19,22 @@ export const SubscriptionLockSection = ({
   initialLockEnabled,
   initialLockDatetime,
   initialLockMessage,
+  initialCheckInterval,
   refetch
 }: SubscriptionLockSectionProps) => {
   const { toast } = useToast();
   const [lockEnabled, setLockEnabled] = useState(initialLockEnabled);
   const [lockDatetime, setLockDatetime] = useState(initialLockDatetime || "");
   const [lockMessage, setLockMessage] = useState(initialLockMessage || "");
+  const [checkInterval, setCheckInterval] = useState(initialCheckInterval || 60000);
 
   const handleSave = async () => {
     try {
       await updateSettings({
         lock_enabled: lockEnabled,
         lock_datetime: lockDatetime || null,
-        lock_message: lockMessage || null
+        lock_message: lockMessage || null,
+        lock_check_interval: checkInterval
       });
       await refetch();
       toast({
@@ -83,6 +87,22 @@ export const SubscriptionLockSection = ({
               placeholder="Enter the message to display when the app is locked..."
               className="min-h-[100px]"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="checkInterval">Check Interval (milliseconds)</Label>
+            <Input
+              id="checkInterval"
+              type="number"
+              min="1000"
+              step="1000"
+              value={checkInterval}
+              onChange={(e) => setCheckInterval(Number(e.target.value))}
+              placeholder="Enter check interval in milliseconds (e.g., 60000 for 1 minute)"
+            />
+            <p className="text-sm text-muted-foreground">
+              How often to check if the app should be locked (in milliseconds). Minimum 1000ms (1 second)
+            </p>
           </div>
           
           <Button onClick={handleSave} className="w-full">

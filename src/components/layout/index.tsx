@@ -45,8 +45,8 @@ const Layout = ({ children }: LayoutProps) => {
     // Check immediately
     checkLockStatus();
 
-    // Then check every minute
-    const interval = setInterval(checkLockStatus, 60000);
+    // Then check based on the configured interval
+    const interval = setInterval(checkLockStatus, settings?.lock_check_interval || 60000);
 
     return () => clearInterval(interval);
   }, [settings, refetch]);

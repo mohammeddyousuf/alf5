@@ -23,6 +23,7 @@ export interface Settings {
   lock_enabled: boolean | null;
   lock_datetime: string | null;
   lock_message: string | null;
+  lock_check_interval: number | null;
 }
 
 export interface SettingsInsert extends Partial<Omit<Settings, 'whatsapp_number' | 'created_at' | 'updated_at'>> {

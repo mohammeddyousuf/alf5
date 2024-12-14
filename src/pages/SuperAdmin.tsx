@@ -49,6 +49,7 @@ const SuperAdmin = () => {
             initialLockEnabled={settings?.lock_enabled || false}
             initialLockDatetime={settings?.lock_datetime}
             initialLockMessage={settings?.lock_message}
+            initialCheckInterval={settings?.lock_check_interval}
             refetch={refetch}
           />
         </Card>
