@@ -39,13 +39,9 @@ export const SubscriptionLockSection = ({
 
   const handleSave = async () => {
     try {
-      // Convert local datetime to UTC before saving
-      const localDate = new Date(lockDatetime);
-      const utcDate = new Date(localDate.getTime() - (localDate.getTimezoneOffset() * 60000));
-      
       const updates = {
         lock_enabled: lockEnabled,
-        lock_datetime: lockEnabled ? utcDate.toISOString() : null,
+        lock_datetime: lockEnabled ? new Date(lockDatetime).toISOString() : null,
         lock_message: lockEnabled ? lockMessage : null,
         lock_check_interval: checkInterval * 60000
       };
