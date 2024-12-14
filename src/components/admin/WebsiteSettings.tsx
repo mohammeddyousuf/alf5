@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { GeneralSettings } from "./settings/GeneralSettings";
 import { ThemeSettings } from "./settings/ThemeSettings";
 import { initializeThemeColors } from "@/utils/themeUtils";
+import { SubscriptionLockSection } from "./settings/SubscriptionLockSection";
 
 export const WebsiteSettings = () => {
   const { data: settings, refetch } = useQuery({
@@ -24,6 +25,11 @@ export const WebsiteSettings = () => {
         // If settings exist, return them
         if (existingSettings) {
           initializeThemeColors(existingSettings);
+          // Format the lock_datetime to local datetime-local format if it exists
+          if (existingSettings.lock_datetime) {
+            const date = new Date(existingSettings.lock_datetime);
+            existingSettings.lock_datetime = date.toISOString().slice(0, 16);
+          }
           return existingSettings;
         }
 

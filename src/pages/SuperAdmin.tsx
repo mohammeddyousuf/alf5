@@ -22,6 +22,13 @@ const SuperAdmin = () => {
         .maybeSingle();
       
       if (error) throw error;
+
+      // Format the lock_datetime to local datetime-local format if it exists
+      if (data?.lock_datetime) {
+        const date = new Date(data.lock_datetime);
+        data.lock_datetime = date.toISOString().slice(0, 16);
+      }
+      
       return data;
     },
   });
