@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { useQuery } from "@tanstack/react-query";
@@ -10,7 +10,7 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  const { data: settings } = useQuery({
+  const { data: settings, refetch } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -24,6 +24,32 @@ const Layout = ({ children }: LayoutProps) => {
       return data;
     },
   });
+
+  // Periodically check lock status
+  useEffect(() => {
+    // Check immediately on mount
+    const checkLockStatus = () => {
+      const now = new Date();
+      const lockDateTime = settings?.lock_datetime ? new Date(settings.lock_datetime) : null;
+      
+      if (settings?.lock_enabled && lockDateTime && now >= lockDateTime) {
+        console.log('App is locked:', {
+          now: now.toISOString(),
+          lockDateTime: lockDateTime.toISOString(),
+          message: settings.lock_message
+        });
+        refetch(); // Refresh settings to ensure we have latest lock status
+      }
+    };
+
+    // Check immediately
+    checkLockStatus();
+
+    // Then check every minute
+    const interval = setInterval(checkLockStatus, 60000);
+
+    return () => clearInterval(interval);
+  }, [settings, refetch]);
 
   const isLocked = settings?.lock_enabled && 
     settings?.lock_datetime && 
