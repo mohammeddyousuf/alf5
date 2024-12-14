@@ -26,9 +26,8 @@ const SuperAdmin = () => {
       // Format the lock_datetime to local datetime-local format if it exists
       if (data?.lock_datetime) {
         const date = new Date(data.lock_datetime);
-        const userTimezoneOffset = date.getTimezoneOffset() * 60000;
-        const localDate = new Date(date.getTime() + userTimezoneOffset);
-        data.lock_datetime = localDate.toISOString().slice(0, 16);
+        const formattedDate = date.toISOString().split('.')[0]; // Remove milliseconds
+        data.lock_datetime = formattedDate.slice(0, 16); // Get only YYYY-MM-DDTHH:mm
       }
       
       return data;
@@ -64,16 +63,14 @@ const SuperAdmin = () => {
         </Card>
 
         <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              <h2 className="text-xl font-semibold">Page Management</h2>
-            </div>
-            <Button onClick={() => navigate("/admin/pages/new")} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create New Page
-            </Button>
+          <div className="flex items-center gap-2 mb-4">
+            <FileText className="h-5 w-5" />
+            <h2 className="text-xl font-semibold">Page Management</h2>
           </div>
+          <Button onClick={() => navigate("/admin/pages/new")} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Create New Page
+          </Button>
           <p className="text-muted-foreground">
             Create new pages and manage their placement in the navigation
           </p>
