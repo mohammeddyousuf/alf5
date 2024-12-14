@@ -45,16 +45,19 @@ export const SubscriptionLockSection = ({
   const handleSave = async () => {
     try {
       let formattedDateTime = null;
+      let messageToSave = null;
+      
       if (lockEnabled && lockDatetime) {
         // Convert local datetime to UTC for storage
         const localDate = new Date(lockDatetime);
         formattedDateTime = new Date(localDate.getTime() + (localDate.getTimezoneOffset() * 60000)).toISOString();
+        messageToSave = lockMessage || null;
       }
 
       const updates = {
         lock_enabled: lockEnabled,
         lock_datetime: formattedDateTime,
-        lock_message: lockMessage || null,
+        lock_message: messageToSave,
         lock_check_interval: checkInterval * 60000
       };
 
@@ -77,6 +80,38 @@ export const SubscriptionLockSection = ({
     }
   };
 
+  const handleLockToggle = async (checked: boolean) => {
+    setLockEnabled(checked);
+    if (!checked) {
+      setLockDatetime("");
+      setLockMessage("");
+      // Immediately save when disabling
+      try {
+        const updates = {
+          lock_enabled: false,
+          lock_datetime: null,
+          lock_message: null,
+          lock_check_interval: checkInterval * 60000
+        };
+        
+        await updateSettings(updates);
+        await refetch();
+        
+        toast({
+          title: "Success",
+          description: "Subscription lock disabled successfully",
+        });
+      } catch (error) {
+        console.error('Error disabling subscription lock:', error);
+        toast({
+          title: "Error",
+          description: "Failed to disable subscription lock",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -88,13 +123,7 @@ export const SubscriptionLockSection = ({
         </div>
         <Switch
           checked={lockEnabled}
-          onCheckedChange={(checked) => {
-            setLockEnabled(checked);
-            if (!checked) {
-              setLockDatetime("");
-              setLockMessage("");
-            }
-          }}
+          onCheckedChange={handleLockToggle}
         />
       </div>
       
