@@ -73,6 +73,20 @@ export function BasicFields({ form }: BasicFieldsProps) {
 
       <FormField
         control={form.control}
+        name="custom_label"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Custom Label</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ''} placeholder="Enter a custom label to display on product image" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="name"
         render={({ field }) => (
           <FormItem>
