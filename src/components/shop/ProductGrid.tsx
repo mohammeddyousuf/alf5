@@ -7,6 +7,7 @@ interface Product {
   sale_price: number | null;
   images: string[];
   brand: string | null;
+  custom_label: string | null;
 }
 
 interface ProductGridProps {
@@ -33,6 +34,7 @@ export function ProductGrid({ products }: ProductGridProps) {
           salePrice={product.sale_price}
           imageUrl={product.images?.[0]}
           brand={product.brand}
+          customLabel={product.custom_label}
         />
       ))}
     </div>

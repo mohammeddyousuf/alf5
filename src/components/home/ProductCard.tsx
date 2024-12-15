@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SaleCountdown } from "@/components/product/SaleCountdown";
 import { MessageCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductCardProps {
   id: string;
@@ -13,9 +14,18 @@ interface ProductCardProps {
   salePrice?: number | null;
   imageUrl?: string;
   brand?: string | null;
+  customLabel?: string | null;
 }
 
-export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: ProductCardProps) => {
+export const ProductCard = ({ 
+  id, 
+  name, 
+  price, 
+  salePrice, 
+  imageUrl, 
+  brand,
+  customLabel 
+}: ProductCardProps) => {
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
@@ -93,6 +103,18 @@ export const ProductCard = ({ id, name, price, salePrice, imageUrl, brand }: Pro
               {showSaleTimer && settings?.clearance_sale_end_date && (
                 <div className="absolute top-2 right-2">
                   <SaleCountdown endDate={settings.clearance_sale_end_date} />
+                </div>
+              )}
+              {customLabel && (
+                <div className="absolute bottom-2 right-2">
+                  <Badge 
+                    style={{ 
+                      backgroundColor: settings?.primary_color || '#9b87f5',
+                      color: 'white'
+                    }}
+                  >
+                    {customLabel}
+                  </Badge>
                 </div>
               )}
             </>
