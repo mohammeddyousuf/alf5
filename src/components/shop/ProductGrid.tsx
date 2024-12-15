@@ -1,5 +1,4 @@
 import { ProductCard } from "@/components/home/ProductCard";
-import { useNavigate } from "react-router-dom";
 
 interface Product {
   id: string;
@@ -15,8 +14,6 @@ interface ProductGridProps {
 }
 
 export function ProductGrid({ products }: ProductGridProps) {
-  const navigate = useNavigate();
-
   if (!products || products.length === 0) {
     return (
       <p className="text-center text-muted-foreground">
@@ -25,27 +22,18 @@ export function ProductGrid({ products }: ProductGridProps) {
     );
   }
 
-  const handleProductClick = (productId: string) => {
-    navigate(`/products/${productId}`);
-  };
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {products.map((product) => (
-        <div 
+        <ProductCard
           key={product.id}
-          onClick={() => handleProductClick(product.id)}
-          className="cursor-pointer transition-transform hover:scale-105"
-        >
-          <ProductCard
-            id={product.id}
-            name={product.name}
-            price={product.price}
-            salePrice={product.sale_price}
-            imageUrl={product.images?.[0]}
-            brand={product.brand}
-          />
-        </div>
+          id={product.id}
+          name={product.name}
+          price={product.price}
+          salePrice={product.sale_price}
+          imageUrl={product.images?.[0]}
+          brand={product.brand}
+        />
       ))}
     </div>
   );

@@ -22,7 +22,6 @@ export const productFormSchema = z.object({
         message: "Sale price must be less than regular price"
       }
     ),
-  custom_label: z.string().nullable().optional(),
   images: z.array(z.string()).default([]),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   category_id: z.string().nullable().optional(),

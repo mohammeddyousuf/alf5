@@ -8,7 +8,6 @@ interface ProductImageProps {
   price: number;
   showSaleTimer: boolean;
   saleEndDate: string | null;
-  customLabel?: string | null;
 }
 
 export function ProductImage({ 
@@ -17,8 +16,7 @@ export function ProductImage({
   salePrice, 
   price,
   showSaleTimer,
-  saleEndDate,
-  customLabel
+  saleEndDate
 }: ProductImageProps) {
   const showSaleBadge = salePrice && salePrice < price;
   
@@ -39,13 +37,6 @@ export function ProductImage({
           {showSaleTimer && saleEndDate && (
             <div className="absolute top-2 right-2">
               <SaleCountdown endDate={saleEndDate} />
-            </div>
-          )}
-          {customLabel && (
-            <div className="absolute bottom-2 right-2">
-              <Badge variant="secondary" className="bg-[#9b87f5] text-white hover:bg-[#7E69AB]">
-                {customLabel}
-              </Badge>
             </div>
           )}
         </>
