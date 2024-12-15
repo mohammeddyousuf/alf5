@@ -15,6 +15,7 @@ export interface Products {
     subcategory_id: string | null
     updated_at: string
     video_urls: string[] | null
+    custom_label: string | null
   }
   Insert: {
     added_date?: string | null
@@ -32,6 +33,7 @@ export interface Products {
     subcategory_id?: string | null
     updated_at?: string
     video_urls?: string[] | null
+    custom_label?: string | null
   }
   Update: {
     added_date?: string | null
@@ -49,6 +51,7 @@ export interface Products {
     subcategory_id?: string | null
     updated_at?: string
     video_urls?: string[] | null
+    custom_label?: string | null
   }
 }
 
