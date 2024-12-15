@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Database } from "@/integrations/supabase/types";
 import { Pencil } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ProductForm } from "./ProductForm";
+import { ProductForm } from "@/components/admin/product/ProductForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -18,19 +18,35 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useState } from "react";
-import { ProductImage } from "./ProductImage";
-import { ProductPrice } from "./ProductPrice";
+import { ProductImage } from "@/components/admin/product/ProductImage";
+import { ProductPrice } from "@/components/admin/product/ProductPrice";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
 interface ProductCardProps {
-  product: ProductRow;
-  onStatusChange: (id: string, currentStatus: string | null) => Promise<void>;
-  onDelete: (id: string) => Promise<void>;
-  onSuccess: () => void;
+  id?: string;
+  product?: ProductRow;
+  name?: string;
+  price?: number;
+  salePrice?: number | null;
+  imageUrl?: string;
+  brand?: string | null;
+  onStatusChange?: (id: string, currentStatus: string | null) => Promise<void>;
+  onDelete?: (id: string) => Promise<void>;
+  onSuccess?: () => void;
 }
 
-export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: ProductCardProps) {
+export function ProductCard({ 
+  id,
+  product,
+  name,
+  price,
+  salePrice,
+  imageUrl,
+  onStatusChange,
+  onDelete,
+  onSuccess 
+}: ProductCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const { data: settings } = useQuery({
@@ -50,16 +66,12 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
 
   const isSaleValid = () => {
     try {
-      // If clearance sale is not active, show regular product-specific sale prices
       if (!settings?.clearance_sale_active) {
         return true;
       }
-
-      // If clearance sale is active but no end date, don't show sale
       if (!settings?.clearance_sale_end_date) {
         return false;
       }
-
       const endDate = new Date(settings.clearance_sale_end_date);
       const now = new Date();
       return endDate > now;
@@ -70,24 +82,18 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
   };
 
   const shouldShowSalePrice = () => {
-    // Show sale price if it exists and is less than regular price, and either:
-    // 1. There's no global sale timer (regular product discount)
-    // 2. There's a global sale timer and it hasn't expired
-    return product.sale_price && 
+    return product?.sale_price && 
       product.sale_price < product.price && 
       (!settings?.clearance_sale_active || isSaleValid());
   };
 
   const shouldShowSaleTimer = () => {
-    // Only show timer if global sale is active and product has valid sale price
     if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
       return false;
     }
-
-    if (!product.sale_price || product.sale_price >= product.price) {
+    if (!product?.sale_price || product.sale_price >= product.price) {
       return false;
     }
-
     return isSaleValid();
   };
 
@@ -104,86 +110,108 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
     }
   };
 
-  return (
-    <Card key={product.id} className="p-4">
-      <ProductImage 
-        images={product.images}
-        name={product.name}
-        salePrice={shouldShowSalePrice() ? product.sale_price : null}
-        price={product.price}
-        showSaleTimer={shouldShowSaleTimer()}
-        saleEndDate={settings?.clearance_sale_end_date || null}
-        customLabel={product.custom_label} // Pass the custom label here
-      />
-      
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="font-semibold">{product.name}</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onStatusChange(product.id, product.status)}
-          className="hover:bg-transparent"
-        >
-          <Badge
-            variant={getStatusBadgeVariant(product.status)}
-            className="cursor-pointer"
-          >
-            {product.status || "draft"}
-          </Badge>
-        </Button>
-      </div>
-
-      <ProductPrice 
-        price={product.price} 
-        salePrice={shouldShowSalePrice() ? product.sale_price : null}
-      />
-
-      <div className="flex gap-2">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="default" className="flex-1">
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-3xl">
-            <DialogHeader>
-              <DialogTitle>Edit Product</DialogTitle>
-            </DialogHeader>
-            <ProductForm product={product} onSuccess={onSuccess} />
-          </DialogContent>
-        </Dialog>
-
-        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+  if (product) {
+    return (
+      <Card key={product.id} className="p-4">
+        <ProductImage 
+          images={product.images}
+          name={product.name}
+          salePrice={shouldShowSalePrice() ? product.sale_price : null}
+          price={product.price}
+          showSaleTimer={shouldShowSaleTimer()}
+          saleEndDate={settings?.clearance_sale_end_date || null}
+          customLabel={product.custom_label}
+        />
+        
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-semibold">{product.name}</h3>
           <Button
-            variant="destructive"
-            className="flex-1"
-            onClick={() => setShowDeleteDialog(true)}
+            variant="ghost"
+            size="sm"
+            onClick={() => onStatusChange?.(product.id, product.status)}
+            className="hover:bg-transparent"
           >
-            Delete
+            <Badge
+              variant={getStatusBadgeVariant(product.status)}
+              className="cursor-pointer"
+            >
+              {product.status || "draft"}
+            </Badge>
           </Button>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the product
-                and remove its data from our servers.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
-                  onDelete(product.id);
-                  setShowDeleteDialog(false);
-                }}
-              >
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        </div>
+
+        <ProductPrice 
+          price={product.price} 
+          salePrice={shouldShowSalePrice() ? product.sale_price : null}
+        />
+
+        <div className="flex gap-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="default" className="flex-1">
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl">
+              <DialogHeader>
+                <DialogTitle>Edit Product</DialogTitle>
+              </DialogHeader>
+              <ProductForm product={product} onSuccess={onSuccess} />
+            </DialogContent>
+          </Dialog>
+
+          <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <Button
+              variant="destructive"
+              className="flex-1"
+              onClick={() => setShowDeleteDialog(true)}
+            >
+              Delete
+            </Button>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the product
+                  and remove its data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    onDelete?.(product.id);
+                    setShowDeleteDialog(false);
+                  }}
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="p-4">
+      <ProductImage 
+        images={imageUrl ? [imageUrl] : []}
+        name={name || ""}
+        salePrice={salePrice}
+        price={price || 0}
+        showSaleTimer={false}
+        saleEndDate={null}
+      />
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-semibold">{name}</h3>
       </div>
+      <ProductPrice 
+        price={price || 0}
+        salePrice={salePrice}
+      />
     </Card>
   );
 }
