@@ -1,5 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { SaleCountdown } from "@/components/product/SaleCountdown";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductImageProps {
   images: string[] | null;
@@ -8,6 +10,7 @@ interface ProductImageProps {
   price: number;
   showSaleTimer: boolean;
   saleEndDate: string | null;
+  customLabel?: string | null;
 }
 
 export function ProductImage({ 
@@ -16,9 +19,25 @@ export function ProductImage({
   salePrice, 
   price,
   showSaleTimer,
-  saleEndDate
+  saleEndDate,
+  customLabel
 }: ProductImageProps) {
   const showSaleBadge = salePrice && salePrice < price;
+
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
   
   return (
     <div className="aspect-square mb-4 overflow-hidden rounded-lg relative">
@@ -37,6 +56,18 @@ export function ProductImage({
           {showSaleTimer && saleEndDate && (
             <div className="absolute top-2 right-2">
               <SaleCountdown endDate={saleEndDate} />
+            </div>
+          )}
+          {customLabel && (
+            <div className="absolute bottom-2 right-2">
+              <Badge 
+                style={{ 
+                  backgroundColor: settings?.primary_color || '#9b87f5',
+                  color: 'white'
+                }}
+              >
+                {customLabel}
+              </Badge>
             </div>
           )}
         </>
