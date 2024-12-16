@@ -155,7 +155,8 @@ const Shop = () => {
 
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (product.description?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (product.brand?.toLowerCase().includes(searchQuery.toLowerCase()));
+      (product.brand?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (product.custom_label?.toLowerCase().includes(searchQuery.toLowerCase()));
     
     const price = isProductOnSale(product) ? product.sale_price : product.price;
     const meetsPrice = priceRange[0] === 0 && priceRange[1] === 0 ? true :

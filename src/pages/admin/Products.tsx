@@ -16,7 +16,6 @@ const Products = () => {
   const [search, setSearch] = useState("");
   const [showSaleProducts, setShowSaleProducts] = useState(true);
   const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
-  const [customLabelFilter, setCustomLabelFilter] = useState("");
   const { data: products } = useProducts();
 
   const { data: systemLimits, isLoading: isLoadingLimits } = useQuery({
@@ -103,15 +102,12 @@ const Products = () => {
         setShowSaleProducts={setShowSaleProducts}
         showNonSaleProducts={showNonSaleProducts}
         setShowNonSaleProducts={setShowNonSaleProducts}
-        customLabelFilter={customLabelFilter}
-        setCustomLabelFilter={setCustomLabelFilter}
       />
 
       <ProductList 
         search={search}
         showSaleProducts={showSaleProducts}
         showNonSaleProducts={showNonSaleProducts}
-        customLabelFilter={customLabelFilter}
       />
     </div>
   );

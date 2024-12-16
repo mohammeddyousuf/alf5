@@ -9,8 +9,6 @@ interface ProductFiltersProps {
   setShowSaleProducts: (value: boolean) => void;
   showNonSaleProducts: boolean;
   setShowNonSaleProducts: (value: boolean) => void;
-  customLabelFilter: string;
-  setCustomLabelFilter: (value: string) => void;
 }
 
 export function ProductFilters({
@@ -20,8 +18,6 @@ export function ProductFilters({
   setShowSaleProducts,
   showNonSaleProducts,
   setShowNonSaleProducts,
-  customLabelFilter,
-  setCustomLabelFilter
 }: ProductFiltersProps) {
   return (
     <div className="space-y-4">
@@ -29,19 +25,9 @@ export function ProductFilters({
         <Label htmlFor="search">Search</Label>
         <Input
           id="search"
-          placeholder="Search products..."
+          placeholder="Search by name, brand, description, or custom label..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-      
-      <div>
-        <Label htmlFor="customLabel">Filter by Custom Label</Label>
-        <Input
-          id="customLabel"
-          placeholder="Filter by custom label..."
-          value={customLabelFilter}
-          onChange={(e) => setCustomLabelFilter(e.target.value)}
         />
       </div>
 
