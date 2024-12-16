@@ -56,6 +56,22 @@ export function ProductFilters({
 
       <div className="flex items-center space-x-4">
         <div className="flex items-center space-x-2">
+          <Select value={selectedBrand} onValueChange={setSelectedBrand}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by brand" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Brands</SelectItem>
+              {brands?.map((brand) => (
+                <SelectItem key={brand} value={brand}>
+                  {brand}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center space-x-2">
           <Switch
             id="sale-products"
             checked={showSaleProducts}
@@ -71,22 +87,6 @@ export function ProductFilters({
             onCheckedChange={setShowNonSaleProducts}
           />
           <Label htmlFor="non-sale-products">Show Non-Sale Products</Label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Filter by brand" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Brands</SelectItem>
-              {brands?.map((brand) => (
-                <SelectItem key={brand} value={brand}>
-                  {brand}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </div>
     </div>
