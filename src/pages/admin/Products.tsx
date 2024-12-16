@@ -16,6 +16,7 @@ const Products = () => {
   const [search, setSearch] = useState("");
   const [showSaleProducts, setShowSaleProducts] = useState(true);
   const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
+  const [selectedBrand, setSelectedBrand] = useState("");
   const { data: products } = useProducts();
 
   const { data: systemLimits, isLoading: isLoadingLimits } = useQuery({
@@ -102,12 +103,15 @@ const Products = () => {
         setShowSaleProducts={setShowSaleProducts}
         showNonSaleProducts={showNonSaleProducts}
         setShowNonSaleProducts={setShowNonSaleProducts}
+        selectedBrand={selectedBrand}
+        setSelectedBrand={setSelectedBrand}
       />
 
       <ProductList 
         search={search}
         showSaleProducts={showSaleProducts}
         showNonSaleProducts={showNonSaleProducts}
+        selectedBrand={selectedBrand}
       />
     </div>
   );
