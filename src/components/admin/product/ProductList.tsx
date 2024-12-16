@@ -145,9 +145,6 @@ export const ProductList = ({
     );
   }
 
-  // Filter products based on search and sale status
-
-  // Filter products based on search, sale status, and brand
   const filteredProducts = products?.filter((product: ProductRow) => {
     const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase()) ||
       (product.description?.toLowerCase().includes(search.toLowerCase())) ||
@@ -163,7 +160,7 @@ export const ProductList = ({
     );
 
     // Check if product matches selected brand filter
-    const matchesBrand = !selectedBrand || product.brand === selectedBrand;
+    const matchesBrand = selectedBrand === 'all' || product.brand === selectedBrand;
 
     return matchesSearch && showBasedOnSaleStatus && matchesBrand;
   });

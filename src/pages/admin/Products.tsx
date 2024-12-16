@@ -16,7 +16,8 @@ const Products = () => {
   const [search, setSearch] = useState("");
   const [showSaleProducts, setShowSaleProducts] = useState(true);
   const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
-  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState("all");
+  
   const { data: products } = useProducts();
 
   const { data: systemLimits, isLoading: isLoadingLimits } = useQuery({

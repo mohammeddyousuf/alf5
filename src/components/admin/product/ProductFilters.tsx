@@ -79,7 +79,7 @@ export function ProductFilters({
               <SelectValue placeholder="Filter by brand" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Brands</SelectItem>
+              <SelectItem value="all">All Brands</SelectItem>
               {brands?.map((brand) => (
                 <SelectItem key={brand} value={brand}>
                   {brand}
