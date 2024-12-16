@@ -36,7 +36,7 @@ export function ProductMedia({
   const { toast } = useToast();
   const mediaItems = [...(images || []), ...(videoUrls || [])];
 
-  const { data: settings } = useQuery({
+  const { data: settings, refetch } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
       const { data, error } = await supabase
