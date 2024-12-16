@@ -113,6 +113,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
         price={product.price}
         showSaleTimer={shouldShowSaleTimer()}
         saleEndDate={settings?.clearance_sale_end_date || null}
+        customLabel={product.custom_label}
       />
       
       <div className="flex items-center justify-between mb-2">

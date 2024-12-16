@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 interface ProductFiltersProps {
   search: string;
@@ -9,6 +9,8 @@ interface ProductFiltersProps {
   setShowSaleProducts: (value: boolean) => void;
   showNonSaleProducts: boolean;
   setShowNonSaleProducts: (value: boolean) => void;
+  customLabelFilter: string;
+  setCustomLabelFilter: (value: string) => void;
 }
 
 export function ProductFilters({
@@ -18,33 +20,48 @@ export function ProductFilters({
   setShowSaleProducts,
   showNonSaleProducts,
   setShowNonSaleProducts,
+  customLabelFilter,
+  setCustomLabelFilter
 }: ProductFiltersProps) {
   return (
-    <div className="flex items-center gap-6">
-      <Input
-        placeholder="Search products..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="max-w-sm"
-      />
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="sale-filter"
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="search">Search</Label>
+        <Input
+          id="search"
+          placeholder="Search products..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+      
+      <div>
+        <Label htmlFor="customLabel">Filter by Custom Label</Label>
+        <Input
+          id="customLabel"
+          placeholder="Filter by custom label..."
+          value={customLabelFilter}
+          onChange={(e) => setCustomLabelFilter(e.target.value)}
+        />
+      </div>
+
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="sale-products"
             checked={showSaleProducts}
-            onCheckedChange={(checked) => setShowSaleProducts(checked as boolean)}
+            onCheckedChange={setShowSaleProducts}
           />
-          <Label htmlFor="sale-filter">Sale Products</Label>
+          <Label htmlFor="sale-products">Show Sale Products</Label>
         </div>
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="non-sale-filter"
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="non-sale-products"
             checked={showNonSaleProducts}
-            onCheckedChange={(checked) =>
-              setShowNonSaleProducts(checked as boolean)
-            }
+            onCheckedChange={setShowNonSaleProducts}
           />
-          <Label htmlFor="non-sale-filter">Non-Sale Products</Label>
+          <Label htmlFor="non-sale-products">Show Non-Sale Products</Label>
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { SaleCountdown } from "./SaleCountdown";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 
 interface ProductMediaProps {
   images?: string[];
@@ -20,20 +21,22 @@ interface ProductMediaProps {
   getYouTubeVideoId: (url: string) => string | null;
   salePrice?: number | null;
   price: number;
+  customLabel?: string | null;
 }
 
 export function ProductMedia({ 
   images, 
   videoUrls, 
   productName, 
-  getYouTubeVideoId, 
-  salePrice, 
-  price 
+  getYouTubeVideoId,
+  salePrice,
+  price,
+  customLabel
 }: ProductMediaProps) {
   const { toast } = useToast();
   const mediaItems = [...(images || []), ...(videoUrls || [])];
 
-  const { data: settings, refetch } = useQuery({
+  const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -116,6 +119,18 @@ export function ProductMedia({
           <SaleCountdown 
             endDate={settings.clearance_sale_end_date}
           />
+        </div>
+      )}
+      {customLabel && (
+        <div className="absolute bottom-4 right-4 z-10">
+          <Badge 
+            style={{ 
+              backgroundColor: settings?.primary_color || '#9b87f5',
+              color: 'white'
+            }}
+          >
+            {customLabel}
+          </Badge>
         </div>
       )}
       <Carousel className="w-full">

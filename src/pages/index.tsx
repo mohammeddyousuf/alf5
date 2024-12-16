@@ -110,6 +110,8 @@ const Index = () => {
                   price={product.price}
                   salePrice={product.sale_price}
                   imageUrl={product.images?.[0]}
+                  brand={product.brand}
+                  customLabel={product.custom_label}
                 />
               </CarouselItem>
             ))}
@@ -132,6 +134,8 @@ const Index = () => {
                     price={product.price}
                     salePrice={product.sale_price}
                     imageUrl={product.images?.[0]}
+                    brand={product.brand}
+                    customLabel={product.custom_label}
                   />
                 </CarouselItem>
               ))}

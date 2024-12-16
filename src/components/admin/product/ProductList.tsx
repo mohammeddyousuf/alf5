@@ -12,9 +12,10 @@ interface ProductListProps {
   search: string;
   showSaleProducts: boolean;
   showNonSaleProducts: boolean;
+  customLabelFilter: string;
 }
 
-export const ProductList = ({ search, showSaleProducts, showNonSaleProducts }: ProductListProps) => {
+export const ProductList = ({ search, showSaleProducts, showNonSaleProducts, customLabelFilter }: ProductListProps) => {
   const { data: products, refetch, isLoading } = useProducts();
   const { toast } = useToast();
 
@@ -139,10 +140,12 @@ export const ProductList = ({ search, showSaleProducts, showNonSaleProducts }: P
     );
   }
 
-  // Filter products based on search and sale status
+  // Filter products based on search, sale status, and custom label
   const filteredProducts = products?.filter((product: ProductRow) => {
     const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
     const isOnSale = isProductOnSale(product);
+    const matchesCustomLabel = !customLabelFilter || 
+      (product.custom_label?.toLowerCase().includes(customLabelFilter.toLowerCase()));
     
     // Check if product should be shown based on sale status filters
     const showBasedOnSaleStatus = (
@@ -150,7 +153,7 @@ export const ProductList = ({ search, showSaleProducts, showNonSaleProducts }: P
       (!isOnSale && showNonSaleProducts)
     );
 
-    return matchesSearch && showBasedOnSaleStatus;
+    return matchesSearch && showBasedOnSaleStatus && matchesCustomLabel;
   });
 
   return (
