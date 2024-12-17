@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Trash2, Upload } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageDeleteDialog } from "@/components/admin/shared/ImageDeleteDialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { SearchAndSort } from "./image-management/SearchAndSort";
+import { ImageTable } from "./image-management/ImageTable";
 
 interface ImageManagementDialogProps {
   open: boolean;
@@ -26,29 +28,59 @@ export function ImageManagementDialog({
   const [imageToDelete, setImageToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<"name-asc" | "name-desc" | "date-asc" | "date-desc">("date-desc");
 
   const loadImages = async () => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase.storage
+      const { data: imageData, error: imageError } = await supabase.storage
         .from("product-images")
         .list();
 
-      if (error) throw error;
+      if (imageError) throw imageError;
 
-      const imagesWithUrls = await Promise.all(
-        data.map(async (file) => {
+      // Get all products to find image usage
+      const { data: products } = await supabase
+        .from("products")
+        .select("name, images");
+
+      // Get all sliders
+      const { data: sliders } = await supabase
+        .from("sliders")
+        .select("title, image_url");
+
+      const imagesWithUsage = await Promise.all(
+        imageData.map(async (file) => {
           const { data: { publicUrl } } = supabase.storage
             .from("product-images")
             .getPublicUrl(file.name);
+
+          const usage = [];
+
+          // Check products
+          products?.forEach(product => {
+            if (product.images?.includes(publicUrl)) {
+              usage.push({ type: 'Product', name: product.name });
+            }
+          });
+
+          // Check sliders
+          sliders?.forEach(slider => {
+            if (slider.image_url === publicUrl) {
+              usage.push({ type: 'Slider', name: slider.title });
+            }
+          });
+
           return {
             ...file,
-            url: publicUrl
+            url: publicUrl,
+            usage
           };
         })
       );
 
-      setImages(imagesWithUrls);
+      setImages(imagesWithUsage);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -77,7 +109,7 @@ export function ImageManagementDialog({
       });
 
       await loadImages();
-      onImageUpload(); // Refresh folder size
+      onImageUpload();
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -127,7 +159,14 @@ export function ImageManagementDialog({
     }
   };
 
-  // Load images when dialog opens
+  const filteredImages = images.filter(image => 
+    image.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    image.usage?.some((u: any) => 
+      u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.type.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
+
   useEffect(() => {
     if (open) {
       loadImages();
@@ -138,7 +177,7 @@ export function ImageManagementDialog({
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent 
-          className="w-[90vw] sm:max-w-[600px]"
+          className="w-[90vw] sm:max-w-[900px]"
           onDragOver={(e) => {
             e.preventDefault();
             setIsDragging(true);
@@ -182,35 +221,30 @@ export function ImageManagementDialog({
             </label>
           </div>
 
-          <ScrollArea className="h-[70vh] mt-6">
+          <SearchAndSort
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            sortOrder={sortOrder}
+            onSortChange={(value) => setSortOrder(value as any)}
+          />
+
+          <ScrollArea className="h-[calc(100vh-250px)] mt-6">
             {isLoading ? (
               <div className="flex justify-center items-center h-32">
                 <Loader2 className="h-6 w-6 animate-spin" />
               </div>
             ) : (
               <div 
-                className={`grid grid-cols-2 gap-4 p-4 rounded-lg transition-colors ${
+                className={`rounded-lg transition-colors ${
                   isDragging ? 'bg-muted/50 border-2 border-dashed border-primary' : ''
                 }`}
               >
-                {images.map((image) => (
-                  <div key={image.name} className="relative group">
-                    <img
-                      src={image.url}
-                      alt={image.name}
-                      className="w-full aspect-square object-cover rounded-lg"
-                    />
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={() => setImageToDelete(image.name)}
-                      disabled={isDeleting}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
+                <ImageTable
+                  images={filteredImages}
+                  isDeleting={isDeleting}
+                  onDeleteClick={setImageToDelete}
+                  sortOrder={sortOrder}
+                />
               </div>
             )}
           </ScrollArea>
