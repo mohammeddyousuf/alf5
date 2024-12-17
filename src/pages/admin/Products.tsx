@@ -12,6 +12,7 @@ import { Download, Upload, FolderOpen, Loader2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Papa from 'papaparse';
 import { useProducts } from "@/hooks/useProducts";
+import { ImageManagementDialog } from "@/components/admin/product/ImageManagementDialog";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -203,7 +204,6 @@ const Products = () => {
   };
 
   const [showImageManager, setShowImageManager] = useState(false);
-  const [imageToDelete, setImageToDelete] = useState<string | null>(null);
   const [folderSize, setFolderSize] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -261,31 +261,6 @@ const Products = () => {
     }
   };
 
-  const handleImageDelete = async () => {
-    if (!imageToDelete) return;
-
-    try {
-      const { error } = await supabase.storage
-        .from("product-images")
-        .remove([imageToDelete]);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Image deleted successfully",
-      });
-      setImageToDelete(null);
-      calculateFolderSize();
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
-    }
-  };
-
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'}`}>
@@ -301,7 +276,7 @@ const Products = () => {
           <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-2'}`}>
             <Button 
               variant="outline" 
-              onClick={() => window.open(`${supabase.storage.from("product-images").getPublicUrl('').data.publicUrl}`, '_blank')}
+              onClick={() => setShowImageManager(true)}
               className="w-full"
             >
               <FolderOpen className="h-4 w-4 mr-2" />
@@ -350,6 +325,13 @@ const Products = () => {
           </div>
         </div>
       </div>
+
+      <ImageManagementDialog
+        open={showImageManager}
+        onOpenChange={setShowImageManager}
+        onImageUpload={calculateFolderSize}
+        folderSize={folderSize}
+      />
 
       <GlobalSaleControls />
 
