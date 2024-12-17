@@ -63,6 +63,28 @@ const Products = () => {
     },
   });
 
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: subcategories } = useQuery({
+    queryKey: ["subcategories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subcategories")
+        .select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const handleAddProduct = () => {
     if (!systemLimits?.product_limit) {
       toast({
@@ -95,19 +117,26 @@ const Products = () => {
       return;
     }
 
-    const exportData = products.map(product => ({
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      sale_price: product.sale_price,
-      brand: product.brand,
-      custom_label: product.custom_label,
-      featured: product.featured,
-      status: product.status,
-      category_id: product.category_id,
-      subcategory_id: product.subcategory_id,
-      images: product.images ? product.images.join(';') : '',
-    }));
+    const exportData = products.map(product => {
+      const category = categories?.find(c => c.id === product.category_id);
+      const subcategory = subcategories?.find(s => s.id === product.subcategory_id);
+
+      return {
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        sale_price: product.sale_price,
+        brand: product.brand,
+        custom_label: product.custom_label,
+        featured: product.featured,
+        status: product.status,
+        category: category?.name || '',
+        subcategory: subcategory?.name || '',
+        category_id: product.category_id,
+        subcategory_id: product.subcategory_id,
+        images: product.images ? product.images.join(';') : '',
+      };
+    });
 
     const csv = Papa.unparse(exportData);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
