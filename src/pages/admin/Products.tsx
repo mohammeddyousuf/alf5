@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { ProductFilters } from "@/components/admin/product/ProductFilters";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductList } from "@/components/admin/product/ProductList";
 import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import { GlobalSaleControls } from "@/components/admin/product/GlobalSaleControls";
-import { Download, Upload } from "lucide-react";
+import { Download, Upload, FolderOpen, Loader2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Papa from 'papaparse';
 import { useProducts } from "@/hooks/useProducts";
@@ -90,26 +90,12 @@ const Products = () => {
     },
   });
 
-  const handleAddProduct = () => {
-    if (!systemLimits?.product_limit) {
-      toast({
-        title: "Error",
-        description: "System limits not configured. Please contact super admin.",
-        variant: "destructive",
-      });
-      return;
-    }
+  const getImageNameFromUrl = (url: string) => {
+    return decodeURIComponent(url.split("/").pop() || "");
+  };
 
-    if (products && products.length >= systemLimits.product_limit) {
-      toast({
-        title: "Error",
-        description: `Product limit (${systemLimits.product_limit}) reached. Please contact super admin to increase the limit.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    navigate("/admin/products/new");
+  const getFullImageUrl = (fileName: string) => {
+    return `${supabase.storage.from("product-images").getPublicUrl(fileName).data.publicUrl}`;
   };
 
   const handleExport = () => {
@@ -137,7 +123,7 @@ const Products = () => {
         status: product.status,
         category: category?.name || '',
         subcategory: subcategory?.name || '',
-        images: product.images ? product.images.join(';') : '',
+        images: product.images ? product.images.map(url => getImageNameFromUrl(url)).join(';') : '',
       };
     });
 
@@ -167,7 +153,7 @@ const Products = () => {
           try {
             const products = results.data.map((row: any) => ({
               ...row,
-              images: row.images ? row.images.split(';') : [],
+              images: row.images ? row.images.split(';').map((fileName: string) => getFullImageUrl(fileName.trim())) : [],
               featured: row.featured === 'true',
               price: parseFloat(row.price),
               sale_price: row.sale_price ? parseFloat(row.sale_price) : null,
@@ -212,6 +198,90 @@ const Products = () => {
     }
   };
 
+  const [showImageManager, setShowImageManager] = useState(false);
+  const [imageToDelete, setImageToDelete] = useState<string | null>(null);
+  const [folderSize, setFolderSize] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const calculateFolderSize = async () => {
+    const { data, error } = await supabase.storage
+      .from("product-images")
+      .list();
+    
+    if (error) {
+      console.error("Error fetching folder size:", error);
+      return;
+    }
+
+    const totalSize = data.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
+    setFolderSize(totalSize);
+  };
+
+  useEffect(() => {
+    calculateFolderSize();
+  }, []);
+
+  const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    try {
+      await Promise.all(
+        Array.from(files).map(async (file) => {
+          const fileName = `product_${Date.now()}_${file.name}`;
+          const { error } = await supabase.storage
+            .from("product-images")
+            .upload(fileName, file, {
+              upsert: false
+            });
+
+          if (error) throw error;
+        })
+      );
+
+      toast({
+        title: "Success",
+        description: "Images uploaded successfully",
+      });
+      calculateFolderSize();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    } finally {
+      setIsUploading(false);
+      event.target.value = "";
+    }
+  };
+
+  const handleImageDelete = async () => {
+    if (!imageToDelete) return;
+
+    try {
+      const { error } = await supabase.storage
+        .from("product-images")
+        .remove([imageToDelete]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Image deleted successfully",
+      });
+      setImageToDelete(null);
+      calculateFolderSize();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'}`}>
@@ -219,11 +289,40 @@ const Products = () => {
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-sm text-muted-foreground">
             Manage your products ({products?.length || 0} of {systemLimits?.product_limit || '...'} allowed)
+            {folderSize > 0 && ` • Images folder size: ${(folderSize / (1024 * 1024)).toFixed(2)} MB`}
           </p>
         </div>
         <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-4'}`}>
           <BackToDashboard />
           <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-2'}`}>
+            <Button 
+              variant="outline" 
+              onClick={() => window.open(`${supabase.storage.from("product-images").getPublicUrl('').data.publicUrl}`, '_blank')}
+              className="w-full"
+            >
+              <FolderOpen className="h-4 w-4 mr-2" />
+              View Images
+            </Button>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleBulkUpload}
+              className="hidden"
+              id="bulk-upload"
+            />
+            <label htmlFor="bulk-upload">
+              <Button variant="outline" className="cursor-pointer w-full" asChild disabled={isUploading}>
+                <div className="flex items-center gap-2">
+                  {isUploading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
+                  Bulk Upload
+                </div>
+              </Button>
+            </label>
             <input
               type="file"
               accept=".csv"
@@ -248,9 +347,7 @@ const Products = () => {
         </div>
       </div>
 
-      <div className="text-center">
-        <GlobalSaleControls />
-      </div>
+      <GlobalSaleControls />
 
       <ProductFilters
         search={search}
