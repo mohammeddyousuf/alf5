@@ -13,6 +13,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Papa from 'papaparse';
 import { useProducts } from "@/hooks/useProducts";
 import { ImageManagementDialog } from "@/components/admin/product/ImageManagementDialog";
+import { LimitExceededDialog } from "@/components/admin/product/LimitExceededDialog";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -30,23 +31,18 @@ const Products = () => {
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
   
   const { data: products } = useProducts();
-
-  const handleAddProduct = () => {
-    navigate("/admin/products/new");
-  };
-
-  const { data: systemLimits, isLoading: isLoadingLimits } = useQuery({
+  const { data: systemLimits } = useQuery({
     queryKey: ["system-limits"],
     queryFn: async () => {
-      const { data: existingLimits, error: fetchError } = await supabase
+      const { data: existingLimits, error } = await supabase
         .from("system_limits")
         .select("*")
         .order('created_at', { ascending: false })
         .limit(1);
       
-      if (fetchError) {
-        console.error("Error fetching limits:", fetchError);
-        throw fetchError;
+      if (error) {
+        console.error("Error fetching limits:", error);
+        throw error;
       }
       
       if (!existingLimits || existingLimits.length === 0) {
@@ -73,78 +69,38 @@ const Products = () => {
     },
   });
 
-  const { data: categories } = useQuery({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("*");
-      if (error) throw error;
-      return data;
-    },
-  });
+  const [showImageManager, setShowImageManager] = useState(false);
+  const [folderSize, setFolderSize] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [images, setImages] = useState<any[]>([]);
+  const [showLimitExceeded, setShowLimitExceeded] = useState(false);
 
-  const { data: subcategories } = useQuery({
-    queryKey: ["subcategories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("subcategories")
-        .select("*");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const getImageNameFromUrl = (url: string) => {
-    return decodeURIComponent(url.split("/").pop() || "");
-  };
-
-  const getFullImageUrl = (fileName: string) => {
-    return `${supabase.storage.from("product-images").getPublicUrl(fileName).data.publicUrl}`;
-  };
-
-  const handleExport = () => {
-    if (!products?.length) {
-      toast({
-        title: "Error",
-        description: "No products to export",
-        variant: "destructive",
-      });
+  const calculateFolderSize = async () => {
+    const { data, error } = await supabase.storage
+      .from("product-images")
+      .list();
+    
+    if (error) {
+      console.error("Error fetching folder size:", error);
       return;
     }
 
-    const exportData = products.map(product => {
-      const category = categories?.find(c => c.id === product.category_id);
-      const subcategory = subcategories?.find(s => s.id === product.subcategory_id);
+    const totalSize = data.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
+    setFolderSize(totalSize);
+  };
 
-      return {
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        sale_price: product.sale_price,
-        brand: product.brand,
-        custom_label: product.custom_label,
-        featured: product.featured,
-        status: product.status,
-        category: category?.name || '',
-        subcategory: subcategory?.name || '',
-        images: product.images ? product.images.map(url => getImageNameFromUrl(url)).join(';') : '',
-      };
-    });
+  useEffect(() => {
+    calculateFolderSize();
+  }, []);
 
-    const csv = Papa.unparse(exportData);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'products.csv';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    toast({
-      title: "Success",
-      description: "Products exported successfully",
-    });
+  const handleAddProduct = () => {
+    const currentCount = products?.length || 0;
+    const limit = systemLimits?.product_limit || 100;
+    if (currentCount >= limit) {
+      setShowLimitExceeded(true);
+      return;
+    }
+    navigate("/admin/products/new");
   };
 
   const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,15 +112,19 @@ const Products = () => {
         header: true,
         complete: async (results) => {
           try {
-            const products = results.data.map((row: any) => ({
-              ...row,
-              images: row.images ? row.images.split(';').map((fileName: string) => getFullImageUrl(fileName.trim())) : [],
-              featured: row.featured === 'true',
-              price: parseFloat(row.price),
-              sale_price: row.sale_price ? parseFloat(row.sale_price) : null,
-            }));
+            const newProducts = results.data;
+            const totalProducts = (products?.length || 0) + newProducts.length;
+            
+            if (totalProducts > (systemLimits?.product_limit || 100)) {
+              toast({
+                variant: "destructive",
+                title: "Product Limit Exceeded",
+                description: `Cannot import ${newProducts.length} products. This would exceed your limit of ${systemLimits?.product_limit} products. Please contact your administrator.`
+              });
+              return;
+            }
 
-            for (const product of products) {
+            for (const product of newProducts) {
               const { error } = await supabase
                 .from("products")
                 .insert([product]);
@@ -174,7 +134,7 @@ const Products = () => {
 
             toast({
               title: "Success",
-              description: `${products.length} products imported successfully`,
+              description: `${newProducts.length} products imported successfully`,
             });
 
             window.location.reload();
@@ -203,35 +163,19 @@ const Products = () => {
     }
   };
 
-  const [showImageManager, setShowImageManager] = useState(false);
-  const [folderSize, setFolderSize] = useState<number>(0);
-  const [isUploading, setIsUploading] = useState(false);
-  const [images, setImages] = useState<any[]>([]);
-
-  const calculateFolderSize = async () => {
-    const { data, error } = await supabase.storage
-      .from("product-images")
-      .list();
-    
-    if (error) {
-      console.error("Error fetching folder size:", error);
-      return;
-    }
-
-    const totalSize = data.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
-    setFolderSize(totalSize);
-  };
-
-  useEffect(() => {
-    calculateFolderSize();
-  }, []);
-
   const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
     setIsUploading(true);
     try {
+      const currentCount = products?.length || 0;
+      const limit = systemLimits?.product_limit || 100;
+      if (currentCount + files.length > limit) {
+        setShowLimitExceeded(true);
+        return;
+      }
+
       await Promise.all(
         Array.from(files).map(async (file) => {
           const fileName = `product_${Date.now()}_${file.name}`;
@@ -285,7 +229,7 @@ const Products = () => {
               className="w-full"
             >
               <FolderOpen className="h-4 w-4 mr-2" />
-              View Images
+              Images
             </Button>
             <input
               type="file"
@@ -374,6 +318,13 @@ const Products = () => {
         selectedCustomLabel={selectedCustomLabel}
         selectedCategory={selectedCategory}
         selectedSubcategory={selectedSubcategory}
+      />
+
+      <LimitExceededDialog
+        open={showLimitExceeded}
+        onOpenChange={setShowLimitExceeded}
+        currentCount={products?.length || 0}
+        limit={systemLimits?.product_limit || 100}
       />
     </div>
   );
