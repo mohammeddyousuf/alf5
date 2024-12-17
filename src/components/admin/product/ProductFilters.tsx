@@ -137,40 +137,6 @@ export function ProductFilters({
         </div>
 
         <div className="flex items-center space-x-2">
-          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="archived">Archived</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="sale-products"
-            checked={showSaleProducts}
-            onCheckedChange={setShowSaleProducts}
-          />
-          <Label htmlFor="sale-products">Show Sale Products</Label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="non-sale-products"
-            checked={showNonSaleProducts}
-            onCheckedChange={setShowNonSaleProducts}
-          />
-          <Label htmlFor="non-sale-products">Show Non-Sale Products</Label>
-        </div>
-      </div>
-
-      <div className={`${isMobile ? 'flex flex-col space-y-4' : 'grid grid-cols-4 gap-4'}`}>
-        <div className="flex items-center space-x-2">
           <Select value={selectedBrand} onValueChange={setSelectedBrand}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Filter by brand" />
@@ -217,7 +183,9 @@ export function ProductFilters({
             </SelectContent>
           </Select>
         </div>
+      </div>
 
+      <div className={`${isMobile ? 'flex flex-col space-y-4' : 'grid grid-cols-4 gap-4'}`}>
         <div className="flex items-center space-x-2">
           <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
             <SelectTrigger className="w-full">
@@ -234,6 +202,38 @@ export function ProductFilters({
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="sale-products"
+            checked={showSaleProducts}
+            onCheckedChange={setShowSaleProducts}
+          />
+          <Label htmlFor="sale-products">Show Sale Products</Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="non-sale-products"
+            checked={showNonSaleProducts}
+            onCheckedChange={setShowNonSaleProducts}
+          />
+          <Label htmlFor="non-sale-products">Show Non-Sale Products</Label>
         </div>
       </div>
 
