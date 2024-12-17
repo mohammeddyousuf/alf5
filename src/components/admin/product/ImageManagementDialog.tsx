@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Trash2, Upload } from "lucide-react";
@@ -25,6 +25,7 @@ export function ImageManagementDialog({
   const [isLoading, setIsLoading] = useState(true);
   const [imageToDelete, setImageToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const loadImages = async () => {
     try {
@@ -89,17 +90,62 @@ export function ImageManagementDialog({
     }
   };
 
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length === 0) return;
+
+    try {
+      await Promise.all(
+        files.map(async (file) => {
+          const fileName = `product_${Date.now()}_${file.name}`;
+          const { error } = await supabase.storage
+            .from("product-images")
+            .upload(fileName, file, {
+              upsert: false
+            });
+
+          if (error) throw error;
+        })
+      );
+
+      toast({
+        title: "Success",
+        description: "Images uploaded successfully"
+      });
+      
+      await loadImages();
+      onImageUpload();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message
+      });
+    }
+  };
+
   // Load images when dialog opens
-  useState(() => {
+  useEffect(() => {
     if (open) {
       loadImages();
     }
-  });
+  }, [open]);
 
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent className="w-[90vw] sm:max-w-[600px]">
+        <SheetContent 
+          className="w-[90vw] sm:max-w-[600px]"
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+        >
           <SheetHeader>
             <SheetTitle className="flex justify-between items-center">
               Product Images
@@ -115,8 +161,12 @@ export function ImageManagementDialog({
               accept="image/*"
               multiple
               onChange={(e) => {
-                onImageUpload();
-                loadImages();
+                if (e.target.files && e.target.files.length > 0) {
+                  handleDrop({ 
+                    preventDefault: () => {},
+                    dataTransfer: { files: e.target.files } 
+                  } as any);
+                }
                 e.target.value = '';
               }}
               className="hidden"
@@ -138,7 +188,11 @@ export function ImageManagementDialog({
                 <Loader2 className="h-6 w-6 animate-spin" />
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-4">
+              <div 
+                className={`grid grid-cols-2 gap-4 p-4 rounded-lg transition-colors ${
+                  isDragging ? 'bg-muted/50 border-2 border-dashed border-primary' : ''
+                }`}
+              >
                 {images.map((image) => (
                   <div key={image.name} className="relative group">
                     <img
@@ -151,6 +205,7 @@ export function ImageManagementDialog({
                       size="icon"
                       className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={() => setImageToDelete(image.name)}
+                      disabled={isDeleting}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
