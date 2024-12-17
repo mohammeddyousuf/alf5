@@ -30,6 +30,10 @@ const Products = () => {
   
   const { data: products } = useProducts();
 
+  const handleAddProduct = () => {
+    navigate("/admin/products/new");
+  };
+
   const { data: systemLimits, isLoading: isLoadingLimits } = useQuery({
     queryKey: ["system-limits"],
     queryFn: async () => {
