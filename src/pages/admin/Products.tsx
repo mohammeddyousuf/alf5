@@ -11,6 +11,7 @@ import { GlobalSaleControls } from "@/components/admin/product/GlobalSaleControl
 import { Download, Upload } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Papa from 'papaparse';
+import { useProducts } from "@/hooks/useProducts";
 
 const Products = () => {
   const navigate = useNavigate();
