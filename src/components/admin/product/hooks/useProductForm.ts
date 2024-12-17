@@ -10,6 +10,7 @@ type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 interface UseProductFormProps {
   product?: ProductRow;
   onSuccess?: () => void;
+  onLimitExceeded?: () => void;
 }
 
 const defaultValues: ProductFormData = {
@@ -26,7 +27,7 @@ const defaultValues: ProductFormData = {
   custom_label: null,
 };
 
-export function useProductForm({ product, onSuccess }: UseProductFormProps) {
+export function useProductForm({ product, onSuccess, onLimitExceeded }: UseProductFormProps) {
   const { toast } = useToast();
   
   const form = useForm<ProductFormData>({
@@ -97,6 +98,7 @@ export function useProductForm({ product, onSuccess }: UseProductFormProps) {
         title: "Error",
         description: error.message,
       });
+      onLimitExceeded?.();
     }
   };
 
