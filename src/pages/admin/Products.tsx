@@ -137,8 +137,6 @@ const Products = () => {
         status: product.status,
         category: category?.name || '',
         subcategory: subcategory?.name || '',
-        category_id: product.category_id,
-        subcategory_id: product.subcategory_id,
         images: product.images ? product.images.join(';') : '',
       };
     });

@@ -117,10 +117,10 @@ export function ProductFilters({
         />
       </div>
 
-      <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'items-center space-x-4'}`}>
+      <div className={`${isMobile ? 'flex flex-col space-y-4' : 'grid grid-cols-4 gap-4'}`}>
         <div className="flex items-center space-x-2">
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -137,67 +137,15 @@ export function ProductFilters({
         </div>
 
         <div className="flex items-center space-x-2">
-          <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
-              <SelectValue placeholder="Filter by brand" />
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Brands</SelectItem>
-              {brands?.map((brand) => (
-                <SelectItem key={brand} value={brand}>
-                  {brand}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Select value={selectedCustomLabel} onValueChange={setSelectedCustomLabel}>
-            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
-              <SelectValue placeholder="Filter by label" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Labels</SelectItem>
-              {customLabels?.map((label) => (
-                <SelectItem key={label} value={label}>
-                  {label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
-              <SelectValue placeholder="Filter by category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories?.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
-            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
-              <SelectValue placeholder="Filter by subcategory" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Subcategories</SelectItem>
-              {subcategories?.filter(sub => 
-                selectedCategory === 'all' || sub.category_id === selectedCategory
-              )?.map((subcategory) => (
-                <SelectItem key={subcategory.id} value={subcategory.id}>
-                  {subcategory.name}
-                </SelectItem>
-              ))}
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -219,7 +167,77 @@ export function ProductFilters({
           />
           <Label htmlFor="non-sale-products">Show Non-Sale Products</Label>
         </div>
+      </div>
 
+      <div className={`${isMobile ? 'flex flex-col space-y-4' : 'grid grid-cols-4 gap-4'}`}>
+        <div className="flex items-center space-x-2">
+          <Select value={selectedBrand} onValueChange={setSelectedBrand}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter by brand" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Brands</SelectItem>
+              {brands?.map((brand) => (
+                <SelectItem key={brand} value={brand}>
+                  {brand}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Select value={selectedCustomLabel} onValueChange={setSelectedCustomLabel}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter by label" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Labels</SelectItem>
+              {customLabels?.map((label) => (
+                <SelectItem key={label} value={label}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter by category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories?.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Filter by subcategory" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Subcategories</SelectItem>
+              {subcategories?.filter(sub => 
+                selectedCategory === 'all' || sub.category_id === selectedCategory
+              )?.map((subcategory) => (
+                <SelectItem key={subcategory.id} value={subcategory.id}>
+                  {subcategory.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className={`${isMobile ? 'flex flex-col space-y-4' : 'grid grid-cols-4 gap-4'}`}>
         <div className="flex items-center space-x-2">
           <Switch
             id="featured-products"
@@ -227,20 +245,6 @@ export function ProductFilters({
             onCheckedChange={setShowFeatured}
           />
           <Label htmlFor="featured-products">Show Featured Products</Label>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
-              <SelectItem value="archived">Archived</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
       </div>
     </div>
