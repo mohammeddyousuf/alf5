@@ -14,6 +14,7 @@ interface ImageDeleteDialogProps {
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   imageName: string;
+  isFavicon?: boolean;
 }
 
 export function ImageDeleteDialog({
@@ -21,12 +22,13 @@ export function ImageDeleteDialog({
   onOpenChange,
   onConfirm,
   imageName,
+  isFavicon,
 }: ImageDeleteDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Image</AlertDialogTitle>
+          <AlertDialogTitle>Delete {isFavicon ? 'Favicon' : 'Image'}</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete {imageName}? This action cannot be undone.
           </AlertDialogDescription>

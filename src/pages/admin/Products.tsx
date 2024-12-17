@@ -226,6 +226,46 @@ const Products = () => {
     calculateFolderSize();
   }, []);
 
+  const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    try {
+      await Promise.all(
+        Array.from(files).map(async (file) => {
+          const fileName = `product_${Date.now()}_${file.name}`;
+          const { error } = await supabase.storage
+            .from("product-images")
+            .upload(fileName, file, {
+              upsert: false
+            });
+
+          if (error) throw error;
+        })
+      );
+
+      toast({
+        title: "Success",
+        description: "Images uploaded successfully"
+      });
+      
+      await calculateFolderSize();
+      setShowImageManager(true); // Keep the dialog open after upload
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message
+      });
+    } finally {
+      setIsUploading(false);
+      if (event.target) {
+        event.target.value = "";
+      }
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'}`}>
