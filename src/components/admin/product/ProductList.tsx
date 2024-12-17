@@ -13,13 +13,15 @@ interface ProductListProps {
   showSaleProducts: boolean;
   showNonSaleProducts: boolean;
   selectedBrand: string;
+  sortBy: string;
 }
 
 export const ProductList = ({ 
   search, 
   showSaleProducts, 
   showNonSaleProducts,
-  selectedBrand 
+  selectedBrand,
+  sortBy
 }: ProductListProps) => {
   const { data: products, refetch, isLoading } = useProducts();
   const { toast } = useToast();
@@ -137,6 +139,23 @@ export const ProductList = ({
     }
   };
 
+  const sortProducts = (products: ProductRow[]) => {
+    return [...products].sort((a, b) => {
+      switch (sortBy) {
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
+        case 'price-asc':
+          return a.price - b.price;
+        case 'price-desc':
+          return b.price - a.price;
+        default:
+          return 0;
+      }
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
@@ -165,9 +184,11 @@ export const ProductList = ({
     return matchesSearch && showBasedOnSaleStatus && matchesBrand;
   });
 
+  const sortedProducts = sortProducts(filteredProducts || []);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {filteredProducts?.map((product: ProductRow) => (
+      {sortedProducts.map((product: ProductRow) => (
         <ProductCard
           key={product.id}
           product={product}

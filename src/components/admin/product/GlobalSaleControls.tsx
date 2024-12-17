@@ -147,13 +147,14 @@ export function GlobalSaleControls() {
 
   return (
     <div className="bg-card p-4 rounded-lg border mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <div className="space-y-1">
-          <h3 className="font-semibold">Global Sale Timer</h3>
-          <p className="text-sm text-muted-foreground">
-            Enable to show countdown timer on all products with sale prices
-          </p>
-        </div>
+      <div className="text-center space-y-1 mb-4">
+        <h3 className="font-semibold">Global Sale Timer</h3>
+        <p className="text-sm text-muted-foreground">
+          Enable to show countdown timer on all products with sale prices
+        </p>
+      </div>
+      
+      <div className="flex items-center justify-center mb-4">
         <Switch
           checked={isGlobalSaleEnabled}
           onCheckedChange={handleToggleSale}

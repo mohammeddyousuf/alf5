@@ -9,6 +9,7 @@ import { ProductList } from "@/components/admin/product/ProductList";
 import { useProducts } from "@/hooks/useProducts";
 import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import { GlobalSaleControls } from "@/components/admin/product/GlobalSaleControls";
+import { Download, Upload } from "lucide-react";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Products = () => {
   const [showSaleProducts, setShowSaleProducts] = useState(true);
   const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState("all");
+  const [sortBy, setSortBy] = useState("name-asc");
   
   const { data: products } = useProducts();
 
@@ -80,6 +82,94 @@ const Products = () => {
     navigate("/admin/products/new");
   };
 
+  const handleExport = () => {
+    if (!products?.length) {
+      toast({
+        title: "Error",
+        description: "No products to export",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const exportData = products.map(product => ({
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      sale_price: product.sale_price,
+      brand: product.brand,
+      custom_label: product.custom_label,
+      featured: product.featured,
+      status: product.status,
+      category_id: product.category_id,
+      subcategory_id: product.subcategory_id,
+      images: product.images,
+    }));
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'products.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Success",
+      description: "Products exported successfully",
+    });
+  };
+
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const products = JSON.parse(e.target?.result as string);
+          
+          if (!Array.isArray(products)) {
+            throw new Error("Invalid file format");
+          }
+
+          // Validate and insert products
+          for (const product of products) {
+            const { error } = await supabase
+              .from("products")
+              .insert([product]);
+            
+            if (error) throw error;
+          }
+
+          toast({
+            title: "Success",
+            description: `${products.length} products imported successfully`,
+          });
+
+          // Refresh the products list
+          window.location.reload();
+        } catch (error: any) {
+          toast({
+            title: "Error",
+            description: `Failed to import products: ${error.message}`,
+            variant: "destructive",
+          });
+        }
+      };
+      reader.readAsText(file);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: `Failed to read file: ${error.message}`,
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -91,7 +181,28 @@ const Products = () => {
         </div>
         <div className="flex items-center gap-4">
           <BackToDashboard />
-          <Button onClick={handleAddProduct}>Add Product</Button>
+          <div className="flex items-center gap-2">
+            <input
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              className="hidden"
+              id="import-file"
+            />
+            <label htmlFor="import-file">
+              <Button variant="outline" className="cursor-pointer" asChild>
+                <div className="flex items-center gap-2">
+                  <Upload className="h-4 w-4" />
+                  Import
+                </div>
+              </Button>
+            </label>
+            <Button variant="outline" onClick={handleExport}>
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+            <Button onClick={handleAddProduct}>Add Product</Button>
+          </div>
         </div>
       </div>
 
@@ -106,6 +217,8 @@ const Products = () => {
         setShowNonSaleProducts={setShowNonSaleProducts}
         selectedBrand={selectedBrand}
         setSelectedBrand={setSelectedBrand}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
       />
 
       <ProductList 
@@ -113,6 +226,7 @@ const Products = () => {
         showSaleProducts={showSaleProducts}
         showNonSaleProducts={showNonSaleProducts}
         selectedBrand={selectedBrand}
+        sortBy={sortBy}
       />
     </div>
   );

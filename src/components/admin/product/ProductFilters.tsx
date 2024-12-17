@@ -14,6 +14,8 @@ interface ProductFiltersProps {
   setShowNonSaleProducts: (value: boolean) => void;
   selectedBrand: string;
   setSelectedBrand: (value: string) => void;
+  sortBy: string;
+  setSortBy: (value: string) => void;
 }
 
 export function ProductFilters({
@@ -25,6 +27,8 @@ export function ProductFilters({
   setShowNonSaleProducts,
   selectedBrand,
   setSelectedBrand,
+  sortBy,
+  setSortBy,
 }: ProductFiltersProps) {
   const { data: brands } = useQuery({
     queryKey: ["product-brands"],
@@ -36,7 +40,6 @@ export function ProductFilters({
       
       if (!products) return [];
       
-      // Get unique brands
       const uniqueBrands = Array.from(new Set(products.map(p => p.brand)));
       return uniqueBrands.filter(Boolean).sort();
     },
@@ -87,6 +90,20 @@ export function ProductFilters({
             onCheckedChange={setShowNonSaleProducts}
           />
           <Label htmlFor="non-sale-products">Show Non-Sale Products</Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+              <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+              <SelectItem value="price-asc">Price (Low-High)</SelectItem>
+              <SelectItem value="price-desc">Price (High-Low)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>
