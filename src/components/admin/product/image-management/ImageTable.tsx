@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Loader2, Trash2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -8,23 +9,32 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
 
 interface ImageTableProps {
   images: any[];
   isDeleting: boolean;
-  onDeleteClick: (imageName: string) => void;
+  onDeleteClick: (imageNames: string[]) => void;
   sortOrder: "name-asc" | "name-desc" | "date-asc" | "date-desc";
+  showUnassigned: boolean;
 }
 
 export function ImageTable({ 
   images, 
   isDeleting, 
   onDeleteClick,
-  sortOrder 
+  sortOrder,
+  showUnassigned
 }: ImageTableProps) {
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+
   const sortImages = (images: any[]) => {
-    return [...images].sort((a, b) => {
+    let filteredImages = [...images];
+    
+    if (showUnassigned) {
+      filteredImages = filteredImages.filter(image => !image.usage || image.usage.length === 0);
+    }
+    
+    return filteredImages.sort((a, b) => {
       if (sortOrder === "name-asc") {
         return a.name.localeCompare(b.name);
       } else if (sortOrder === "name-desc") {
@@ -37,12 +47,34 @@ export function ImageTable({
     });
   };
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedImages(sortedImages.map(image => image.name));
+    } else {
+      setSelectedImages([]);
+    }
+  };
+
+  const handleSelectImage = (imageName: string, checked: boolean) => {
+    if (checked) {
+      setSelectedImages(prev => [...prev, imageName]);
+    } else {
+      setSelectedImages(prev => prev.filter(name => name !== imageName));
+    }
+  };
+
   const sortedImages = sortImages(images);
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
+          <TableHead className="w-[50px]">
+            <Checkbox 
+              checked={selectedImages.length === sortedImages.length && sortedImages.length > 0}
+              onCheckedChange={handleSelectAll}
+            />
+          </TableHead>
           <TableHead>Image</TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Usage</TableHead>
@@ -52,6 +84,12 @@ export function ImageTable({
       <TableBody>
         {sortedImages.map((image) => (
           <TableRow key={image.name}>
+            <TableCell>
+              <Checkbox 
+                checked={selectedImages.includes(image.name)}
+                onCheckedChange={(checked) => handleSelectImage(image.name, checked as boolean)}
+              />
+            </TableCell>
             <TableCell>
               <img
                 src={image.url}
@@ -71,7 +109,7 @@ export function ImageTable({
               <Button
                 variant="destructive"
                 size="icon"
-                onClick={() => onDeleteClick(image.name)}
+                onClick={() => onDeleteClick([image.name])}
                 disabled={isDeleting}
               >
                 <Trash2 className="h-4 w-4" />

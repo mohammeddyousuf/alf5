@@ -25,11 +25,12 @@ export function ImageManagementDialog({
   const { toast } = useToast();
   const [images, setImages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [imageToDelete, setImageToDelete] = useState<string | null>(null);
+  const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"name-asc" | "name-desc" | "date-asc" | "date-desc">("date-desc");
+  const [showUnassigned, setShowUnassigned] = useState(false);
 
   const loadImages = async () => {
     try {
@@ -93,19 +94,19 @@ export function ImageManagementDialog({
   };
 
   const handleDelete = async () => {
-    if (!imageToDelete) return;
+    if (!imagesToDelete.length) return;
 
     try {
       setIsDeleting(true);
       const { error } = await supabase.storage
         .from("product-images")
-        .remove([imageToDelete]);
+        .remove(imagesToDelete);
 
       if (error) throw error;
 
       toast({
         title: "Success",
-        description: "Image deleted successfully"
+        description: `${imagesToDelete.length} image(s) deleted successfully`
       });
 
       await loadImages();
@@ -118,7 +119,7 @@ export function ImageManagementDialog({
       });
     } finally {
       setIsDeleting(false);
-      setImageToDelete(null);
+      setImagesToDelete([]);
     }
   };
 
@@ -189,7 +190,7 @@ export function ImageManagementDialog({
             <SheetTitle className="flex justify-between items-center">
               Product Images
               <span className="text-sm font-normal text-muted-foreground">
-                Folder size: {(folderSize / (1024 * 1024)).toFixed(2)} MB
+                Total images: {images.length} • Folder size: {(folderSize / (1024 * 1024)).toFixed(2)} MB
               </span>
             </SheetTitle>
           </SheetHeader>
@@ -226,6 +227,8 @@ export function ImageManagementDialog({
             onSearchChange={setSearchQuery}
             sortOrder={sortOrder}
             onSortChange={(value) => setSortOrder(value as any)}
+            showUnassigned={showUnassigned}
+            onShowUnassignedChange={setShowUnassigned}
           />
 
           <ScrollArea className="h-[calc(100vh-250px)] mt-6">
@@ -242,8 +245,9 @@ export function ImageManagementDialog({
                 <ImageTable
                   images={filteredImages}
                   isDeleting={isDeleting}
-                  onDeleteClick={setImageToDelete}
+                  onDeleteClick={setImagesToDelete}
                   sortOrder={sortOrder}
+                  showUnassigned={showUnassigned}
                 />
               </div>
             )}
@@ -252,9 +256,10 @@ export function ImageManagementDialog({
       </Sheet>
 
       <ImageDeleteDialog
-        open={!!imageToDelete}
-        onOpenChange={(open) => !open && setImageToDelete(null)}
+        open={imagesToDelete.length > 0}
+        onOpenChange={(open) => !open && setImagesToDelete([])}
         onConfirmDelete={handleDelete}
+        count={imagesToDelete.length}
       />
     </>
   );
