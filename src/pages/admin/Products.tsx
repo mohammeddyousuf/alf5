@@ -22,6 +22,11 @@ const Products = () => {
   const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState("all");
   const [sortBy, setSortBy] = useState("name-asc");
+  const [showFeatured, setShowFeatured] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedCustomLabel, setSelectedCustomLabel] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedSubcategory, setSelectedSubcategory] = useState("all");
   
   const { data: products } = useProducts();
 
@@ -260,6 +265,16 @@ const Products = () => {
         setSelectedBrand={setSelectedBrand}
         sortBy={sortBy}
         setSortBy={setSortBy}
+        showFeatured={showFeatured}
+        setShowFeatured={setShowFeatured}
+        selectedStatus={selectedStatus}
+        setSelectedStatus={setSelectedStatus}
+        selectedCustomLabel={selectedCustomLabel}
+        setSelectedCustomLabel={setSelectedCustomLabel}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        selectedSubcategory={selectedSubcategory}
+        setSelectedSubcategory={setSelectedSubcategory}
       />
 
       <ProductList 
@@ -268,6 +283,11 @@ const Products = () => {
         showNonSaleProducts={showNonSaleProducts}
         selectedBrand={selectedBrand}
         sortBy={sortBy}
+        showFeatured={showFeatured}
+        selectedStatus={selectedStatus}
+        selectedCustomLabel={selectedCustomLabel}
+        selectedCategory={selectedCategory}
+        selectedSubcategory={selectedSubcategory}
       />
     </div>
   );

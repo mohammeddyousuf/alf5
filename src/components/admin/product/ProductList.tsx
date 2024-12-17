@@ -14,6 +14,11 @@ interface ProductListProps {
   showNonSaleProducts: boolean;
   selectedBrand: string;
   sortBy: string;
+  showFeatured: boolean;
+  selectedStatus: string;
+  selectedCustomLabel: string;
+  selectedCategory: string;
+  selectedSubcategory: string;
 }
 
 export const ProductList = ({ 
@@ -21,7 +26,12 @@ export const ProductList = ({
   showSaleProducts, 
   showNonSaleProducts,
   selectedBrand,
-  sortBy
+  sortBy,
+  showFeatured,
+  selectedStatus,
+  selectedCustomLabel,
+  selectedCategory,
+  selectedSubcategory
 }: ProductListProps) => {
   const { data: products, refetch, isLoading } = useProducts();
   const { toast } = useToast();
@@ -150,6 +160,10 @@ export const ProductList = ({
           return a.price - b.price;
         case 'price-desc':
           return b.price - a.price;
+        case 'sale-price-asc':
+          return (a.sale_price || a.price) - (b.sale_price || b.price);
+        case 'sale-price-desc':
+          return (b.sale_price || b.price) - (a.sale_price || a.price);
         case 'date-asc':
           return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
         case 'date-desc':
@@ -176,16 +190,26 @@ export const ProductList = ({
     
     const isOnSale = isProductOnSale(product);
     
-    // Check if product should be shown based on sale status filters
     const showBasedOnSaleStatus = (
       (isOnSale && showSaleProducts) || 
       (!isOnSale && showNonSaleProducts)
     );
 
-    // Check if product matches selected brand filter
     const matchesBrand = selectedBrand === 'all' || product.brand === selectedBrand;
+    const matchesCustomLabel = selectedCustomLabel === 'all' || product.custom_label === selectedCustomLabel;
+    const matchesCategory = selectedCategory === 'all' || product.category_id === selectedCategory;
+    const matchesSubcategory = selectedSubcategory === 'all' || product.subcategory_id === selectedSubcategory;
+    const matchesFeatured = !showFeatured || product.featured;
+    const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus;
 
-    return matchesSearch && showBasedOnSaleStatus && matchesBrand;
+    return matchesSearch && 
+           showBasedOnSaleStatus && 
+           matchesBrand && 
+           matchesCustomLabel && 
+           matchesCategory && 
+           matchesSubcategory && 
+           matchesFeatured && 
+           matchesStatus;
   });
 
   const sortedProducts = sortProducts(filteredProducts || []);

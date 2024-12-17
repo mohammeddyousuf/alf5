@@ -17,6 +17,16 @@ interface ProductFiltersProps {
   setSelectedBrand: (value: string) => void;
   sortBy: string;
   setSortBy: (value: string) => void;
+  showFeatured: boolean;
+  setShowFeatured: (value: boolean) => void;
+  selectedStatus: string;
+  setSelectedStatus: (value: string) => void;
+  selectedCustomLabel: string;
+  setSelectedCustomLabel: (value: string) => void;
+  selectedCategory: string;
+  setSelectedCategory: (value: string) => void;
+  selectedSubcategory: string;
+  setSelectedSubcategory: (value: string) => void;
 }
 
 export function ProductFilters({
@@ -30,6 +40,16 @@ export function ProductFilters({
   setSelectedBrand,
   sortBy,
   setSortBy,
+  showFeatured,
+  setShowFeatured,
+  selectedStatus,
+  setSelectedStatus,
+  selectedCustomLabel,
+  setSelectedCustomLabel,
+  selectedCategory,
+  setSelectedCategory,
+  selectedSubcategory,
+  setSelectedSubcategory,
 }: ProductFiltersProps) {
   const isMobile = useIsMobile();
   
@@ -45,6 +65,43 @@ export function ProductFilters({
       
       const uniqueBrands = Array.from(new Set(products.map(p => p.brand)));
       return uniqueBrands.filter(Boolean).sort();
+    },
+  });
+
+  const { data: customLabels } = useQuery({
+    queryKey: ["product-custom-labels"],
+    queryFn: async () => {
+      const { data: products } = await supabase
+        .from("products")
+        .select("custom_label")
+        .not("custom_label", "is", null);
+      
+      if (!products) return [];
+      
+      const uniqueLabels = Array.from(new Set(products.map(p => p.custom_label)));
+      return uniqueLabels.filter(Boolean).sort();
+    },
+  });
+
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: subcategories } = useQuery({
+    queryKey: ["subcategories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subcategories")
+        .select("*");
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -71,6 +128,8 @@ export function ProductFilters({
               <SelectItem value="name-desc">Name (Z-A)</SelectItem>
               <SelectItem value="price-asc">Price (Low-High)</SelectItem>
               <SelectItem value="price-desc">Price (High-Low)</SelectItem>
+              <SelectItem value="sale-price-asc">Sale Price (Low-High)</SelectItem>
+              <SelectItem value="sale-price-desc">Sale Price (High-Low)</SelectItem>
               <SelectItem value="date-asc">Oldest First</SelectItem>
               <SelectItem value="date-desc">Newest First</SelectItem>
             </SelectContent>
@@ -94,6 +153,56 @@ export function ProductFilters({
         </div>
 
         <div className="flex items-center space-x-2">
+          <Select value={selectedCustomLabel} onValueChange={setSelectedCustomLabel}>
+            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
+              <SelectValue placeholder="Filter by label" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Labels</SelectItem>
+              {customLabels?.map((label) => (
+                <SelectItem key={label} value={label}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
+              <SelectValue placeholder="Filter by category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories?.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Select value={selectedSubcategory} onValueChange={setSelectedSubcategory}>
+            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
+              <SelectValue placeholder="Filter by subcategory" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Subcategories</SelectItem>
+              {subcategories?.filter(sub => 
+                selectedCategory === 'all' || sub.category_id === selectedCategory
+              )?.map((subcategory) => (
+                <SelectItem key={subcategory.id} value={subcategory.id}>
+                  {subcategory.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center space-x-2">
           <Switch
             id="sale-products"
             checked={showSaleProducts}
@@ -109,6 +218,29 @@ export function ProductFilters({
             onCheckedChange={setShowNonSaleProducts}
           />
           <Label htmlFor="non-sale-products">Show Non-Sale Products</Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="featured-products"
+            checked={showFeatured}
+            onCheckedChange={setShowFeatured}
+          />
+          <Label htmlFor="featured-products">Show Featured Products</Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="published">Published</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>
