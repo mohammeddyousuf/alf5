@@ -150,6 +150,10 @@ export const ProductList = ({
           return a.price - b.price;
         case 'price-desc':
           return b.price - a.price;
+        case 'date-asc':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'date-desc':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
         default:
           return 0;
       }

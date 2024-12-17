@@ -4,6 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ProductFiltersProps {
   search: string;
@@ -30,6 +31,8 @@ export function ProductFilters({
   sortBy,
   setSortBy,
 }: ProductFiltersProps) {
+  const isMobile = useIsMobile();
+  
   const { data: brands } = useQuery({
     queryKey: ["product-brands"],
     queryFn: async () => {
@@ -57,10 +60,10 @@ export function ProductFilters({
         />
       </div>
 
-      <div className="flex items-center space-x-4">
+      <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'items-center space-x-4'}`}>
         <div className="flex items-center space-x-2">
           <Select value={selectedBrand} onValueChange={setSelectedBrand}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
               <SelectValue placeholder="Filter by brand" />
             </SelectTrigger>
             <SelectContent>
@@ -94,7 +97,7 @@ export function ProductFilters({
 
         <div className="flex items-center space-x-2">
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-[180px]'}`}>
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
@@ -102,6 +105,8 @@ export function ProductFilters({
               <SelectItem value="name-desc">Name (Z-A)</SelectItem>
               <SelectItem value="price-asc">Price (Low-High)</SelectItem>
               <SelectItem value="price-desc">Price (High-Low)</SelectItem>
+              <SelectItem value="date-asc">Oldest First</SelectItem>
+              <SelectItem value="date-desc">Newest First</SelectItem>
             </SelectContent>
           </Select>
         </div>

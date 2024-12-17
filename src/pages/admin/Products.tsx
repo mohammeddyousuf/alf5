@@ -6,14 +6,16 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductList } from "@/components/admin/product/ProductList";
-import { useProducts } from "@/hooks/useProducts";
 import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import { GlobalSaleControls } from "@/components/admin/product/GlobalSaleControls";
 import { Download, Upload } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import Papa from 'papaparse';
 
 const Products = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [showSaleProducts, setShowSaleProducts] = useState(true);
   const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
@@ -103,18 +105,17 @@ const Products = () => {
       status: product.status,
       category_id: product.category_id,
       subcategory_id: product.subcategory_id,
-      images: product.images,
+      images: product.images ? product.images.join(';') : '',
     }));
 
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'products.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const csv = Papa.unparse(exportData);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'products.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
     toast({
       title: "Success",
@@ -127,40 +128,48 @@ const Products = () => {
     if (!file) return;
 
     try {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const products = JSON.parse(e.target?.result as string);
-          
-          if (!Array.isArray(products)) {
-            throw new Error("Invalid file format");
+      Papa.parse(file, {
+        header: true,
+        complete: async (results) => {
+          try {
+            const products = results.data.map((row: any) => ({
+              ...row,
+              images: row.images ? row.images.split(';') : [],
+              featured: row.featured === 'true',
+              price: parseFloat(row.price),
+              sale_price: row.sale_price ? parseFloat(row.sale_price) : null,
+            }));
+
+            for (const product of products) {
+              const { error } = await supabase
+                .from("products")
+                .insert([product]);
+              
+              if (error) throw error;
+            }
+
+            toast({
+              title: "Success",
+              description: `${products.length} products imported successfully`,
+            });
+
+            window.location.reload();
+          } catch (error: any) {
+            toast({
+              title: "Error",
+              description: `Failed to import products: ${error.message}`,
+              variant: "destructive",
+            });
           }
-
-          // Validate and insert products
-          for (const product of products) {
-            const { error } = await supabase
-              .from("products")
-              .insert([product]);
-            
-            if (error) throw error;
-          }
-
-          toast({
-            title: "Success",
-            description: `${products.length} products imported successfully`,
-          });
-
-          // Refresh the products list
-          window.location.reload();
-        } catch (error: any) {
+        },
+        error: (error) => {
           toast({
             title: "Error",
-            description: `Failed to import products: ${error.message}`,
+            description: `Failed to parse CSV: ${error.message}`,
             variant: "destructive",
           });
         }
-      };
-      reader.readAsText(file);
+      });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -172,41 +181,43 @@ const Products = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
+      <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'}`}>
         <div className="space-y-1">
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-sm text-muted-foreground">
             Manage your products ({products?.length || 0} of {systemLimits?.product_limit || '...'} allowed)
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-4'}`}>
           <BackToDashboard />
-          <div className="flex items-center gap-2">
+          <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-2'}`}>
             <input
               type="file"
-              accept=".json"
+              accept=".csv"
               onChange={handleImport}
               className="hidden"
               id="import-file"
             />
             <label htmlFor="import-file">
-              <Button variant="outline" className="cursor-pointer" asChild>
+              <Button variant="outline" className="cursor-pointer w-full" asChild>
                 <div className="flex items-center gap-2">
                   <Upload className="h-4 w-4" />
-                  Import
+                  Import CSV
                 </div>
               </Button>
             </label>
-            <Button variant="outline" onClick={handleExport}>
+            <Button variant="outline" onClick={handleExport} className="w-full">
               <Download className="h-4 w-4 mr-2" />
-              Export
+              Export CSV
             </Button>
-            <Button onClick={handleAddProduct}>Add Product</Button>
+            <Button onClick={handleAddProduct} className="w-full">Add Product</Button>
           </div>
         </div>
       </div>
 
-      <GlobalSaleControls />
+      <div className="text-center">
+        <GlobalSaleControls />
+      </div>
 
       <ProductFilters
         search={search}
