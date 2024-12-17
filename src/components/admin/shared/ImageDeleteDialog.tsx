@@ -14,6 +14,7 @@ interface ImageDeleteDialogProps {
   onOpenChange: (open: boolean) => void;
   onConfirmDelete: () => void;
   count?: number;
+  isFavicon?: boolean;
 }
 
 export function ImageDeleteDialog({
@@ -21,12 +22,13 @@ export function ImageDeleteDialog({
   onOpenChange,
   onConfirmDelete,
   count = 1,
+  isFavicon = false,
 }: ImageDeleteDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete {count > 1 ? `${count} Images` : 'Image'}</AlertDialogTitle>
+          <AlertDialogTitle>Delete {isFavicon ? 'Favicon' : (count > 1 ? `${count} Images` : 'Image')}</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete {count > 1 ? 'these images' : 'this image'}? This action cannot be undone.
           </AlertDialogDescription>
