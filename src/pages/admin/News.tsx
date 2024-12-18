@@ -10,14 +10,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { NewsForm } from "@/components/admin/news/NewsForm";
 import { supabase } from "@/integrations/supabase/client";
+import { ImageDeleteDialog } from "@/components/admin/shared/ImageDeleteDialog";
+import { useToast } from "@/hooks/use-toast";
 
 const News = () => {
   const [open, setOpen] = useState(false);
   const [selectedNews, setSelectedNews] = useState<any>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [newsToDelete, setNewsToDelete] = useState<any>(null);
+  const { toast } = useToast();
 
   const { data: newsItems, isLoading } = useQuery({
     queryKey: ["news-ticker"],
@@ -31,6 +36,25 @@ const News = () => {
       return data;
     },
   });
+
+  const handleDelete = async () => {
+    try {
+      const { error } = await supabase
+        .from("news_ticker")
+        .delete()
+        .eq("id", newsToDelete.id);
+
+      if (error) throw error;
+
+      toast({ description: "News item deleted successfully" });
+      setDeleteDialogOpen(false);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        description: error.message,
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -82,20 +106,39 @@ const News = () => {
               <TableCell>{item.order_index}</TableCell>
               <TableCell>{item.active ? "Yes" : "No"}</TableCell>
               <TableCell>
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setSelectedNews(item);
-                    setOpen(true);
-                  }}
-                >
-                  Edit
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setSelectedNews(item);
+                      setOpen(true);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="text-red-500 hover:text-red-700"
+                    onClick={() => {
+                      setNewsToDelete(item);
+                      setDeleteDialogOpen(true);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      <ImageDeleteDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirmDelete={handleDelete}
+        count={1}
+      />
     </div>
   );
 };
