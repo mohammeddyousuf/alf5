@@ -52,6 +52,17 @@ export function ImageManagementDialog({
         .from("sliders")
         .select("title, image_url");
 
+      // Get all collections
+      const { data: collections } = await supabase
+        .from("collections")
+        .select("name, image_url");
+
+      // Get website settings for logo and favicon
+      const { data: settings } = await supabase
+        .from("settings")
+        .select("logo_url, favicon_url")
+        .single();
+
       const imagesWithUsage = await Promise.all(
         imageData.map(async (file) => {
           const { data: { publicUrl } } = supabase.storage
@@ -73,6 +84,23 @@ export function ImageManagementDialog({
               usage.push({ type: 'Slider', name: slider.title });
             }
           });
+
+          // Check collections
+          collections?.forEach(collection => {
+            if (collection.image_url === publicUrl) {
+              usage.push({ type: 'Collection', name: collection.name });
+            }
+          });
+
+          // Check logo
+          if (settings?.logo_url === publicUrl) {
+            usage.push({ type: 'Website', name: 'Logo' });
+          }
+
+          // Check favicon
+          if (settings?.favicon_url === publicUrl) {
+            usage.push({ type: 'Website', name: 'Favicon' });
+          }
 
           return {
             ...file,
