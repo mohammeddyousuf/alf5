@@ -304,29 +304,9 @@ const Products = () => {
               onClick={() => setShowImageManager(true)}
               className="w-full"
             >
-              <FolderOpen className="h-4 w-4 mr-2" />
+              <Upload className="h-4 w-4 mr-2" />
               Images
             </Button>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleBulkUpload}
-              className="hidden"
-              id="bulk-upload"
-            />
-            <label htmlFor="bulk-upload">
-              <Button variant="outline" className="cursor-pointer w-full" asChild disabled={isUploading}>
-                <div className="flex items-center gap-2">
-                  {isUploading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Upload className="h-4 w-4" />
-                  )}
-                  Bulk Upload
-                </div>
-              </Button>
-            </label>
             <input
               type="file"
               accept=".csv"
