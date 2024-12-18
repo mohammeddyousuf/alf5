@@ -72,6 +72,30 @@ const Products = () => {
     },
   });
 
+  const { data: categories } = useQuery({
+    queryKey: ["admin-categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: subcategories } = useQuery({
+    queryKey: ["admin-subcategories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subcategories")
+        .select("*")
+        .order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const [showImageManager, setShowImageManager] = useState(false);
   const [folderSize, setFolderSize] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
@@ -267,15 +291,23 @@ const Products = () => {
   };
 
   const handleExport = () => {
-    if (!products) return;
+    if (!products || !categories || !subcategories) return;
     
-    // Create a deep copy of products and transform image URLs to filenames
-    const exportProducts = products.map(product => ({
-      ...product,
-      images: product.images?.map(imageUrl => 
-        imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
-      )
-    }));
+    // Create a deep copy of products and transform data
+    const exportProducts = products.map(product => {
+      // Find category and subcategory names
+      const category = categories.find(cat => cat.id === product.category_id);
+      const subcategory = subcategories.find(subcat => subcat.id === product.subcategory_id);
+      
+      return {
+        ...product,
+        category_id: category?.name || '',
+        subcategory_id: subcategory?.name || '',
+        images: product.images?.map(imageUrl => 
+          imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
+        )
+      };
+    });
     
     const csv = Papa.unparse(exportProducts);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
