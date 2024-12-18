@@ -1,139 +1,144 @@
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
-import { Database } from "@/integrations/supabase/types";
-
-type SystemLimits = Database['public']['Tables']['system_limits']['Row'];
 
 export function SystemLimits() {
-  const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
-  
-  const { data: limits, isLoading, refetch } = useQuery({
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const { data: limits, refetch } = useQuery({
     queryKey: ["system-limits"],
     queryFn: async () => {
-      // First try to get existing limits
-      const { data: existingLimits, error: fetchError } = await supabase
+      const { data: existingLimits, error } = await supabase
         .from("system_limits")
-        .select("*");
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1);
       
-      if (fetchError) {
-        console.error("Error fetching limits:", fetchError);
-        throw fetchError;
+      if (error) {
+        console.error("Error fetching limits:", error);
+        throw error;
       }
       
-      // If no limits exist, create default ones
       if (!existingLimits || existingLimits.length === 0) {
         console.log("No limits found, creating default");
         const defaultLimit = {
-          product_limit: 100 // Default limit
+          product_limit: 100,
+          max_image_size_mb: 5,
+          max_folder_size_mb: 500
         };
         
         const { data: insertedData, error: insertError } = await supabase
           .from("system_limits")
           .insert([defaultLimit])
           .select()
-          .maybeSingle();
+          .single();
           
         if (insertError) {
           console.error("Error creating default limits:", insertError);
           throw insertError;
         }
 
-        console.log("Created default limits:", insertedData);
         return insertedData;
       }
       
-      console.log("Found existing limits:", existingLimits[0]);
       return existingLimits[0];
     },
   });
 
-  const [productLimit, setProductLimit] = useState("");
-
-  // Update local state when limits data changes
-  useEffect(() => {
-    if (limits?.product_limit) {
-      setProductLimit(limits.product_limit.toString());
-    }
-  }, [limits]);
-
-  const handleUpdateLimit = async () => {
-    if (!productLimit) {
-      toast({
-        title: "Error",
-        description: "Please enter a product limit",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    
+    const updates = {
+      product_limit: parseInt(formData.get("product_limit") as string),
+      max_image_size_mb: parseFloat(formData.get("max_image_size_mb") as string),
+      max_folder_size_mb: parseFloat(formData.get("max_folder_size_mb") as string)
+    };
 
     setIsUpdating(true);
     try {
       const { error } = await supabase
         .from("system_limits")
-        .update({ product_limit: parseInt(productLimit) })
+        .update(updates)
         .eq("id", limits?.id);
 
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Product limit updated successfully",
+        description: "System limits updated successfully",
       });
       
       refetch();
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message,
         variant: "destructive",
+        description: error.message,
       });
     } finally {
       setIsUpdating(false);
     }
   };
 
-  if (isLoading) {
+  if (!limits) {
     return (
-      <div className="flex justify-center items-center p-8">
+      <div className="flex justify-center">
         <Loader2 className="h-6 w-6 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col space-y-2">
-        <label htmlFor="productLimit" className="text-sm font-medium">
-          Maximum Products Allowed
-        </label>
-        <div className="flex space-x-2">
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="product_limit">Maximum Products</Label>
           <Input
-            id="productLimit"
+            id="product_limit"
+            name="product_limit"
             type="number"
-            min="1"
-            value={productLimit}
-            onChange={(e) => setProductLimit(e.target.value)}
-            className="max-w-[200px]"
-            placeholder="Enter product limit"
+            defaultValue={limits.product_limit}
+            min={1}
+            required
           />
-          <Button 
-            onClick={handleUpdateLimit}
-            disabled={isUpdating}
-          >
-            {isUpdating ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              "Update Limit"
-            )}
-          </Button>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="max_image_size_mb">Maximum Image Size (MB)</Label>
+          <Input
+            id="max_image_size_mb"
+            name="max_image_size_mb"
+            type="number"
+            defaultValue={limits.max_image_size_mb || 5}
+            min={0.1}
+            step={0.1}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="max_folder_size_mb">Maximum Folder Size (MB)</Label>
+          <Input
+            id="max_folder_size_mb"
+            name="max_folder_size_mb"
+            type="number"
+            defaultValue={limits.max_folder_size_mb || 500}
+            min={1}
+            required
+          />
         </div>
       </div>
-    </div>
+
+      <Button type="submit" disabled={isUpdating}>
+        {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        Save Changes
+      </Button>
+    </form>
   );
 }
