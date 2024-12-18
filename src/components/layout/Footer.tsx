@@ -35,10 +35,8 @@ export const Footer = () => {
     
     const message = `Hi ${settings.website_name || 'your website'},\nName: ${name}\nMobile: ${mobile}\nEmail: ${email}${comments ? `\nComments: ${comments}` : ''}`;
     
-    // Log the enquiry with the new fields
     await logEnquiry(message, name, mobile, email);
     
-    // Open WhatsApp with the message
     window.open(
       `https://wa.me/${settings.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`,
       '_blank'
@@ -54,22 +52,34 @@ export const Footer = () => {
   };
 
   const handleShopClick = (filter: 'all' | 'new' | 'featured') => {
-    queryClient.setQueryData(["shop-filters"], {
+    // Reset all filters first
+    const baseFilters = {
       showSaleOnly: false,
-      showFeaturedOnly: filter === 'featured',
-      showNewArrivalsOnly: filter === 'new',
+      showFeaturedOnly: false,
+      showNewArrivalsOnly: false,
       selectedCategory: null,
       selectedSubcategory: null,
       selectedBrand: null,
       priceRange: [0, 1000],
       sortOrder: "default"
-    });
+    };
 
+    // Set specific filters based on selection
+    const filters = {
+      ...baseFilters,
+      ...(filter === 'featured' && { showFeaturedOnly: true }),
+      ...(filter === 'new' && { showNewArrivalsOnly: true })
+    };
+
+    // Update the query client with new filters
+    queryClient.setQueryData(["shop-filters"], filters);
+
+    // Navigate to shop with appropriate state
     navigate('/shop', { 
       state: { 
         filter,
         showFeaturedOnly: filter === 'featured',
-        showNewArrivalsOnly: filter === 'new' 
+        showNewArrivalsOnly: filter === 'new'
       } 
     });
   };
