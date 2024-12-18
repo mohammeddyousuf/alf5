@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Filter } from "lucide-react";
-import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ShopFilters } from "@/components/shop/ShopFilters";
@@ -13,19 +13,26 @@ import { useShopUrlParams } from "@/hooks/useShopUrlParams";
 
 const Shop = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { getUrlParam, updateUrlParams } = useShopUrlParams();
   const { toast } = useToast();
 
-  // Initialize state from URL parameters
+  // Initialize state from URL parameters or location state
   const [searchQuery, setSearchQuery] = useState(getUrlParam("search") || "");
   const [priceRange, setPriceRange] = useState([
     Number(getUrlParam("minPrice")) || 0,
     Number(getUrlParam("maxPrice")) || 0
   ]);
-  const [showSaleOnly, setShowSaleOnly] = useState(getUrlParam("sale") === "true");
-  const [showFeaturedOnly, setShowFeaturedOnly] = useState(getUrlParam("featured") === "true");
-  const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(getUrlParam("newArrivals") === "true");
+  
+  // Initialize filter states from location.state if available
+  const [showSaleOnly, setShowSaleOnly] = useState(
+    location.state?.showSaleOnly || getUrlParam("sale") === "true"
+  );
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(
+    location.state?.showFeaturedOnly || getUrlParam("featured") === "true"
+  );
+  const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(
+    location.state?.showNewArrivalsOnly || getUrlParam("newArrivals") === "true"
+  );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">(
     (getUrlParam("sort") as "asc" | "desc" | "default") || "default"
   );
@@ -33,6 +40,15 @@ const Shop = () => {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(getUrlParam("subcategory"));
   const [selectedBrand, setSelectedBrand] = useState<string | null>(getUrlParam("brand"));
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  // Effect to update filters when location.state changes
+  useEffect(() => {
+    if (location.state) {
+      const { showFeaturedOnly: featured, showNewArrivalsOnly: newArrivals } = location.state;
+      setShowFeaturedOnly(featured || false);
+      setShowNewArrivalsOnly(newArrivals || false);
+    }
+  }, [location.state]);
 
   // Update URL when filters change
   useEffect(() => {
@@ -165,13 +181,8 @@ const Shop = () => {
     
     const meetsSale = showSaleOnly ? isProductOnSale(product) : true;
     const meetsBrand = selectedBrand ? product.brand === selectedBrand : true;
-    
-    const isNewArrival = product.created_at 
-      ? new Date(product.created_at) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-      : false;
-    const meetsNewArrival = showNewArrivalsOnly ? isNewArrival : true;
 
-    return matchesSearch && meetsPrice && meetsSale && meetsNewArrival && meetsBrand;
+    return matchesSearch && meetsPrice && meetsSale && meetsBrand;
   });
 
   const sortedProducts = [...(filteredProducts || [])].sort((a, b) => {
