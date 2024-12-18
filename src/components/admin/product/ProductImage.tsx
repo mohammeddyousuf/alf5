@@ -44,7 +44,7 @@ export function ProductImage({
     if (fileName.startsWith('http')) {
       return fileName;
     }
-    // Otherwise, construct the URL
+    // Otherwise, construct the URL using Supabase storage
     const { data: { publicUrl } } = supabase.storage
       .from("product-images")
       .getPublicUrl(fileName);

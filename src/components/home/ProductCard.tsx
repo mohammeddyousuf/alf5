@@ -57,6 +57,19 @@ export const ProductCard = ({
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   };
 
+  const getImageUrl = (fileName: string | undefined) => {
+    if (!fileName) return '';
+    // If the fileName is already a full URL, return it as is
+    if (fileName.startsWith('http')) {
+      return fileName;
+    }
+    // Otherwise, construct the URL using Supabase storage
+    const { data: { publicUrl } } = supabase.storage
+      .from("product-images")
+      .getPublicUrl(fileName);
+    return publicUrl;
+  };
+
   // Only use the first 8 characters of the UUID
   const shortId = id.split('-')[0];
   const productUrl = `/products/${formatUrlSlug(name)}-${shortId}`;
@@ -91,7 +104,7 @@ export const ProductCard = ({
           {imageUrl ? (
             <>
               <img
-                src={imageUrl}
+                src={getImageUrl(imageUrl)}
                 alt={name}
                 className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
               />
