@@ -61,6 +61,8 @@ export function ImageManagementDialog({
       const { data: settings } = await supabase
         .from("settings")
         .select("logo_url, favicon_url")
+        .order('created_at', { ascending: false })
+        .limit(1)
         .single();
 
       const imagesWithUsage = await Promise.all(
