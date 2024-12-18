@@ -14,6 +14,7 @@ import Papa from 'papaparse';
 import { useProducts } from "@/hooks/useProducts";
 import { ImageManagementDialog } from "@/components/admin/product/ImageManagementDialog";
 import { LimitExceededDialog } from "@/components/admin/product/LimitExceededDialog";
+import { BulkUploadLimitDialog } from "@/components/admin/product/BulkUploadLimitDialog";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -77,6 +78,8 @@ const Products = () => {
   const [images, setImages] = useState<any[]>([]);
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
   const [totalImages, setTotalImages] = useState(0);
+  const [showBulkUploadLimit, setShowBulkUploadLimit] = useState(false);
+  const [bulkUploadLimitMessage, setBulkUploadLimitMessage] = useState("");
 
   const fetchTotalImages = async () => {
     try {
@@ -195,14 +198,39 @@ const Products = () => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    setIsUploading(true);
     try {
+      // Check product limit
       const currentCount = products?.length || 0;
       const limit = systemLimits?.product_limit || 100;
       if (currentCount + files.length > limit) {
-        setShowLimitExceeded(true);
+        setBulkUploadLimitMessage(`Cannot upload ${files.length} products. This would exceed your limit of ${limit} products.`);
+        setShowBulkUploadLimit(true);
         return;
       }
+
+      // Calculate total size of new files
+      const totalNewSize = Array.from(files).reduce((acc, file) => acc + file.size, 0);
+      const currentFolderSize = folderSize || 0;
+      const maxFolderSize = (systemLimits?.max_folder_size_mb || 500) * 1024 * 1024; // Convert MB to bytes
+
+      // Check folder size limit
+      if (currentFolderSize + totalNewSize > maxFolderSize) {
+        setBulkUploadLimitMessage(`Upload would exceed maximum folder size of ${systemLimits?.max_folder_size_mb}MB.`);
+        setShowBulkUploadLimit(true);
+        return;
+      }
+
+      // Check individual file size limits
+      const maxFileSize = (systemLimits?.max_image_size_mb || 5) * 1024 * 1024; // Convert MB to bytes
+      const oversizedFiles = Array.from(files).filter(file => file.size > maxFileSize);
+      
+      if (oversizedFiles.length > 0) {
+        setBulkUploadLimitMessage(`${oversizedFiles.length} file(s) exceed the maximum file size of ${systemLimits?.max_image_size_mb}MB.`);
+        setShowBulkUploadLimit(true);
+        return;
+      }
+
+      setIsUploading(true);
 
       await Promise.all(
         Array.from(files).map(async (file) => {
@@ -222,7 +250,7 @@ const Products = () => {
         description: "Images uploaded successfully"
       });
       
-      await fetchTotalImages(); // Update images count after upload
+      await fetchTotalImages();
       setShowImageManager(true);
     } catch (error: any) {
       toast({
@@ -373,6 +401,12 @@ const Products = () => {
         onOpenChange={setShowLimitExceeded}
         currentCount={products?.length || 0}
         limit={systemLimits?.product_limit || 100}
+      />
+
+      <BulkUploadLimitDialog
+        open={showBulkUploadLimit}
+        onOpenChange={setShowBulkUploadLimit}
+        message={bulkUploadLimitMessage}
       />
     </div>
   );
