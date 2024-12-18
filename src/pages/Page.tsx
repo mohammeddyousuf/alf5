@@ -16,13 +16,27 @@ const Page = () => {
   const { data: page, isLoading, error } = useQuery({
     queryKey: ["page", pageSlug],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First try to fetch by slug
+      let { data, error } = await supabase
         .from("pages")
         .select("*")
         .eq("slug", pageSlug)
         .maybeSingle();
       
       if (error) throw error;
+      
+      // If no page found by slug, try to match the path
+      if (!data) {
+        const { data: pathData, error: pathError } = await supabase
+          .from("pages")
+          .select("*")
+          .eq("slug", currentPath)
+          .maybeSingle();
+        
+        if (pathError) throw pathError;
+        data = pathData;
+      }
+      
       return data;
     },
   });
