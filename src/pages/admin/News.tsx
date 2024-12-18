@@ -136,7 +136,7 @@ const News = () => {
       <ImageDeleteDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        onConfirmDelete={handleDelete}
+        onConfirm={handleDelete}
         count={1}
       />
     </div>

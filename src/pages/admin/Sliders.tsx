@@ -145,7 +145,7 @@ const Sliders = () => {
       <ImageDeleteDialog
         open={!!sliderToDelete}
         onOpenChange={() => setSliderToDelete(null)}
-        onConfirmDelete={handleDeleteSlider}
+        onConfirm={handleDeleteSlider}
       />
     </div>
   );

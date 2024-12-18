@@ -187,7 +187,7 @@ export function ImageUploadField({
       <ImageDeleteDialog
         open={showDeleteDialog}
         onOpenChange={setShowDeleteDialog}
-        onConfirmDelete={handleImageDelete}
+        onConfirm={handleImageDelete}
         isFavicon={isFavicon}
       />
     </div>
