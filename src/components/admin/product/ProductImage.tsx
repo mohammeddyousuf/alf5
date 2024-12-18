@@ -38,13 +38,20 @@ export function ProductImage({
       return data;
     },
   });
+
+  const getImageUrl = (fileName: string) => {
+    const { data: { publicUrl } } = supabase.storage
+      .from("product-images")
+      .getPublicUrl(fileName);
+    return publicUrl;
+  };
   
   return (
     <div className="aspect-square mb-4 overflow-hidden rounded-lg relative">
       {images?.[0] ? (
         <>
           <img
-            src={images[0]}
+            src={getImageUrl(images[0])}
             alt={name}
             className="h-full w-full object-cover"
           />

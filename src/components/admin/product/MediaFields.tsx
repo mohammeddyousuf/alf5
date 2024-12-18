@@ -37,7 +37,6 @@ export function MediaFields({ form }: MediaFieldsProps) {
     let fileName = `product_${baseName}.${extension}`;
     let counter = 1;
 
-    // Check if file exists
     const { data } = await supabase.storage
       .from("product-images")
       .list();
@@ -65,7 +64,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
           const fileName = await generateUniqueFileName(file.name);
           console.log("Generated unique filename:", fileName);
 
-          const { error: uploadError, data } = await supabase.storage
+          const { error: uploadError } = await supabase.storage
             .from("product-images")
             .upload(fileName, file, {
               upsert: false
@@ -73,11 +72,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
 
           if (uploadError) throw uploadError;
 
-          const { data: { publicUrl } } = supabase.storage
-            .from("product-images")
-            .getPublicUrl(fileName);
-
-          return publicUrl;
+          return fileName; // Store only the filename
         })
       );
 
@@ -103,13 +98,11 @@ export function MediaFields({ form }: MediaFieldsProps) {
     try {
       setIsDeleting(prev => ({ ...prev, [indexToRemove]: true }));
       
-      // Extract the filename from the URL
-      const fileName = decodeURIComponent(imageUrl.split("/").pop() || "");
-      if (!fileName) throw new Error("Invalid file URL");
-
+      // Extract the filename from the URL or use the filename directly
+      const fileName = imageUrl.includes('/') ? imageUrl.split('/').pop()! : imageUrl;
+      
       console.log("Attempting to delete file:", fileName);
 
-      // Delete from Supabase Storage
       const { error: deleteError, data } = await supabase.storage
         .from("product-images")
         .remove([fileName]);
@@ -121,7 +114,6 @@ export function MediaFields({ form }: MediaFieldsProps) {
 
       console.log("Storage deletion response:", data);
 
-      // Update form state only after successful storage deletion
       const currentImages = form.getValues("images") || [];
       const updatedImages = currentImages.filter((_, index) => index !== indexToRemove);
       form.setValue("images", updatedImages);
@@ -143,21 +135,28 @@ export function MediaFields({ form }: MediaFieldsProps) {
     }
   };
 
+  const getImageUrl = (fileName: string) => {
+    const { data: { publicUrl } } = supabase.storage
+      .from("product-images")
+      .getPublicUrl(fileName);
+    return publicUrl;
+  };
+
   return (
     <div className="space-y-4">
       <div>
         <FormLabel>Images</FormLabel>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-          {form.watch("images")?.map((url, index) => (
-            <div key={url} className="relative group aspect-square">
+          {form.watch("images")?.map((fileName, index) => (
+            <div key={fileName} className="relative group aspect-square">
               <img
-                src={url}
+                src={getImageUrl(fileName)}
                 alt={`Product image ${index + 1}`}
                 className="w-full h-full object-cover rounded-lg"
               />
               <button
                 type="button"
-                onClick={() => setImageToDelete({ index, url })}
+                onClick={() => setImageToDelete({ index, url: fileName })}
                 disabled={isDeleting[index]}
                 className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
               >
