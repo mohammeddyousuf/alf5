@@ -299,10 +299,22 @@ const Products = () => {
       const category = categories.find(cat => cat.id === product.category_id);
       const subcategory = subcategories.find(subcat => subcat.id === product.subcategory_id);
       
+      // Create a new object with desired field order
       return {
-        ...product,
-        category_id: category?.name || '',
-        subcategory_id: subcategory?.name || '',
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        sale_price: product.sale_price,
+        status: product.status,
+        category: category?.name || '',
+        subcategory: subcategory?.name || '',
+        featured: product.featured,
+        brand: product.brand,
+        custom_label: product.custom_label,
+        video_urls: product.video_urls,
+        created_at: product.created_at,
+        updated_at: product.updated_at,
+        added_date: product.added_date,
         images: product.images?.map(imageUrl => 
           imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
         )
