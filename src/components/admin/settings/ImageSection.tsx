@@ -57,27 +57,31 @@ export const ImageSection = ({
   };
 
   return (
-    <>
-      <div className="space-y-2">
+    <div className="flex flex-col items-center space-y-6 w-full">
+      <div className="space-y-2 w-full text-center">
         <Label htmlFor="logo">Logo</Label>
-        <ImageUploadField
-          imageUrl={logoUrl}
-          onImageChange={handleLogoChange}
-          isUploading={isUploading}
-          setIsUploading={setIsUploading}
-        />
+        <div className="flex justify-center">
+          <ImageUploadField
+            imageUrl={logoUrl}
+            onImageChange={handleLogoChange}
+            isUploading={isUploading}
+            setIsUploading={setIsUploading}
+          />
+        </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 w-full text-center">
         <Label htmlFor="favicon">Favicon (ICO)</Label>
-        <ImageUploadField
-          imageUrl={faviconUrl}
-          onImageChange={handleFaviconChange}
-          isUploading={isUploading}
-          setIsUploading={setIsUploading}
-          isFavicon={true}
-        />
+        <div className="flex justify-center">
+          <ImageUploadField
+            imageUrl={faviconUrl}
+            onImageChange={handleFaviconChange}
+            isUploading={isUploading}
+            setIsUploading={setIsUploading}
+            isFavicon={true}
+          />
+        </div>
       </div>
-    </>
+    </div>
   );
 };
