@@ -125,6 +125,12 @@ const Admin = () => {
           </Card>
 
           <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">Enquiries</h2>
+            <p className="text-3xl font-bold mb-4">{enquiries?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/enquiries")}>View Enquiries</Button>
+          </Card>
+
+          <Card className="p-6">
             <h2 className="text-xl font-semibold mb-2">Products</h2>
             <p className="text-3xl font-bold mb-4">{products?.length || 0}</p>
             <Button onClick={() => navigate("/admin/products")}>Manage Products</Button>
@@ -164,12 +170,6 @@ const Admin = () => {
             <h2 className="text-xl font-semibold mb-2">Pages</h2>
             <p className="text-3xl font-bold mb-4">{pages?.length || 0}</p>
             <Button onClick={() => navigate("/admin/pages")}>Manage Pages</Button>
-          </Card>
-
-          <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-2">Enquiries</h2>
-            <p className="text-3xl font-bold mb-4">{enquiries?.length || 0}</p>
-            <Button onClick={() => navigate("/admin/enquiries")}>View Enquiries</Button>
           </Card>
         </div>
 
