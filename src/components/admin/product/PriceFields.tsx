@@ -23,9 +23,8 @@ export function PriceFields({ form }: PriceFieldsProps) {
               <Input 
                 type="number" 
                 {...field} 
-                value={field.value === 0 ? '' : field.value}
                 onChange={(e) => {
-                  const value = e.target.value === '' ? 0 : Math.floor(Number(e.target.value));
+                  const value = Math.floor(Number(e.target.value));
                   field.onChange(value);
                 }}
               />
