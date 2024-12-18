@@ -48,7 +48,9 @@ const Products = () => {
       if (!existingLimits || existingLimits.length === 0) {
         console.log("No limits found, creating default");
         const defaultLimit = {
-          product_limit: 100
+          product_limit: 100,
+          max_image_size_mb: 5,
+          max_folder_size_mb: 500
         };
         
         const { data: insertedData, error: insertError } = await supabase
@@ -262,7 +264,7 @@ const Products = () => {
             <li>Total Products: {products?.length || 0}/{systemLimits?.product_limit || '...'}</li>
             <li>Total Images: {totalImages}</li>
             {folderSize > 0 && (
-              <li>Images Folder Size: {(folderSize / (1024 * 1024)).toFixed(2)} MB</li>
+              <li>Images Folder Size: {(folderSize / (1024 * 1024)).toFixed(2)} MB / {systemLimits?.max_folder_size_mb || '...'} MB</li>
             )}
           </ul>
         </div>

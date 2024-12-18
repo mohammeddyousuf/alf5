@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchAndSort } from "./image-management/SearchAndSort";
 import { ImageTable } from "./image-management/ImageTable";
+import { useQuery } from "@tanstack/react-query";
 
 interface ImageManagementDialogProps {
   open: boolean;
@@ -174,6 +175,21 @@ export function ImageManagementDialog({
     }
   }, [open]);
 
+  const { data: systemLimits } = useQuery({
+    queryKey: ["system-limits"],
+    queryFn: async () => {
+      const { data: existingLimits, error } = await supabase
+        .from("system_limits")
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return existingLimits;
+    },
+  });
+
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -190,7 +206,7 @@ export function ImageManagementDialog({
             <SheetTitle className="flex justify-between items-center">
               Product Images
               <span className="text-sm font-normal text-muted-foreground">
-                Total images: {images.length} • Folder size: {(folderSize / (1024 * 1024)).toFixed(2)} MB
+                Total images: {images.length} • Folder size: {(folderSize / (1024 * 1024)).toFixed(2)} MB / {systemLimits?.max_folder_size_mb || '...'} MB
               </span>
             </SheetTitle>
           </SheetHeader>
@@ -258,7 +274,7 @@ export function ImageManagementDialog({
       <ImageDeleteDialog
         open={imagesToDelete.length > 0}
         onOpenChange={(open) => !open && setImagesToDelete([])}
-        onConfirmDelete={handleDelete}
+        onConfirm={handleDelete}
         count={imagesToDelete.length}
       />
     </>
