@@ -7,12 +7,15 @@ import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { CollectionForm } from "@/components/admin/CollectionForm";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Collections() {
   const { toast } = useToast();
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [collectionToDelete, setCollectionToDelete] = useState<string | null>(null);
   
   const { data: collections, refetch: refetchCollections } = useQuery({
     queryKey: ["admin-collections"],
@@ -41,6 +44,7 @@ export default function Collections() {
       });
       refetchCollections();
     }
+    setCollectionToDelete(null);
   };
 
   const handleEditClick = (collection: any) => {
@@ -64,13 +68,15 @@ export default function Collections() {
             <DialogTrigger asChild>
               <Button>Add Collection</Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="max-w-3xl max-h-[90vh]">
               <DialogHeader>
                 <DialogTitle>Add New Collection</DialogTitle>
               </DialogHeader>
-              <div className="mt-4">
-                <CollectionForm onSuccess={refetchCollections} />
-              </div>
+              <ScrollArea className="max-h-[calc(90vh-8rem)] pr-4">
+                <div className="mt-4">
+                  <CollectionForm onSuccess={refetchCollections} />
+                </div>
+              </ScrollArea>
             </DialogContent>
           </Dialog>
         </div>
@@ -110,8 +116,9 @@ export default function Collections() {
                 <Button 
                   variant="destructive"
                   size="sm"
-                  onClick={() => handleDeleteCollection(collection.id)}
+                  onClick={() => setCollectionToDelete(collection.id)}
                 >
+                  <Trash2 className="h-4 w-4 mr-2" />
                   Delete
                 </Button>
               </div>
@@ -121,18 +128,40 @@ export default function Collections() {
       </div>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-3xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle>Edit Collection</DialogTitle>
           </DialogHeader>
-          <div className="mt-4">
-            <CollectionForm 
-              collection={selectedCollection} 
-              onSuccess={handleEditSuccess}
-            />
-          </div>
+          <ScrollArea className="max-h-[calc(90vh-8rem)] pr-4">
+            <div className="mt-4">
+              <CollectionForm 
+                collection={selectedCollection} 
+                onSuccess={handleEditSuccess}
+              />
+            </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!collectionToDelete} onOpenChange={() => setCollectionToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the collection.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => collectionToDelete && handleDeleteCollection(collectionToDelete)}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
