@@ -269,7 +269,15 @@ const Products = () => {
   const handleExport = () => {
     if (!products) return;
     
-    const csv = Papa.unparse(products);
+    // Create a deep copy of products and transform image URLs to filenames
+    const exportProducts = products.map(product => ({
+      ...product,
+      images: product.images?.map(imageUrl => 
+        imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
+      )
+    }));
+    
+    const csv = Papa.unparse(exportProducts);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
