@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { ProductFilters } from "@/components/admin/product/ProductFilters";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -174,8 +174,7 @@ const Products = () => {
         description: "Images uploaded successfully"
       });
       
-      await calculateFolderSize();
-      setShowImageManager(true); // Keep the dialog open after upload
+      setShowImageManager(true);
     } catch (error: any) {
       toast({
         variant: "destructive",
