@@ -30,8 +30,6 @@ export function SystemLimits() {
         console.log("No limits found, creating default");
         const defaultLimit = {
           product_limit: 100,
-          max_image_size_mb: 5,
-          max_folder_size_mb: 500
         };
         
         const { data: insertedData, error: insertError } = await supabase
@@ -58,8 +56,6 @@ export function SystemLimits() {
     
     const updates = {
       product_limit: parseInt(formData.get("product_limit") as string),
-      max_image_size_mb: parseFloat(formData.get("max_image_size_mb") as string),
-      max_folder_size_mb: parseFloat(formData.get("max_folder_size_mb") as string)
     };
 
     setIsUpdating(true);
@@ -104,31 +100,6 @@ export function SystemLimits() {
             name="product_limit"
             type="number"
             defaultValue={limits.product_limit}
-            min={1}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="max_image_size_mb">Maximum Image Size (MB)</Label>
-          <Input
-            id="max_image_size_mb"
-            name="max_image_size_mb"
-            type="number"
-            defaultValue={limits.max_image_size_mb || 5}
-            min={0.1}
-            step={0.1}
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="max_folder_size_mb">Maximum Folder Size (MB)</Label>
-          <Input
-            id="max_folder_size_mb"
-            name="max_folder_size_mb"
-            type="number"
-            defaultValue={limits.max_folder_size_mb || 500}
             min={1}
             required
           />
