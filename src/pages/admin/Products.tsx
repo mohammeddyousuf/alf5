@@ -301,16 +301,16 @@ const Products = () => {
       
       // Create a new object with desired field order
       return {
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        sale_price: product.sale_price,
+        featured: product.featured,
         status: product.status,
+        custom_label: product.custom_label,
+        name: product.name,
+        brand: product.brand,
+        description: product.description,
         category: category?.name || '',
         subcategory: subcategory?.name || '',
-        featured: product.featured,
-        brand: product.brand,
-        custom_label: product.custom_label,
+        price: product.price,
+        sale_price: product.sale_price,
         images: product.images?.map(imageUrl => 
           imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
         ),
