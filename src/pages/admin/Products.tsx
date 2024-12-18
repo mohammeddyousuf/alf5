@@ -311,13 +311,13 @@ const Products = () => {
         featured: product.featured,
         brand: product.brand,
         custom_label: product.custom_label,
+        images: product.images?.map(imageUrl => 
+          imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
+        ),
         video_urls: product.video_urls,
         created_at: product.created_at,
         updated_at: product.updated_at,
-        added_date: product.added_date,
-        images: product.images?.map(imageUrl => 
-          imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
-        )
+        added_date: product.added_date
       };
     });
     
