@@ -35,8 +35,10 @@ export const Footer = () => {
     
     const message = `Hi ${settings.website_name || 'your website'},\nName: ${name}\nMobile: ${mobile}\nEmail: ${email}${comments ? `\nComments: ${comments}` : ''}`;
     
+    // Log the enquiry with the new fields
     await logEnquiry(message, name, mobile, email);
     
+    // Open WhatsApp with the message
     window.open(
       `https://wa.me/${settings.whatsapp_number.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`,
       '_blank'
@@ -52,8 +54,7 @@ export const Footer = () => {
   };
 
   const handleShopClick = (filter: 'all' | 'new' | 'featured') => {
-    // Set the initial filter state
-    const filterState = {
+    queryClient.setQueryData(["shop-filters"], {
       showSaleOnly: false,
       showFeaturedOnly: filter === 'featured',
       showNewArrivalsOnly: filter === 'new',
@@ -61,16 +62,15 @@ export const Footer = () => {
       selectedSubcategory: null,
       selectedBrand: null,
       priceRange: [0, 1000],
-      sortOrder: "default",
-      search: ""
-    };
+      sortOrder: "default"
+    });
 
-    // Update the query client with the new filter state
-    queryClient.setQueryData(["shop-filters"], filterState);
-
-    // Navigate to shop with the appropriate state
     navigate('/shop', { 
-      state: filterState
+      state: { 
+        filter,
+        showFeaturedOnly: filter === 'featured',
+        showNewArrivalsOnly: filter === 'new' 
+      } 
     });
   };
 
@@ -105,7 +105,6 @@ export const Footer = () => {
               Featured
             </button>
           </div>
-          
           <div className="flex flex-col items-start gap-2">
             <h3 className="text-lg font-semibold">Company</h3>
             <Link to="/about" className="text-sm text-muted-foreground hover:text-foreground">
@@ -157,7 +156,6 @@ export const Footer = () => {
               </a>
             ))}
           </div>
-          
         </div>
         <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
           © {new Date().getFullYear()} {settings?.website_name || "WhatsApp Store"}. All rights reserved.
