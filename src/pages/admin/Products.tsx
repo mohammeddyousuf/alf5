@@ -74,6 +74,32 @@ const Products = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [images, setImages] = useState<any[]>([]);
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
+  const [totalImages, setTotalImages] = useState(0);
+
+  const fetchTotalImages = async () => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("product-images")
+        .list();
+      
+      if (error) {
+        console.error("Error fetching images:", error);
+        return;
+      }
+
+      setTotalImages(data.length);
+      
+      // Calculate folder size
+      const totalSize = data.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
+      setFolderSize(totalSize);
+    } catch (error) {
+      console.error("Error in fetchTotalImages:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalImages();
+  }, []);
 
   const calculateFolderSize = async () => {
     const { data, error } = await supabase.storage
@@ -194,8 +220,8 @@ const Products = () => {
         description: "Images uploaded successfully"
       });
       
-      await calculateFolderSize();
-      setShowImageManager(true); // Keep the dialog open after upload
+      await fetchTotalImages(); // Update images count after upload
+      setShowImageManager(true);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -234,7 +260,8 @@ const Products = () => {
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-sm text-muted-foreground">
             Manage your products ({products?.length || 0} of {systemLimits?.product_limit || '...'} allowed)
-            {folderSize > 0 && ` • ${images?.length || 0} images • Folder size: ${(folderSize / (1024 * 1024)).toFixed(2)} MB`}
+            {` • ${totalImages} images`}
+            {folderSize > 0 && ` • Folder size: ${(folderSize / (1024 * 1024)).toFixed(2)} MB`}
           </p>
         </div>
         <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-4'}`}>
