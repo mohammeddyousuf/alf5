@@ -18,6 +18,8 @@ export const WebsiteNameSection = ({ initialName, refetch }: WebsiteNameSectionP
     try {
       await updateSettings({ website_name: websiteName });
       await refetch();
+      // Dispatch event to update title
+      window.dispatchEvent(new Event('settingsUpdated'));
       toast({
         title: "Success",
         description: "Website name updated successfully",

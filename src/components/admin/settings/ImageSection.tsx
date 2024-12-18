@@ -39,8 +39,8 @@ export const ImageSection = ({
       await updateSettings({ favicon_url: url });
       await refetch();
       
-      // Dispatch custom event to update favicon
-      window.dispatchEvent(new Event('faviconUpdated'));
+      // Dispatch custom event to update favicon and title
+      window.dispatchEvent(new Event('settingsUpdated'));
       
       toast({
         title: "Success",
