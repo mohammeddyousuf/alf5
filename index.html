@@ -31,7 +31,7 @@
       // Update favicon and title when needed
       async function updateFaviconAndTitle() {
         try {
-          const response = await fetch('https://hoytbffldsdeywkyuuza.supabase.co/rest/v1/settings?select=favicon_url,website_name', {
+          const response = await fetch('https://hoytbffldsdeywkyuuza.supabase.co/rest/v1/settings?select=favicon_url,website_name&order=created_at.desc&limit=1', {
             headers: {
               'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhveXRiZmZsZHNkZXl3a3l1dXphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM3MTAyNDksImV4cCI6MjA0OTI4NjI0OX0.gJwvzpKqdhIWhsIGF1a4BPUXysKXNtB-lg_aNG_VFz4',
               'Content-Type': 'application/json'
