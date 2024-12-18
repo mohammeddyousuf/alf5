@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { ProductFilters } from "@/components/admin/product/ProductFilters";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -70,8 +70,28 @@ const Products = () => {
   });
 
   const [showImageManager, setShowImageManager] = useState(false);
+  const [folderSize, setFolderSize] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [images, setImages] = useState<any[]>([]);
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
+
+  const calculateFolderSize = async () => {
+    const { data, error } = await supabase.storage
+      .from("product-images")
+      .list();
+    
+    if (error) {
+      console.error("Error fetching folder size:", error);
+      return;
+    }
+
+    const totalSize = data.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
+    setFolderSize(totalSize);
+  };
+
+  useEffect(() => {
+    calculateFolderSize();
+  }, []);
 
   const handleAddProduct = () => {
     const currentCount = products?.length || 0;
@@ -174,7 +194,8 @@ const Products = () => {
         description: "Images uploaded successfully"
       });
       
-      setShowImageManager(true);
+      await calculateFolderSize();
+      setShowImageManager(true); // Keep the dialog open after upload
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -212,7 +233,8 @@ const Products = () => {
         <div className="space-y-1">
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-sm text-muted-foreground">
-            Total Products: {products?.length || 0}/{systemLimits?.product_limit || '...'}
+            Manage your products ({products?.length || 0} of {systemLimits?.product_limit || '...'} allowed)
+            {folderSize > 0 && ` • ${images?.length || 0} images • Folder size: ${(folderSize / (1024 * 1024)).toFixed(2)} MB`}
           </p>
         </div>
         <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-4'}`}>
@@ -273,8 +295,8 @@ const Products = () => {
       <ImageManagementDialog
         open={showImageManager}
         onOpenChange={setShowImageManager}
-        onImageUpload={() => {}}
-        folderSize={0}
+        onImageUpload={calculateFolderSize}
+        folderSize={folderSize}
       />
 
       <GlobalSaleControls />
