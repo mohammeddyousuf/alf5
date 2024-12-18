@@ -158,8 +158,8 @@ export function ProductMedia({
         </CarouselContent>
         {mediaItems.length > 1 && (
           <>
-            <CarouselPrevious />
-            <CarouselNext />
+            <CarouselPrevious className="left-2" />
+            <CarouselNext className="right-2" />
           </>
         )}
       </Carousel>

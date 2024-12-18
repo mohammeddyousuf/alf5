@@ -93,14 +93,14 @@ export function ProductInfo({
   };
 
   return (
-    <div className="space-y-6 text-center">
-      <h1 className="text-3xl font-bold text-foreground">{name}</h1>
+    <div className="space-y-6 text-left">
+      <h1 className="text-3xl font-bold text-foreground text-center">{name}</h1>
       
       {brand && (
-        <p className="text-lg text-muted-foreground">{brand}</p>
+        <p className="text-lg text-muted-foreground text-center">{brand}</p>
       )}
       
-      <div className="space-y-2">
+      <div className="space-y-2 text-center">
         <div className="flex items-center justify-center gap-4">
           <p className={`text-2xl font-bold ${showSalePrice ? 'text-destructive' : 'text-foreground'}`}>
             {formatPrice(showSalePrice ? salePrice! : price)}
@@ -119,7 +119,7 @@ export function ProductInfo({
       </div>
 
       {description && (
-        <p className="text-muted-foreground">{description}</p>
+        <p className="text-muted-foreground text-left">{description}</p>
       )}
 
       <div className="flex justify-center">
