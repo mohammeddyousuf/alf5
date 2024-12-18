@@ -12,7 +12,7 @@ import {
 interface ImageDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirmDelete: () => void;
+  onConfirm: () => void;
   count?: number;
   isFavicon?: boolean;
 }
@@ -20,7 +20,7 @@ interface ImageDeleteDialogProps {
 export function ImageDeleteDialog({
   open,
   onOpenChange,
-  onConfirmDelete,
+  onConfirm,
   count = 1,
   isFavicon = false,
 }: ImageDeleteDialogProps) {
@@ -36,7 +36,7 @@ export function ImageDeleteDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirmDelete}
+            onClick={onConfirm}
             className="bg-red-500 hover:bg-red-600"
           >
             Delete
