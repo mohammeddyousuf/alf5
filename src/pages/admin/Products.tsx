@@ -258,11 +258,13 @@ const Products = () => {
       <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'}`}>
         <div className="space-y-1">
           <h1 className="text-3xl font-bold">Products</h1>
-          <p className="text-sm text-muted-foreground">
-            Manage your products ({products?.length || 0} of {systemLimits?.product_limit || '...'} allowed)
-            {` • ${totalImages} images`}
-            {folderSize > 0 && ` • Folder size: ${(folderSize / (1024 * 1024)).toFixed(2)} MB`}
-          </p>
+          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 ml-1">
+            <li>Total Products: {products?.length || 0}/{systemLimits?.product_limit || '...'}</li>
+            <li>Total Images: {totalImages}</li>
+            {folderSize > 0 && (
+              <li>Images Folder Size: {(folderSize / (1024 * 1024)).toFixed(2)} MB</li>
+            )}
+          </ul>
         </div>
         <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-4'}`}>
           <BackToDashboard />
