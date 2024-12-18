@@ -7,9 +7,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { CollectionForm } from "@/components/admin/CollectionForm";
+import { Pencil } from "lucide-react";
 
 export default function Collections() {
   const { toast } = useToast();
+  const [selectedCollection, setSelectedCollection] = useState(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
   const { data: collections, refetch: refetchCollections } = useQuery({
     queryKey: ["admin-collections"],
@@ -40,7 +43,14 @@ export default function Collections() {
     }
   };
 
-  const handleSuccess = () => {
+  const handleEditClick = (collection: any) => {
+    setSelectedCollection(collection);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditSuccess = () => {
+    setIsEditDialogOpen(false);
+    setSelectedCollection(null);
     refetchCollections();
   };
 
@@ -59,7 +69,7 @@ export default function Collections() {
                 <DialogTitle>Add New Collection</DialogTitle>
               </DialogHeader>
               <div className="mt-4">
-                <CollectionForm onSuccess={handleSuccess} />
+                <CollectionForm onSuccess={refetchCollections} />
               </div>
             </DialogContent>
           </Dialog>
@@ -88,9 +98,18 @@ export default function Collections() {
                   Link: {collection.link_url}
                 </p>
               )}
-              <div className="pt-2">
+              <div className="pt-2 flex gap-2">
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEditClick(collection)}
+                >
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
                 <Button 
                   variant="destructive"
+                  size="sm"
                   onClick={() => handleDeleteCollection(collection.id)}
                 >
                   Delete
@@ -100,6 +119,20 @@ export default function Collections() {
           </Card>
         ))}
       </div>
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Collection</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <CollectionForm 
+              collection={selectedCollection} 
+              onSuccess={handleEditSuccess}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
