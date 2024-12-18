@@ -70,28 +70,8 @@ const Products = () => {
   });
 
   const [showImageManager, setShowImageManager] = useState(false);
-  const [folderSize, setFolderSize] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
-  const [images, setImages] = useState<any[]>([]);
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
-
-  const calculateFolderSize = async () => {
-    const { data, error } = await supabase.storage
-      .from("product-images")
-      .list();
-    
-    if (error) {
-      console.error("Error fetching folder size:", error);
-      return;
-    }
-
-    const totalSize = data.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
-    setFolderSize(totalSize);
-  };
-
-  useEffect(() => {
-    calculateFolderSize();
-  }, []);
 
   const handleAddProduct = () => {
     const currentCount = products?.length || 0;
@@ -233,8 +213,7 @@ const Products = () => {
         <div className="space-y-1">
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-sm text-muted-foreground">
-            Manage your products ({products?.length || 0} of {systemLimits?.product_limit || '...'} allowed)
-            {folderSize > 0 && ` • ${images?.length || 0} images • Folder size: ${(folderSize / (1024 * 1024)).toFixed(2)} MB`}
+            Total Products: {products?.length || 0}/{systemLimits?.product_limit || '...'}
           </p>
         </div>
         <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-4'}`}>
@@ -295,8 +274,8 @@ const Products = () => {
       <ImageManagementDialog
         open={showImageManager}
         onOpenChange={setShowImageManager}
-        onImageUpload={calculateFolderSize}
-        folderSize={folderSize}
+        onImageUpload={() => {}}
+        folderSize={0}
       />
 
       <GlobalSaleControls />
