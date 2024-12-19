@@ -1,13 +1,9 @@
-import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { ProductFilters } from "@/components/admin/product/ProductFilters";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import { GlobalSaleControls } from "@/components/admin/product/GlobalSaleControls";
-import { Download, Upload } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useProducts } from "@/hooks/useProducts";
 import { ImageManagementDialog } from "@/components/admin/product/ImageManagementDialog";
@@ -16,6 +12,9 @@ import { BulkUploadLimitDialog } from "@/components/admin/product/BulkUploadLimi
 import { ProductListContainer } from "@/components/admin/product/ProductListContainer";
 import { handleProductImport, exportProducts } from "@/utils/productImportExport";
 import { useDeleteProduct } from "@/hooks/useDeleteProduct";
+import { ProductFilters } from "@/components/admin/product/ProductFilters";
+import { ProductHeader } from "@/components/admin/product/ProductHeader";
+import { useProductManagement } from "@/hooks/useProductManagement";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -35,6 +34,17 @@ const Products = () => {
   const { data: products } = useProducts();
   const deleteProduct = useDeleteProduct();
 
+  const [showImageManager, setShowImageManager] = useState(false);
+  const [folderSize, setFolderSize] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [images, setImages] = useState<any[]>([]);
+  const [showLimitExceeded, setShowLimitExceeded] = useState(false);
+  const [totalImages, setTotalImages] = useState(0);
+  const [showBulkUploadLimit, setShowBulkUploadLimit] = useState(false);
+  const [bulkUploadLimitMessage, setBulkUploadLimitMessage] = useState("");
+
+  const { handleStatusChange } = useProductManagement(fetchTotalImages);
+
   const { data: systemLimits } = useQuery({
     queryKey: ["system-limits"],
     queryFn: async () => {
@@ -44,13 +54,9 @@ const Products = () => {
         .order('created_at', { ascending: false })
         .limit(1);
       
-      if (error) {
-        console.error("Error fetching limits:", error);
-        throw error;
-      }
+      if (error) throw error;
       
       if (!existingLimits || existingLimits.length === 0) {
-        console.log("No limits found, creating default");
         const defaultLimit = {
           product_limit: 100,
           max_image_size_mb: 5,
@@ -63,11 +69,7 @@ const Products = () => {
           .select()
           .single();
           
-        if (insertError) {
-          console.error("Error creating default limits:", insertError);
-          throw insertError;
-        }
-
+        if (insertError) throw insertError;
         return insertedData;
       }
       
@@ -99,15 +101,6 @@ const Products = () => {
     },
   });
 
-  const [showImageManager, setShowImageManager] = useState(false);
-  const [folderSize, setFolderSize] = useState<number>(0);
-  const [isUploading, setIsUploading] = useState(false);
-  const [images, setImages] = useState<any[]>([]);
-  const [showLimitExceeded, setShowLimitExceeded] = useState(false);
-  const [totalImages, setTotalImages] = useState(0);
-  const [showBulkUploadLimit, setShowBulkUploadLimit] = useState(false);
-  const [bulkUploadLimitMessage, setBulkUploadLimitMessage] = useState("");
-
   const fetchTotalImages = async () => {
     try {
       const { data, error } = await supabase.storage
@@ -130,24 +123,6 @@ const Products = () => {
 
   useEffect(() => {
     fetchTotalImages();
-  }, []);
-
-  const calculateFolderSize = async () => {
-    const { data, error } = await supabase.storage
-      .from("product-images")
-      .list();
-    
-    if (error) {
-      console.error("Error fetching folder size:", error);
-      return;
-    }
-
-    const totalSize = data.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
-    setFolderSize(totalSize);
-  };
-
-  useEffect(() => {
-    calculateFolderSize();
   }, []);
 
   const handleAddProduct = () => {
@@ -184,69 +159,24 @@ const Products = () => {
     exportProducts(products, categories, subcategories);
   };
 
-  const handleStatusChange = async (id: string, currentStatus: string | null): Promise<void> => {
-    const newStatus = currentStatus === "published" ? "draft" : "published";
-    const { error } = await supabase
-      .from("products")
-      .update({ status: newStatus })
-      .eq("id", id);
-    
-    if (error) throw error;
-    return fetchTotalImages();
-  };
-
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'}`}>
-        <div className="space-y-1 text-left">
-          <h1 className="text-3xl font-bold">Products</h1>
-          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 ml-1">
-            <li>Total Products: {products?.length || 0}/{systemLimits?.product_limit || '...'}</li>
-            <li>Total Images: {totalImages}</li>
-            {folderSize > 0 && (
-              <li>Images Folder Size: {(folderSize / (1024 * 1024)).toFixed(2)} MB / {systemLimits?.max_folder_size_mb || '...'} MB</li>
-            )}
-          </ul>
-        </div>
-        <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-4'}`}>
-          <BackToDashboard />
-          <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-2'}`}>
-            <Button 
-              variant="outline" 
-              onClick={() => setShowImageManager(true)}
-              className="w-full"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Images
-            </Button>
-            <input
-              type="file"
-              accept=".csv"
-              onChange={handleImport}
-              className="hidden"
-              id="import-file"
-            />
-            <label htmlFor="import-file">
-              <Button variant="outline" className="cursor-pointer w-full" asChild>
-                <div className="flex items-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  Import CSV
-                </div>
-              </Button>
-            </label>
-            <Button variant="outline" onClick={handleExport} className="w-full">
-              <Download className="h-4 w-4 mr-2" />
-              Export CSV
-            </Button>
-            <Button onClick={handleAddProduct} className="w-full">Add Product</Button>
-          </div>
-        </div>
-      </div>
+      <ProductHeader 
+        productsCount={products?.length || 0}
+        totalImages={totalImages}
+        folderSize={folderSize}
+        systemLimits={systemLimits}
+        onAddProduct={handleAddProduct}
+        onImport={handleImport}
+        onExport={handleExport}
+        onShowImageManager={() => setShowImageManager(true)}
+        isMobile={isMobile}
+      />
 
       <ImageManagementDialog
         open={showImageManager}
         onOpenChange={setShowImageManager}
-        onImageUpload={calculateFolderSize}
+        onImageUpload={fetchTotalImages}
         folderSize={folderSize}
       />
 
