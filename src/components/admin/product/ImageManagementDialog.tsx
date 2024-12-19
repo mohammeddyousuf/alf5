@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Upload } from "lucide-react";
@@ -9,8 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { SearchAndSort } from "./image-management/SearchAndSort";
 import { ImageTable } from "./image-management/ImageTable";
 import { useQuery } from "@tanstack/react-query";
-import { useImageManagement } from "./hooks/useImageManagement";
-import { ImagePagination } from "./image-management/ImagePagination";
 
 interface ImageManagementDialogProps {
   open: boolean;
@@ -26,6 +24,8 @@ export function ImageManagementDialog({
   folderSize 
 }: ImageManagementDialogProps) {
   const { toast } = useToast();
+  const [images, setImages] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -33,29 +33,96 @@ export function ImageManagementDialog({
   const [sortOrder, setSortOrder] = useState<"name-asc" | "name-desc" | "date-asc" | "date-desc">("date-desc");
   const [showUnassigned, setShowUnassigned] = useState(false);
 
-  const {
-    images,
-    isLoading,
-    currentPage,
-    setCurrentPage,
-    loadImages,
-    getPaginatedImages
-  } = useImageManagement();
+  const loadImages = async () => {
+    try {
+      setIsLoading(true);
+      const { data: imageData, error: imageError } = await supabase.storage
+        .from("product-images")
+        .list();
 
-  const { data: systemLimits } = useQuery({
-    queryKey: ["system-limits"],
-    queryFn: async () => {
-      const { data: existingLimits, error } = await supabase
-        .from("system_limits")
-        .select("*")
+      if (imageError) throw imageError;
+
+      // Get all products to find image usage
+      const { data: products } = await supabase
+        .from("products")
+        .select("name, images");
+
+      // Get all sliders
+      const { data: sliders } = await supabase
+        .from("sliders")
+        .select("title, image_url");
+
+      // Get all collections
+      const { data: collections } = await supabase
+        .from("collections")
+        .select("name, image_url");
+
+      // Get website settings for logo and favicon
+      const { data: settings } = await supabase
+        .from("settings")
+        .select("logo_url, favicon_url")
         .order('created_at', { ascending: false })
         .limit(1)
-        .maybeSingle();
-      
-      if (error) throw error;
-      return existingLimits;
-    },
-  });
+        .single();
+
+      const imagesWithUsage = await Promise.all(
+        imageData.map(async (file) => {
+          const { data: { publicUrl } } = supabase.storage
+            .from("product-images")
+            .getPublicUrl(file.name);
+
+          const usage = [];
+
+          // Check products
+          products?.forEach(product => {
+            if (product.images?.includes(publicUrl)) {
+              usage.push({ type: 'Product', name: product.name });
+            }
+          });
+
+          // Check sliders
+          sliders?.forEach(slider => {
+            if (slider.image_url === publicUrl) {
+              usage.push({ type: 'Slider', name: slider.title });
+            }
+          });
+
+          // Check collections
+          collections?.forEach(collection => {
+            if (collection.image_url === publicUrl) {
+              usage.push({ type: 'Collection', name: collection.name });
+            }
+          });
+
+          // Check logo
+          if (settings?.logo_url === publicUrl) {
+            usage.push({ type: 'Website', name: 'Logo' });
+          }
+
+          // Check favicon
+          if (settings?.favicon_url === publicUrl) {
+            usage.push({ type: 'Website', name: 'Favicon' });
+          }
+
+          return {
+            ...file,
+            url: publicUrl,
+            usage
+          };
+        })
+      );
+
+      setImages(imagesWithUsage);
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleDelete = async () => {
     if (!imagesToDelete.length) return;
@@ -124,24 +191,40 @@ export function ImageManagementDialog({
     }
   };
 
+  const filteredImages = images.filter(image => 
+    image.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    image.usage?.some((u: any) => 
+      u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.type.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
+
   useEffect(() => {
     if (open) {
       loadImages();
     }
   }, [open]);
 
-  const { paginatedImages, totalPages, totalImages } = getPaginatedImages(
-    images,
-    sortOrder,
-    showUnassigned,
-    searchQuery
-  );
+  const { data: systemLimits } = useQuery({
+    queryKey: ["system-limits"],
+    queryFn: async () => {
+      const { data: existingLimits, error } = await supabase
+        .from("system_limits")
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return existingLimits;
+    },
+  });
 
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent 
-          className="w-[90vw] sm:max-w-[900px] flex flex-col h-full max-h-screen p-4"
+          className="w-[90vw] sm:max-w-[900px]"
           onDragOver={(e) => {
             e.preventDefault();
             setIsDragging(true);
@@ -149,7 +232,7 @@ export function ImageManagementDialog({
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
         >
-          <SheetHeader className="mb-4">
+          <SheetHeader>
             <SheetTitle className="flex justify-between items-center">
               Product Images
               <span className="text-sm font-normal text-muted-foreground">
@@ -158,7 +241,7 @@ export function ImageManagementDialog({
             </SheetTitle>
           </SheetHeader>
 
-          <div className="mb-4">
+          <div className="mt-6">
             <input
               type="file"
               accept="image/*"
@@ -194,38 +277,27 @@ export function ImageManagementDialog({
             onShowUnassignedChange={setShowUnassigned}
           />
 
-          <div className="flex-1 min-h-0 mt-4">
-            <ScrollArea className="h-[calc(100vh-350px)]">
-              {isLoading ? (
-                <div className="flex justify-center items-center h-32">
-                  <Loader2 className="h-6 w-6 animate-spin" />
-                </div>
-              ) : (
-                <div 
-                  className={`rounded-lg transition-colors ${
-                    isDragging ? 'bg-muted/50 border-2 border-dashed border-primary' : ''
-                  }`}
-                >
-                  <ImageTable
-                    images={paginatedImages}
-                    isDeleting={isDeleting}
-                    onDeleteClick={setImagesToDelete}
-                    sortOrder={sortOrder}
-                    showUnassigned={showUnassigned}
-                  />
-                </div>
-              )}
-            </ScrollArea>
-          </div>
-
-          <div className="mt-4 pt-4 border-t">
-            <ImagePagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-              totalImages={totalImages}
-            />
-          </div>
+          <ScrollArea className="h-[calc(100vh-250px)] mt-6">
+            {isLoading ? (
+              <div className="flex justify-center items-center h-32">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : (
+              <div 
+                className={`rounded-lg transition-colors ${
+                  isDragging ? 'bg-muted/50 border-2 border-dashed border-primary' : ''
+                }`}
+              >
+                <ImageTable
+                  images={filteredImages}
+                  isDeleting={isDeleting}
+                  onDeleteClick={setImagesToDelete}
+                  sortOrder={sortOrder}
+                  showUnassigned={showUnassigned}
+                />
+              </div>
+            )}
+          </ScrollArea>
         </SheetContent>
       </Sheet>
 

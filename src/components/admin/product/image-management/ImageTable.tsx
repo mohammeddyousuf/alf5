@@ -66,69 +66,59 @@ export function ImageTable({
 
   const sortedImages = sortImages(images);
 
-  if (sortedImages.length === 0) {
-    return (
-      <div className="text-center py-8 text-muted-foreground">
-        No images found
-      </div>
-    );
-  }
-
   return (
-    <div className="rounded-lg">
-      <Table>
-        <TableHeader>
-          <TableRow className="hover:bg-transparent border-b">
-            <TableHead className="w-[50px]">
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[50px]">
+            <Checkbox 
+              checked={selectedImages.length === sortedImages.length && sortedImages.length > 0}
+              onCheckedChange={handleSelectAll}
+            />
+          </TableHead>
+          <TableHead>Image</TableHead>
+          <TableHead>Name</TableHead>
+          <TableHead>Usage</TableHead>
+          <TableHead className="w-[100px]">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {sortedImages.map((image) => (
+          <TableRow key={image.name}>
+            <TableCell>
               <Checkbox 
-                checked={selectedImages.length === sortedImages.length && sortedImages.length > 0}
-                onCheckedChange={handleSelectAll}
+                checked={selectedImages.includes(image.name)}
+                onCheckedChange={(checked) => handleSelectImage(image.name, checked as boolean)}
               />
-            </TableHead>
-            <TableHead>Image</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Usage</TableHead>
-            <TableHead className="w-[100px]">Actions</TableHead>
+            </TableCell>
+            <TableCell>
+              <img
+                src={image.url}
+                alt={image.name}
+                className="w-20 h-20 object-cover rounded-lg"
+              />
+            </TableCell>
+            <TableCell className="font-medium">{image.name}</TableCell>
+            <TableCell>
+              {image.usage?.map((item: any, index: number) => (
+                <span key={index} className="block text-sm text-muted-foreground">
+                  {item.type}: {item.name}
+                </span>
+              ))}
+            </TableCell>
+            <TableCell>
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => onDeleteClick([image.name])}
+                disabled={isDeleting}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </TableCell>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedImages.map((image) => (
-            <TableRow key={image.name} className="border-b last:border-0">
-              <TableCell>
-                <Checkbox 
-                  checked={selectedImages.includes(image.name)}
-                  onCheckedChange={(checked) => handleSelectImage(image.name, checked as boolean)}
-                />
-              </TableCell>
-              <TableCell>
-                <img
-                  src={image.url}
-                  alt={image.name}
-                  className="w-20 h-20 object-cover rounded-lg"
-                />
-              </TableCell>
-              <TableCell className="font-medium">{image.name}</TableCell>
-              <TableCell>
-                {image.usage?.map((item: any, index: number) => (
-                  <span key={index} className="block text-sm text-muted-foreground">
-                    {item.type}: {item.name}
-                  </span>
-                ))}
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => onDeleteClick([image.name])}
-                  disabled={isDeleting}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+        ))}
+      </TableBody>
+    </Table>
   );
 }
