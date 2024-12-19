@@ -19,6 +19,9 @@ export const ProductMedia: React.FC<ProductMediaProps> = ({
   price,
   customLabel
 }) => {
+  const showSalePrice = salePrice !== null && salePrice < price;
+  const showDiscountPrice = !showSalePrice && discountPrice !== null && discountPrice < price;
+
   return (
     <div className="relative">
       {images && images.length > 0 && (
@@ -28,14 +31,9 @@ export const ProductMedia: React.FC<ProductMediaProps> = ({
             alt={productName}
             className="w-full rounded-lg"
           />
-          {salePrice !== null && salePrice < price && (
-            <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded">
-              SALE
-            </div>
-          )}
-          {discountPrice !== null && discountPrice < price && (
+          {(showSalePrice || showDiscountPrice) && (
             <div className="absolute top-2 left-2 bg-orange-500 text-white px-2 py-1 rounded">
-              DISCOUNT
+              {showSalePrice ? 'SALE' : 'DISCOUNT'}
             </div>
           )}
           {customLabel && (
