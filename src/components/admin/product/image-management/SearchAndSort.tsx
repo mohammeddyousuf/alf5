@@ -1,5 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Upload, Search } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -7,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search } from "lucide-react";
 
 interface SearchAndSortProps {
   searchQuery: string;
