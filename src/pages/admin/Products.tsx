@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ProductFilters } from "@/components/admin/product/ProductFilters";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +19,7 @@ import { handleProductImport, exportProducts } from "@/utils/productImportExport
 const Products = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const [showSaleProducts, setShowSaleProducts] = useState(true);
@@ -167,7 +168,7 @@ const Products = () => {
         title: "Success",
         description: `${importedCount} products imported/updated successfully`,
       });
-      window.location.reload();
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     } catch (error: any) {
       toast({
         title: "Error",
@@ -177,8 +178,8 @@ const Products = () => {
     }
   };
 
-  const handleExport = () => {
-    exportProducts(products, categories, subcategories);
+  const handleExport = async () => {
+    await exportProducts(products, categories, subcategories);
   };
 
   const handleStatusChange = async (id: string, currentStatus: string | null) => {
@@ -189,6 +190,7 @@ const Products = () => {
       .eq("id", id);
     
     if (error) throw error;
+    queryClient.invalidateQueries({ queryKey: ["products"] });
     fetchTotalImages();
   };
 
@@ -198,11 +200,10 @@ const Products = () => {
         .from("products")
         .select("images")
         .eq("id", id)
-        .maybeSingle(); // Changed from single() to maybeSingle()
+        .maybeSingle();
 
       if (fetchError) throw fetchError;
 
-      // Check if product exists
       if (!product) {
         console.log("Product not found:", id);
         toast({
@@ -240,6 +241,8 @@ const Products = () => {
         description: "Product and associated images deleted successfully",
       });
 
+      // Invalidate and refetch products query
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       fetchTotalImages();
     } catch (error: any) {
       console.error("Error deleting product:", error);
