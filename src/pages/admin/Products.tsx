@@ -180,8 +180,8 @@ const Products = () => {
     }
   };
 
-  const handleExport = () => {
-    exportProducts(products, categories, subcategories);
+  const handleExport = async () => {
+    await exportProducts(products, categories, subcategories);
   };
 
   const handleStatusChange = async (id: string, currentStatus: string | null) => {

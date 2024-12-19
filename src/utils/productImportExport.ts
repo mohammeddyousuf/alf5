@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import { ProductsRow } from '@/integrations/supabase/types';
+import { ProductsRow } from '@/integrations/supabase/types/products';
 import { supabase } from '@/integrations/supabase/client';
 
 interface CSVProduct {
@@ -128,11 +128,11 @@ export const handleProductImport = async (
   });
 };
 
-export const exportProducts = (
+export const exportProducts = async (
   products: ProductsRow[] | undefined,
   categories: any[] | undefined,
   subcategories: any[] | undefined
-): void => {
+): Promise<void> => {
   if (!products) return;
 
   // Create a map of category and subcategory IDs to their names
