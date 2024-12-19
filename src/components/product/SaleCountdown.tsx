@@ -17,12 +17,15 @@ export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    let timer: NodeJS.Timeout;
+
     const calculateTimeLeft = () => {
       try {
         const difference = new Date(endDate).getTime() - new Date().getTime();
         
         if (difference <= 0) {
-          // Invalidate queries when timer expires
+          // Immediately invalidate queries and refetch when timer expires
+          console.log("Sale timer expired - invalidating queries");
           queryClient.invalidateQueries({ queryKey: ["settings"] });
           queryClient.invalidateQueries({ queryKey: ["products"] });
           return { days: 0, hours: 0, minutes: 0, seconds: 0 };
@@ -40,22 +43,27 @@ export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
       }
     };
 
-    // Initial calculation
-    setTimeLeft(calculateTimeLeft());
-
-    // Update every second
-    const timer = setInterval(() => {
+    const updateTimer = () => {
       const newTimeLeft = calculateTimeLeft();
       setTimeLeft(newTimeLeft);
       
-      // If timer has expired, clear the interval
+      // If timer has expired, clear the interval and force refetch
       if (newTimeLeft.days === 0 && 
           newTimeLeft.hours === 0 && 
           newTimeLeft.minutes === 0 && 
           newTimeLeft.seconds === 0) {
         clearInterval(timer);
+        // Force an immediate refetch
+        queryClient.refetchQueries({ queryKey: ["settings"] });
+        queryClient.refetchQueries({ queryKey: ["products"] });
       }
-    }, 1000);
+    };
+
+    // Initial calculation
+    updateTimer();
+
+    // Update every second
+    timer = setInterval(updateTimer, 1000);
 
     return () => clearInterval(timer);
   }, [endDate, queryClient]);
