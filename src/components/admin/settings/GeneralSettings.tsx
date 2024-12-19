@@ -50,15 +50,13 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
         refetch={refetch} 
       />
 
-      <div className="space-y-4">
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="show-news-ticker"
-            checked={showNewsTicker}
-            onCheckedChange={handleNewsTickerToggle}
-          />
-          <Label htmlFor="show-news-ticker">Show News Ticker</Label>
-        </div>
+      <div className="flex justify-center items-center space-x-2">
+        <Switch
+          id="show-news-ticker"
+          checked={showNewsTicker}
+          onCheckedChange={handleNewsTickerToggle}
+        />
+        <Label htmlFor="show-news-ticker">Show News Ticker</Label>
       </div>
 
       <ImageSection
