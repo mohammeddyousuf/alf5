@@ -9,6 +9,11 @@ interface Product {
   images: string[];
   brand: string | null;
   custom_label: string | null;
+  description: string | null;
+  category_id: string | null;
+  subcategory_id: string | null;
+  featured: boolean | null;
+  created_at: string;
 }
 
 interface ProductGridProps {
