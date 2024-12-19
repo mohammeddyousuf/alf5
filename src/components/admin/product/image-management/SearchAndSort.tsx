@@ -1,5 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Upload, Search } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -7,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search } from "lucide-react";
 
 interface SearchAndSortProps {
   searchQuery: string;
@@ -27,8 +28,14 @@ export function SearchAndSort({
   onShowUnassignedChange,
 }: SearchAndSortProps) {
   return (
-    <div className="flex flex-col gap-4 mb-6">
-      <div className="flex gap-4">
+    <div className="space-y-4">
+      <div className="flex items-center gap-4">
+        <Button variant="outline" className="whitespace-nowrap" asChild>
+          <label htmlFor="bulk-upload-dialog" className="flex items-center justify-center gap-2 cursor-pointer">
+            <Upload className="h-4 w-4" />
+            Upload Images
+          </label>
+        </Button>
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -49,13 +56,13 @@ export function SearchAndSort({
             <SelectItem value="date-asc">Oldest First</SelectItem>
           </SelectContent>
         </Select>
-      </div>
-      <div className="flex items-center gap-2">
-        <Switch
-          checked={showUnassigned}
-          onCheckedChange={onShowUnassignedChange}
-        />
-        <span className="text-sm">Show only unassigned images</span>
+        <div className="flex items-center gap-2 min-w-[200px]">
+          <Switch
+            checked={showUnassigned}
+            onCheckedChange={onShowUnassignedChange}
+          />
+          <span className="text-sm whitespace-nowrap">Show only unassigned</span>
+        </div>
       </div>
     </div>
   );
