@@ -10,6 +10,7 @@ interface ProductInfoProps {
   description: string | null;
   price: number;
   salePrice: number | null;
+  discountPrice: number | null;
   productId: string;
   onOrderSubmit: (formData: any) => void;
 }
@@ -20,6 +21,7 @@ export function ProductInfo({
   description, 
   price, 
   salePrice,
+  discountPrice,
   productId,
   onOrderSubmit 
 }: ProductInfoProps) {
@@ -78,6 +80,7 @@ export function ProductInfo({
   };
 
   const showSalePrice = salePrice && salePrice < price && isValidSale();
+  const showDiscountPrice = !showSalePrice && discountPrice && discountPrice < price;
 
   const handleWhatsAppClick = () => {
     setOrderDialogOpen(true);
@@ -92,6 +95,10 @@ export function ProductInfo({
     setOrderDialogOpen(false);
   };
 
+  const displayPrice = showSalePrice ? salePrice! : 
+                      showDiscountPrice ? discountPrice! : 
+                      price;
+
   return (
     <div className="space-y-6 text-left">
       <h1 className="text-3xl font-bold text-foreground text-center">{name}</h1>
@@ -102,17 +109,17 @@ export function ProductInfo({
       
       <div className="space-y-2 text-center">
         <div className="flex items-center justify-center gap-4">
-          <p className={`text-2xl font-bold ${showSalePrice ? 'text-destructive' : 'text-foreground'}`}>
-            {formatPrice(showSalePrice ? salePrice! : price)}
+          <p className={`text-2xl font-bold ${(showSalePrice || showDiscountPrice) ? 'text-destructive' : 'text-foreground'}`}>
+            {formatPrice(displayPrice)}
           </p>
         </div>
-        {showSalePrice && (
+        {(showSalePrice || showDiscountPrice) && (
           <div className="flex items-center justify-center gap-2">
             <p className="text-lg text-muted-foreground line-through">
               {formatPrice(price)}
             </p>
             <p className="text-destructive">
-              ({calculateDiscount(price, salePrice!)}%)
+              ({calculateDiscount(price, displayPrice)}%)
             </p>
           </div>
         )}
@@ -134,7 +141,7 @@ export function ProductInfo({
         onOpenChange={setOrderDialogOpen}
         productName={name}
         productBrand={brand}
-        productPrice={showSalePrice ? salePrice! : price}
+        productPrice={displayPrice}
         productId={productId}
         onSubmit={handleOrderSubmit}
       />

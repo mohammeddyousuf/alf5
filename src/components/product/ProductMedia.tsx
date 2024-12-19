@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { Share2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { SaleCountdown } from "./SaleCountdown";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,6 +50,16 @@ export function ProductMedia({
       return data;
     },
   });
+
+  const getImageUrl = (fileName: string) => {
+    if (fileName.startsWith('http')) {
+      return fileName;
+    }
+    const { data: { publicUrl } } = supabase.storage
+      .from("product-images")
+      .getPublicUrl(fileName);
+    return publicUrl;
+  };
 
   useEffect(() => {
     if (settings?.clearance_sale_active && settings?.clearance_sale_end_date) {
@@ -139,7 +149,7 @@ export function ProductMedia({
             <CarouselItem key={index}>
               {images?.includes(item) ? (
                 <img
-                  src={item}
+                  src={getImageUrl(item)}
                   alt={`${productName} - ${index + 1}`}
                   className="w-full rounded-lg object-cover aspect-square"
                 />

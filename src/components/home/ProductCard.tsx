@@ -12,6 +12,7 @@ interface ProductCardProps {
   name: string;
   price: number;
   salePrice?: number | null;
+  discountPrice?: number | null;
   imageUrl?: string;
   brand?: string | null;
   customLabel?: string | null;
@@ -21,7 +22,8 @@ export const ProductCard = ({
   id, 
   name, 
   price, 
-  salePrice, 
+  salePrice,
+  discountPrice, 
   imageUrl, 
   brand,
   customLabel 
@@ -49,8 +51,8 @@ export const ProductCard = ({
     }).format(amount);
   };
 
-  const calculateDiscount = (originalPrice: number, salePrice: number) => {
-    return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+  const calculateDiscount = (originalPrice: number, discountedPrice: number) => {
+    return Math.round(((originalPrice - discountedPrice) / originalPrice) * 100);
   };
 
   const formatUrlSlug = (name: string) => {
@@ -59,11 +61,9 @@ export const ProductCard = ({
 
   const getImageUrl = (fileName: string | undefined) => {
     if (!fileName) return '';
-    // If the fileName is already a full URL, return it as is
     if (fileName.startsWith('http')) {
       return fileName;
     }
-    // Otherwise, construct the URL using Supabase storage
     const { data: { publicUrl } } = supabase.storage
       .from("product-images")
       .getPublicUrl(fileName);
@@ -91,6 +91,10 @@ export const ProductCard = ({
     salePrice < price && 
     (!settings?.clearance_sale_active || isSaleValid());
 
+  const showDiscountPrice = !showSalePrice && 
+    discountPrice && 
+    discountPrice < price;
+
   // Only show timer if global sale is active and not expired
   const showSaleTimer = settings?.clearance_sale_active && 
     settings?.clearance_sale_end_date && 
@@ -108,9 +112,11 @@ export const ProductCard = ({
                 alt={name}
                 className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
               />
-              {showSalePrice && (
+              {(showSalePrice || showDiscountPrice) && (
                 <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground rounded-md px-2 py-1">
-                  <span className="text-xs font-bold">SALE</span>
+                  <span className="text-xs font-bold">
+                    {showSalePrice ? 'SALE' : 'DISCOUNT'}
+                  </span>
                 </div>
               )}
               {showSaleTimer && settings?.clearance_sale_end_date && (
@@ -158,6 +164,20 @@ export const ProductCard = ({
               </div>
               <span className="text-lg font-bold text-destructive">
                 {formatPrice(salePrice)}
+              </span>
+            </>
+          ) : showDiscountPrice ? (
+            <>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground line-through">
+                  {formatPrice(price)}
+                </span>
+                <span className="text-sm text-destructive">
+                  ({calculateDiscount(price, discountPrice)}%)
+                </span>
+              </div>
+              <span className="text-lg font-bold text-destructive">
+                {formatPrice(discountPrice)}
               </span>
             </>
           ) : (
