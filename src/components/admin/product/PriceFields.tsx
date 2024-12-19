@@ -37,10 +37,10 @@ export function PriceFields({ form }: PriceFieldsProps) {
 
       <FormField
         control={form.control}
-        name="sale_price"
+        name="discount_price"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Sale Price (Optional)</FormLabel>
+            <FormLabel>Discount Price (Optional)</FormLabel>
             <FormControl>
               <Input 
                 type="number"
@@ -59,10 +59,10 @@ export function PriceFields({ form }: PriceFieldsProps) {
 
       <FormField
         control={form.control}
-        name="discount_price"
+        name="sale_price"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Discount Price (Optional)</FormLabel>
+            <FormLabel>Sale Price (Optional)</FormLabel>
             <FormControl>
               <Input 
                 type="number"
