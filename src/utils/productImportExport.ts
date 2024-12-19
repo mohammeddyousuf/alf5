@@ -6,17 +6,50 @@ interface CSVProduct {
   id?: string;
   name: string;
   description?: string | null;
-  price: number;
-  sale_price?: number | null;
-  discount_price?: number | null;
-  images?: string[] | null;
+  price: string | number;
+  sale_price?: string | number | null;
+  discount_price?: string | number | null;
+  images?: string | string[] | null;
   status?: "draft" | "published" | "archived" | null;
-  featured?: boolean | null;
+  featured?: boolean | string | null;
   brand?: string | null;
   custom_label?: string | null;
   category_id?: string | null;
   subcategory_id?: string | null;
 }
+
+const convertToBoolean = (value: string | boolean | null | undefined): boolean => {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string') {
+    return value.toLowerCase() === 'true';
+  }
+  return false;
+};
+
+const convertToNumber = (value: string | number | null | undefined): number | null => {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string' && value.trim()) {
+    const num = Number(value);
+    return isNaN(num) ? null : num;
+  }
+  return null;
+};
+
+const processImages = (images: string | string[] | null | undefined): string[] => {
+  if (!images) return [];
+  if (Array.isArray(images)) return images;
+  if (typeof images === 'string') {
+    if (images.includes('[')) {
+      try {
+        return JSON.parse(images);
+      } catch (e) {
+        return [];
+      }
+    }
+    return images.split(',').map(img => img.trim());
+  }
+  return [];
+};
 
 export const handleProductImport = async (
   file: File,
@@ -28,7 +61,11 @@ export const handleProductImport = async (
       header: true,
       complete: async (results) => {
         try {
-          const newProducts = results.data.filter(product => product.name); // Filter out rows without names
+          // Filter out rows without names and validate data
+          const newProducts = results.data.filter(product => 
+            product && typeof product === 'object' && product.name && product.name.trim()
+          );
+
           const totalProducts = (currentProducts?.length || 0) + newProducts.length;
 
           if (totalProducts > (systemLimits?.product_limit || 100)) {
@@ -37,63 +74,32 @@ export const handleProductImport = async (
           }
 
           for (const product of newProducts) {
-            // Handle images array conversion
-            if (typeof product.images === 'string') {
-              try {
-                product.images = product.images.includes('[')
-                  ? JSON.parse(product.images)
-                  : product.images.split(',').map(img => img.trim());
-              } catch (e) {
-                product.images = [];
-              }
-            }
+            const processedProduct = {
+              name: product.name.trim(),
+              description: product.description || null,
+              price: convertToNumber(product.price) || 0,
+              sale_price: convertToNumber(product.sale_price),
+              discount_price: convertToNumber(product.discount_price),
+              images: processImages(product.images),
+              status: product.status || 'draft',
+              featured: convertToBoolean(product.featured),
+              brand: product.brand || null,
+              custom_label: product.custom_label || null,
+              category_id: product.category_id || null,
+              subcategory_id: product.subcategory_id || null,
+            };
 
-            // Convert string boolean to actual boolean
-            product.featured = product.featured === 'true';
-
-            // Convert string numbers to actual numbers
-            product.price = Number(product.price);
-            if (product.sale_price) product.sale_price = Number(product.sale_price);
-            if (product.discount_price) product.discount_price = Number(product.discount_price);
-
-            // If product has an ID, update it, otherwise insert new
             if (product.id) {
               const { error: updateError } = await supabase
                 .from("products")
-                .update({
-                  name: product.name,
-                  description: product.description,
-                  price: product.price,
-                  sale_price: product.sale_price,
-                  discount_price: product.discount_price,
-                  images: product.images,
-                  status: product.status || 'draft',
-                  featured: product.featured,
-                  brand: product.brand,
-                  custom_label: product.custom_label,
-                  category_id: product.category_id,
-                  subcategory_id: product.subcategory_id,
-                })
+                .update(processedProduct)
                 .eq('id', product.id);
 
               if (updateError) throw updateError;
             } else {
               const { error: insertError } = await supabase
                 .from("products")
-                .insert([{
-                  name: product.name,
-                  description: product.description,
-                  price: product.price,
-                  sale_price: product.sale_price,
-                  discount_price: product.discount_price,
-                  images: product.images,
-                  status: product.status || 'draft',
-                  featured: product.featured,
-                  brand: product.brand,
-                  custom_label: product.custom_label,
-                  category_id: product.category_id,
-                  subcategory_id: product.subcategory_id,
-                }]);
+                .insert([processedProduct]);
 
               if (insertError) throw insertError;
             }
