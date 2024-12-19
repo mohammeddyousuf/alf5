@@ -16,6 +16,8 @@ import { NewsForm } from "@/components/admin/news/NewsForm";
 import { supabase } from "@/integrations/supabase/client";
 import { ImageDeleteDialog } from "@/components/admin/shared/ImageDeleteDialog";
 import { useToast } from "@/hooks/use-toast";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 const News = () => {
   const [open, setOpen] = useState(false);
@@ -23,6 +25,21 @@ const News = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [newsToDelete, setNewsToDelete] = useState<any>(null);
   const { toast } = useToast();
+
+  const { data: settings, refetch: refetchSettings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const { data: newsItems, isLoading } = useQuery({
     queryKey: ["news-ticker"],
@@ -36,6 +53,25 @@ const News = () => {
       return data;
     },
   });
+
+  const handleNewsTickerToggle = async (checked: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("settings")
+        .update({ show_news_ticker: checked })
+        .eq('id', settings.id);
+
+      if (error) throw error;
+
+      await refetchSettings();
+      toast({ description: "News ticker visibility updated successfully" });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        description: error.message
+      });
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -88,6 +124,15 @@ const News = () => {
             </DialogContent>
           </Dialog>
         </div>
+      </div>
+
+      <div className="flex flex-col items-center justify-center space-y-2 mb-6 p-4 border rounded-lg bg-background">
+        <Switch
+          id="show-news-ticker"
+          checked={settings?.show_news_ticker}
+          onCheckedChange={handleNewsTickerToggle}
+        />
+        <Label htmlFor="show-news-ticker">Show News Ticker</Label>
       </div>
 
       <Table>
