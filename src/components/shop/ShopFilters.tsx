@@ -30,6 +30,8 @@ interface ShopFiltersProps {
   setShowNewArrivalsOnly: (show: boolean) => void;
   selectedBrand: string | null;
   setSelectedBrand: (brand: string | null) => void;
+  showDiscountOnly: boolean;
+  setShowDiscountOnly: (show: boolean) => void;
 }
 
 export function ShopFilters({
@@ -49,6 +51,8 @@ export function ShopFilters({
   setShowNewArrivalsOnly,
   selectedBrand,
   setSelectedBrand,
+  showDiscountOnly,
+  setShowDiscountOnly,
 }: ShopFiltersProps) {
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -188,7 +192,16 @@ export function ShopFilters({
               checked={showSaleOnly}
               onCheckedChange={setShowSaleOnly}
             />
-            <Label htmlFor="sale-mode">Show Sale Items Only</Label>
+            <Label htmlFor="sale-mode">Show Sale Only</Label>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="discount-mode"
+              checked={showDiscountOnly}
+              onCheckedChange={setShowDiscountOnly}
+            />
+            <Label htmlFor="discount-mode">Show Discount Only</Label>
           </div>
 
           <div className="flex items-center space-x-2">
@@ -197,7 +210,7 @@ export function ShopFilters({
               checked={showFeaturedOnly}
               onCheckedChange={setShowFeaturedOnly}
             />
-            <Label htmlFor="featured-mode">Show Featured Items Only</Label>
+            <Label htmlFor="featured-mode">Show Featured Only</Label>
           </div>
 
           <div className="flex items-center space-x-2">

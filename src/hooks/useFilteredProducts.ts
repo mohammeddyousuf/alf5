@@ -5,6 +5,7 @@ interface FilterParams {
   searchQuery: string;
   priceRange: [number, number];
   showSaleOnly: boolean;
+  showDiscountOnly: boolean;
   selectedBrand: string | null;
   settings: any;
 }
@@ -14,6 +15,7 @@ export const useFilteredProducts = ({
   searchQuery,
   priceRange,
   showSaleOnly,
+  showDiscountOnly,
   selectedBrand,
   settings,
 }: FilterParams) => {
@@ -34,6 +36,10 @@ export const useFilteredProducts = ({
     );
   };
 
+  const hasDiscount = (product: Product) => {
+    return product.discount_price && product.discount_price < product.price;
+  };
+
   const filteredProducts = products?.filter((product) => {
     const matchesSearch =
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -49,9 +55,10 @@ export const useFilteredProducts = ({
           (priceRange[1] === 0 ? true : price <= priceRange[1]);
 
     const meetsSale = showSaleOnly ? isProductOnSale(product) : true;
+    const meetsDiscount = showDiscountOnly ? hasDiscount(product) : true;
     const meetsBrand = selectedBrand ? product.brand === selectedBrand : true;
 
-    return matchesSearch && meetsPrice && meetsSale && meetsBrand;
+    return matchesSearch && meetsPrice && meetsSale && meetsDiscount && meetsBrand;
   });
 
   return { filteredProducts, isProductOnSale };

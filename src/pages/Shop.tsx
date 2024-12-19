@@ -20,23 +20,16 @@ const Shop = () => {
 
   // Initialize state from URL parameters or location state
   const [searchQuery, setSearchQuery] = useState(getUrlParam("search") || "");
-  
-  // Initialize priceRange as a tuple with two numbers
   const [priceRange, setPriceRange] = useState<[number, number]>([
     Number(getUrlParam("minPrice")) || 0,
     Number(getUrlParam("maxPrice")) || 0,
   ]);
 
-  // Initialize filter states from location.state if available
-  const [showSaleOnly, setShowSaleOnly] = useState(
-    location.state?.showSaleOnly || getUrlParam("sale") === "true"
-  );
-  const [showFeaturedOnly, setShowFeaturedOnly] = useState(
-    location.state?.showFeaturedOnly || getUrlParam("featured") === "true"
-  );
-  const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(
-    location.state?.showNewArrivalsOnly || getUrlParam("newArrivals") === "true"
-  );
+  // Initialize filter states from URL parameters
+  const [showSaleOnly, setShowSaleOnly] = useState(getUrlParam("sale") === "true");
+  const [showDiscountOnly, setShowDiscountOnly] = useState(getUrlParam("discount") === "true");
+  const [showFeaturedOnly, setShowFeaturedOnly] = useState(getUrlParam("featured") === "true");
+  const [showNewArrivalsOnly, setShowNewArrivalsOnly] = useState(getUrlParam("newArrivals") === "true");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">(
     (getUrlParam("sort") as "asc" | "desc" | "default") || "default"
   );
@@ -51,16 +44,6 @@ const Shop = () => {
   );
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  // Effect to update filters when location.state changes
-  useEffect(() => {
-    if (location.state) {
-      const { showFeaturedOnly: featured, showNewArrivalsOnly: newArrivals } =
-        location.state;
-      setShowFeaturedOnly(featured || false);
-      setShowNewArrivalsOnly(newArrivals || false);
-    }
-  }, [location.state]);
-
   // Update URL when filters change
   useEffect(() => {
     updateUrlParams({
@@ -68,6 +51,7 @@ const Shop = () => {
       minPrice: priceRange[0] > 0 ? priceRange[0].toString() : null,
       maxPrice: priceRange[1] > 0 ? priceRange[1].toString() : null,
       sale: showSaleOnly ? "true" : null,
+      discount: showDiscountOnly ? "true" : null,
       featured: showFeaturedOnly ? "true" : null,
       newArrivals: showNewArrivalsOnly ? "true" : null,
       sort: sortOrder !== "default" ? sortOrder : null,
@@ -79,6 +63,7 @@ const Shop = () => {
     searchQuery,
     priceRange,
     showSaleOnly,
+    showDiscountOnly,
     showFeaturedOnly,
     showNewArrivalsOnly,
     sortOrder,
@@ -109,6 +94,7 @@ const Shop = () => {
       selectedSubcategory,
       showFeaturedOnly,
       showSaleOnly,
+      showDiscountOnly,
       showNewArrivalsOnly,
     ],
     queryFn: async () => {
@@ -117,6 +103,7 @@ const Shop = () => {
         subcategory: selectedSubcategory,
         featured: showFeaturedOnly,
         sale: showSaleOnly,
+        discount: showDiscountOnly,
         newArrivals: showNewArrivalsOnly,
         priceRange,
       });
@@ -158,7 +145,6 @@ const Shop = () => {
         throw error;
       }
 
-      console.log("Fetched products:", data);
       return data as Product[];
     },
   });
@@ -168,6 +154,7 @@ const Shop = () => {
     searchQuery,
     priceRange,
     showSaleOnly,
+    showDiscountOnly,
     selectedBrand,
     settings,
   });
@@ -218,6 +205,8 @@ const Shop = () => {
                   setPriceRange={setPriceRange}
                   showSaleOnly={showSaleOnly}
                   setShowSaleOnly={setShowSaleOnly}
+                  showDiscountOnly={showDiscountOnly}
+                  setShowDiscountOnly={setShowDiscountOnly}
                   sortOrder={sortOrder}
                   setSortOrder={setSortOrder}
                   selectedCategory={selectedCategory}
@@ -243,6 +232,8 @@ const Shop = () => {
             setPriceRange={setPriceRange}
             showSaleOnly={showSaleOnly}
             setShowSaleOnly={setShowSaleOnly}
+            showDiscountOnly={showDiscountOnly}
+            setShowDiscountOnly={setShowDiscountOnly}
             sortOrder={sortOrder}
             setSortOrder={setSortOrder}
             selectedCategory={selectedCategory}
