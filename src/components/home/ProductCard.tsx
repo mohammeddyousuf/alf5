@@ -70,27 +70,34 @@ export const ProductCard = ({
     return publicUrl;
   };
 
-  // Only use the first 8 characters of the UUID
   const shortId = id.split('-')[0];
   const productUrl = `/products/${formatUrlSlug(name)}-${shortId}`;
 
   const isValidSale = () => {
-    if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
+    try {
+      if (!settings?.clearance_sale_active) {
+        return true;
+      }
+
+      if (!settings?.clearance_sale_end_date) {
+        return false;
+      }
+
+      const endDate = new Date(settings.clearance_sale_end_date);
+      const now = new Date();
+      return endDate > now;
+    } catch (error) {
+      console.error("Error in isSaleValid:", error);
       return false;
     }
-    const endDate = new Date(settings.clearance_sale_end_date);
-    const now = new Date();
-    return endDate > now;
   };
 
-  // Show sale price if it exists, is less than regular price, and either:
-  // 1. There's no global sale timer (regular product discount)
-  // 2. There's a global sale timer and it hasn't expired
+  // Show sale price if it exists, is less than regular price, and sale is valid
   const showSalePrice = salePrice && 
     salePrice < price && 
     (!settings?.clearance_sale_active || isValidSale());
 
-  // Only show discount price if there's no sale price active
+  // Show discount price if there's no sale price and discount price exists and is lower
   const showDiscountPrice = !showSalePrice && 
     discountPrice && 
     discountPrice < price;
