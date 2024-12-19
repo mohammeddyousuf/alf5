@@ -24,11 +24,26 @@ export const ThemeSettings = ({ settings, refetch }: ThemeSettingsProps) => {
   });
 
   useEffect(() => {
-    // Initialize theme colors when settings are loaded
-    initializeThemeColors(settings);
+    if (settings) {
+      setColors({
+        primary: settings.primary_color || "#9b87f5",
+        secondary: settings.secondary_color || "#7E69AB",
+        accent: settings.accent_color || "#6E59A5",
+        background: settings.background_color || "#FFFFFF",
+        foreground: settings.foreground_color || "#000000",
+        sale: settings.sale_color || "#ea384c",
+        discount: settings.discount_color || "#ea384c",
+      });
+      initializeThemeColors(settings);
+    }
   }, [settings]);
 
   const handleColorChange = async (colorKey: keyof typeof colors, value: string) => {
+    if (!settings?.id) {
+      console.error('No settings ID found');
+      return;
+    }
+
     setColors(prev => ({ ...prev, [colorKey]: value }));
     updateThemeColor(colorKey, value);
     
@@ -36,7 +51,7 @@ export const ThemeSettings = ({ settings, refetch }: ThemeSettingsProps) => {
       const { error } = await supabase
         .from('settings')
         .update({ [`${colorKey}_color`]: value })
-        .is('id', null); // This will match the first row
+        .eq('id', settings.id);
 
       if (error) throw error;
       await refetch();
