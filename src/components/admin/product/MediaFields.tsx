@@ -64,7 +64,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
           const fileName = await generateUniqueFileName(file.name);
           console.log("Generated unique filename:", fileName);
 
-          const { error: uploadError } = await supabase.storage
+          const { error: uploadError, data } = await supabase.storage
             .from("product-images")
             .upload(fileName, file, {
               upsert: false
@@ -72,7 +72,12 @@ export function MediaFields({ form }: MediaFieldsProps) {
 
           if (uploadError) throw uploadError;
 
-          return fileName;
+          const { data: { publicUrl } } = supabase.storage
+            .from("product-images")
+            .getPublicUrl(fileName);
+
+          console.log("Uploaded file public URL:", publicUrl);
+          return publicUrl; // Store the full URL instead of just the filename
         })
       );
 
@@ -83,6 +88,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
         description: "Images uploaded successfully",
       });
     } catch (error: any) {
+      console.error("Upload error:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -98,7 +104,9 @@ export function MediaFields({ form }: MediaFieldsProps) {
     try {
       setIsDeleting(prev => ({ ...prev, [indexToRemove]: true }));
       
-      const fileName = imageUrl.includes('/') ? imageUrl.split('/').pop()! : imageUrl;
+      // Extract filename from the full URL
+      const fileName = imageUrl.split('/').pop();
+      if (!fileName) throw new Error("Invalid image URL");
       
       console.log("Attempting to delete file:", fileName);
 
@@ -132,40 +140,25 @@ export function MediaFields({ form }: MediaFieldsProps) {
     }
   };
 
-  const getImageUrl = (fileName: string) => {
-    // If it's already a full URL, return it as is
-    if (fileName.startsWith('http')) {
-      return fileName;
-    }
-    
-    // Otherwise, generate the Supabase storage URL
-    const { data: { publicUrl } } = supabase.storage
-      .from("product-images")
-      .getPublicUrl(fileName);
-      
-    console.log("Generated public URL:", publicUrl); // Debug log
-    return publicUrl;
-  };
-
   return (
     <div className="space-y-4">
       <div>
         <FormLabel>Images</FormLabel>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-2">
-          {form.watch("images")?.map((fileName, index) => (
-            <div key={fileName} className="relative group aspect-square">
+          {form.watch("images")?.map((imageUrl, index) => (
+            <div key={imageUrl} className="relative group aspect-square">
               <img
-                src={getImageUrl(fileName)}
+                src={imageUrl}
                 alt={`Product image ${index + 1}`}
                 className="w-full h-full object-cover rounded-lg"
                 onError={(e) => {
-                  console.error("Error loading image:", fileName);
-                  e.currentTarget.src = "/placeholder.svg"; // Fallback image
+                  console.error("Error loading image:", imageUrl);
+                  e.currentTarget.src = "/placeholder.svg";
                 }}
               />
               <button
                 type="button"
-                onClick={() => setImageToDelete({ index, url: fileName })}
+                onClick={() => setImageToDelete({ index, url: imageUrl })}
                 disabled={isDeleting[index]}
                 className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50"
               >
