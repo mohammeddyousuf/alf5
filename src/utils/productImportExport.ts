@@ -1,27 +1,28 @@
 import Papa from 'papaparse';
-import { ProductsRow } from '@/integrations/supabase/types/products';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from "@/integrations/supabase/client";
+import { ProductsRow, ProductsInsert } from "@/integrations/supabase/types/products";
 
 interface CSVProduct {
   id?: string;
   name: string;
   description?: string | null;
   price: string | number;
-  discount_price?: string | number | null;
   sale_price?: string | number | null;
+  discount_price?: string | number | null;
   images?: string | string[] | null;
   status?: "draft" | "published" | "archived" | null;
   featured?: boolean | string | null;
   brand?: string | null;
   custom_label?: string | null;
-  category?: string | null;
-  subcategory?: string | null;
+  category_id?: string | null;
+  subcategory_id?: string | null;
 }
 
 const convertToBoolean = (value: string | boolean | null | undefined): boolean => {
   if (typeof value === 'boolean') return value;
-  if (value === 'true') return true;
-  if (value === 'false') return false;
+  if (typeof value === 'string') {
+    return value.toLowerCase() === 'true';
+  }
   return false;
 };
 
@@ -89,9 +90,12 @@ export const handleProductImport = async (
               featured: convertToBoolean(product.featured),
               brand: product.brand || null,
               custom_label: product.custom_label || null,
+              category_id: product.category_id || null,
+              subcategory_id: product.subcategory_id || null,
             };
 
             if (product.id) {
+              // Update existing product
               const { error: updateError } = await supabase
                 .from("products")
                 .update(processedProduct)
@@ -102,6 +106,7 @@ export const handleProductImport = async (
                 continue;
               }
             } else {
+              // Insert new product
               const { error: insertError } = await supabase
                 .from("products")
                 .insert([processedProduct]);
@@ -126,83 +131,41 @@ export const handleProductImport = async (
   });
 };
 
-export const exportProducts = async (
+export const exportProducts = (
   products: ProductsRow[] | undefined,
   categories: any[] | undefined,
   subcategories: any[] | undefined
-): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    try {
-      if (!products) {
-        resolve();
-        return;
-      }
+) => {
+  if (!products) return;
 
-      // Create a map of category and subcategory IDs to their names
-      const categoryMap = new Map(categories?.map(cat => [cat.id, cat.name]));
-      const subcategoryMap = new Map(subcategories?.map(subcat => [subcat.id, subcat.name]));
+  const exportProducts = products.map(product => ({
+    id: product.id, // Include ID in export
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    sale_price: product.sale_price,
+    discount_price: product.discount_price,
+    images: product.images?.map(imageUrl =>
+      imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
+    ),
+    status: product.status,
+    featured: product.featured,
+    brand: product.brand,
+    custom_label: product.custom_label,
+    category_id: product.category_id,
+    subcategory_id: product.subcategory_id
+  }));
 
-      // Create export data with existing products
-      const exportProducts = products.map(product => ({
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        discount_price: product.discount_price,
-        sale_price: product.sale_price,
-        images: product.images?.map(imageUrl =>
-          imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
-        ),
-        status: product.status,
-        featured: product.featured,
-        brand: product.brand,
-        custom_label: product.custom_label,
-        category: categoryMap.get(product.category_id || '') || '',
-        subcategory: subcategoryMap.get(product.subcategory_id || '') || ''
-      }));
+  const csv = Papa.unparse(exportProducts);
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
 
-      // Add a template row for new products
-      exportProducts.push({
-        id: '', // Leave empty for new products
-        name: 'New Product Name',
-        description: 'Product Description',
-        price: 0,
-        discount_price: null,
-        sale_price: null,
-        images: [],
-        status: 'draft',
-        featured: false,
-        brand: '',
-        custom_label: '',
-        category: '',
-        subcategory: ''
-      });
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'products.csv');
+  link.style.visibility = 'hidden';
 
-      const csv = Papa.unparse(exportProducts);
-      
-      // Add instructions at the top of the CSV
-      const instructions = `
-# Instructions for editing and adding products:
-# 1. For existing products: Keep the ID to update them
-# 2. For new products: Remove the ID or leave it empty
-# 3. Status can be: draft, published, or archived
-# 4. Featured should be true or false
-# 5. Images should be comma-separated filenames
-# 6. Price must be a whole number
-# 7. Use the last row as a template for new products\n\n`;
-
-      const blob = new Blob([instructions + csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', 'products.csv');
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      resolve();
-    } catch (error) {
-      reject(error);
-    }
-  });
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
