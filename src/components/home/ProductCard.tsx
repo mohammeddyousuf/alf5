@@ -101,6 +101,10 @@ export const ProductCard = ({
     isSaleValid() && 
     showSalePrice;
 
+  const effectivePrice = showSalePrice ? salePrice : 
+                        showDiscountPrice ? discountPrice :
+                        price;
+
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
       <Link to={productUrl}>
@@ -113,10 +117,10 @@ export const ProductCard = ({
                 className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
               />
               {(showSalePrice || showDiscountPrice) && (
-                <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground rounded-md px-2 py-1">
-                  <span className="text-xs font-bold">
+                <div className="absolute top-2 left-2">
+                  <Badge variant="destructive">
                     {showSalePrice ? 'SALE' : 'DISCOUNT'}
-                  </span>
+                  </Badge>
                 </div>
               )}
               {showSaleTimer && settings?.clearance_sale_end_date && (
@@ -152,32 +156,18 @@ export const ProductCard = ({
       </Link>
       <CardFooter className="p-4 pt-0 flex flex-col gap-3">
         <div className="flex flex-col">
-          {showSalePrice ? (
+          {(showSalePrice || showDiscountPrice) ? (
             <>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-muted-foreground line-through">
                   {formatPrice(price)}
                 </span>
                 <span className="text-sm text-destructive">
-                  ({calculateDiscount(price, salePrice)}%)
+                  ({calculateDiscount(price, effectivePrice)}%)
                 </span>
               </div>
               <span className="text-lg font-bold text-destructive">
-                {formatPrice(salePrice)}
-              </span>
-            </>
-          ) : showDiscountPrice ? (
-            <>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground line-through">
-                  {formatPrice(price)}
-                </span>
-                <span className="text-sm text-destructive">
-                  ({calculateDiscount(price, discountPrice)}%)
-                </span>
-              </div>
-              <span className="text-lg font-bold text-destructive">
-                {formatPrice(discountPrice)}
+                {formatPrice(effectivePrice)}
               </span>
             </>
           ) : (

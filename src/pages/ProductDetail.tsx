@@ -177,6 +177,7 @@ Payment Mode: ${formData.paymentMode}`;
             productName={product.name}
             getYouTubeVideoId={getYouTubeVideoId}
             salePrice={product.sale_price}
+            discountPrice={product.discount_price}
             price={product.price}
             customLabel={product.custom_label}
           />
