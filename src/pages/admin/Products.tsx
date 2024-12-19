@@ -303,6 +303,7 @@ const Products = () => {
         subcategory: subcategory?.name || '',
         price: product.price,
         sale_price: product.sale_price,
+        discount_price: product.discount_price,
         images: product.images?.map(imageUrl => 
           imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
         ),
@@ -500,3 +501,4 @@ const Products = () => {
 };
 
 export default Products;
+
