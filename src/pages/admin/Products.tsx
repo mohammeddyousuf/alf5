@@ -119,7 +119,7 @@ const Products = () => {
     fetchTotalImages();
   }, []);
 
-  const handleStatusChange = async (id: string, currentStatus: string | null) => {
+  const handleStatusChange = async (id: string, currentStatus: string | null): Promise<void> => {
     try {
       const newStatus = currentStatus === "published" ? "draft" : "published";
       const { error } = await supabase
@@ -129,7 +129,7 @@ const Products = () => {
       
       if (error) throw error;
       
-      // Return the fetchTotalImages promise to satisfy TypeScript
+      // Explicitly return the Promise from fetchTotalImages
       return fetchTotalImages();
     } catch (error) {
       console.error("Error updating status:", error);
