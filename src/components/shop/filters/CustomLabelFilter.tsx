@@ -25,7 +25,7 @@ export function CustomLabelFilter({ selectedLabel, setSelectedLabel, labels }: C
 
   return (
     <div className="space-y-2">
-      <Label>Custom Label</Label>
+      <Label>Label</Label>
       <Select
         value={selectedLabel || "all"}
         onValueChange={handleLabelChange}
