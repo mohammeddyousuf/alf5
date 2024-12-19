@@ -1,12 +1,8 @@
-import { Badge } from "@/components/ui/badge";
-import { SaleCountdown } from "@/components/product/SaleCountdown";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-
 interface ProductImageProps {
   images: string[] | null;
   name: string;
   salePrice: number | null;
+  discountPrice: number | null;
   price: number;
   showSaleTimer: boolean;
   saleEndDate: string | null;
@@ -17,12 +13,13 @@ export function ProductImage({
   images, 
   name, 
   salePrice, 
+  discountPrice,
   price,
   showSaleTimer,
   saleEndDate,
   customLabel
 }: ProductImageProps) {
-  const showSaleBadge = salePrice && salePrice < price;
+  const showSaleBadge = (salePrice && salePrice < price) || (discountPrice && discountPrice < price);
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -40,11 +37,9 @@ export function ProductImage({
   });
 
   const getImageUrl = (fileName: string) => {
-    // If the fileName is already a full URL, return it as is
     if (fileName.startsWith('http')) {
       return fileName;
     }
-    // Otherwise, construct the URL using Supabase storage
     const { data: { publicUrl } } = supabase.storage
       .from("product-images")
       .getPublicUrl(fileName);
@@ -62,7 +57,9 @@ export function ProductImage({
           />
           {showSaleBadge && (
             <div className="absolute top-2 left-2">
-              <Badge variant="destructive">SALE</Badge>
+              <Badge variant="destructive">
+                {salePrice && salePrice < price ? 'SALE' : 'DISCOUNT'}
+              </Badge>
             </div>
           )}
           {showSaleTimer && saleEndDate && (

@@ -50,12 +50,10 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
 
   const isSaleValid = () => {
     try {
-      // If clearance sale is not active, show regular product-specific sale prices
       if (!settings?.clearance_sale_active) {
         return true;
       }
 
-      // If clearance sale is active but no end date, don't show sale
       if (!settings?.clearance_sale_end_date) {
         return false;
       }
@@ -70,16 +68,18 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
   };
 
   const shouldShowSalePrice = () => {
-    // Show sale price if it exists and is less than regular price, and either:
-    // 1. There's no global sale timer (regular product discount)
-    // 2. There's a global sale timer and it hasn't expired
     return product.sale_price && 
       product.sale_price < product.price && 
       (!settings?.clearance_sale_active || isSaleValid());
   };
 
+  const shouldShowDiscountPrice = () => {
+    return product.discount_price && 
+           product.discount_price < product.price && 
+           (!shouldShowSalePrice());
+  };
+
   const shouldShowSaleTimer = () => {
-    // Only show timer if global sale is active and product has valid sale price
     if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
       return false;
     }
@@ -110,6 +110,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
         images={product.images}
         name={product.name}
         salePrice={shouldShowSalePrice() ? product.sale_price : null}
+        discountPrice={shouldShowDiscountPrice() ? product.discount_price : null}
         price={product.price}
         showSaleTimer={shouldShowSaleTimer()}
         saleEndDate={settings?.clearance_sale_end_date || null}
@@ -134,7 +135,8 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
       </div>
 
       <ProductPrice 
-        price={product.price} 
+        price={product.price}
+        discountPrice={shouldShowDiscountPrice() ? product.discount_price : null}
         salePrice={shouldShowSalePrice() ? product.sale_price : null}
       />
 
