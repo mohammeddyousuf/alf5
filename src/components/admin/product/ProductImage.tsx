@@ -1,3 +1,8 @@
+import { Badge } from "@/components/ui/badge";
+import { SaleCountdown } from "@/components/product/SaleCountdown";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
 interface ProductImageProps {
   images: string[] | null;
   name: string;
