@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 
 interface PriceRangeFilterProps {
   priceRange: [number, number];
-  setPriceRange: (range: [number, number]) => void;
+  setPriceRange: React.Dispatch<React.SetStateAction<[number, number]>>;
 }
 
 export function PriceRangeFilter({ priceRange, setPriceRange }: PriceRangeFilterProps) {
@@ -11,14 +11,14 @@ export function PriceRangeFilter({ priceRange, setPriceRange }: PriceRangeFilter
     const value = e.target.value;
     // If empty string, set to 0
     const newMin = value === '' ? 0 : Math.max(0, parseInt(value) || 0);
-    setPriceRange([newMin, priceRange[1]]);
+    setPriceRange(prev => [newMin, prev[1]]);
   };
 
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     // If empty string, set to 0
     const newMax = value === '' ? 0 : Math.max(0, parseInt(value) || 0);
-    setPriceRange([priceRange[0], newMax]);
+    setPriceRange(prev => [prev[0], newMax]);
   };
 
   return (

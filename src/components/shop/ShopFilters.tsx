@@ -14,8 +14,8 @@ import { PriceRangeFilter } from "./filters/PriceRangeFilter";
 import { BrandFilter } from "./filters/BrandFilter";
 
 interface ShopFiltersProps {
-  priceRange: number[];
-  setPriceRange: (range: number[]) => void;
+  priceRange: [number, number];
+  setPriceRange: React.Dispatch<React.SetStateAction<[number, number]>>;
   showSaleOnly: boolean;
   setShowSaleOnly: (show: boolean) => void;
   sortOrder: "asc" | "desc" | "default";
