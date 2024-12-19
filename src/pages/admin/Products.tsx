@@ -184,7 +184,7 @@ const Products = () => {
     exportProducts(products, categories, subcategories);
   };
 
-  const handleStatusChange = async (id: string, currentStatus: string | null) => {
+  const handleStatusChange = async (id: string, currentStatus: string | null): Promise<void> => {
     const newStatus = currentStatus === "published" ? "draft" : "published";
     const { error } = await supabase
       .from("products")
@@ -192,7 +192,7 @@ const Products = () => {
       .eq("id", id);
     
     if (error) throw error;
-    fetchTotalImages();
+    return fetchTotalImages();
   };
 
   return (
