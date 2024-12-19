@@ -338,7 +338,7 @@ const Products = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'}`}>
-        <div className="space-y-1">
+        <div className="space-y-1 text-left">
           <h1 className="text-3xl font-bold">Products</h1>
           <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 ml-1">
             <li>Total Products: {products?.length || 0}/{systemLimits?.product_limit || '...'}</li>
