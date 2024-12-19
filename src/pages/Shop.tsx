@@ -11,14 +11,17 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useShopUrlParams } from "@/hooks/useShopUrlParams";
 import { useFilteredProducts } from "@/hooks/useFilteredProducts";
+import { ProductPagination } from "@/components/shop/ProductPagination";
 import { Product } from "@/types/product";
+
+const PRODUCTS_PER_PAGE = 12;
 
 const Shop = () => {
   const location = useLocation();
   const { getUrlParam, updateUrlParams } = useShopUrlParams();
   const { toast } = useToast();
+  const [currentPage, setCurrentPage] = useState(Number(getUrlParam("page")) || 1);
 
-  // Initialize state from URL parameters or location state
   const [searchQuery, setSearchQuery] = useState(getUrlParam("search") || "");
   const [priceRange, setPriceRange] = useState<[number, number]>([
     Number(getUrlParam("minPrice")) || 0,
@@ -47,9 +50,10 @@ const Shop = () => {
   );
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  // Update URL when filters change
+  // Update URL when page changes
   useEffect(() => {
     updateUrlParams({
+      page: currentPage.toString(),
       search: searchQuery || null,
       minPrice: priceRange[0] > 0 ? priceRange[0].toString() : null,
       maxPrice: priceRange[1] > 0 ? priceRange[1].toString() : null,
@@ -64,6 +68,7 @@ const Shop = () => {
       label: selectedLabel,
     });
   }, [
+    currentPage,
     searchQuery,
     priceRange,
     showSaleOnly,
@@ -178,6 +183,30 @@ const Shop = () => {
     return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
   });
 
+  // Calculate pagination
+  const totalPages = Math.ceil((sortedProducts?.length || 0) / PRODUCTS_PER_PAGE);
+  const paginatedProducts = sortedProducts?.slice(
+    (currentPage - 1) * PRODUCTS_PER_PAGE,
+    currentPage * PRODUCTS_PER_PAGE
+  );
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    searchQuery,
+    priceRange,
+    showSaleOnly,
+    showDiscountOnly,
+    showFeaturedOnly,
+    showNewArrivalsOnly,
+    sortOrder,
+    selectedCategory,
+    selectedSubcategory,
+    selectedBrand,
+    selectedLabel,
+  ]);
+
   if (error) {
     return (
       <div className="container py-12">
@@ -203,7 +232,7 @@ const Shop = () => {
       <div className="flex flex-col md:flex-row gap-8">
         {/* Mobile Filter Button */}
         <div className="md:hidden mb-4">
-          <Sheet open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+          <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" className="w-full">
                 <Filter className="mr-2 h-4 w-4" />
@@ -267,7 +296,14 @@ const Shop = () => {
 
         <div className="flex-1">
           <SearchBar value={searchQuery} onChange={setSearchQuery} />
-          <ProductGrid products={sortedProducts} />
+          <ProductGrid products={paginatedProducts} />
+          {totalPages > 1 && (
+            <ProductPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          )}
         </div>
       </div>
     </div>
