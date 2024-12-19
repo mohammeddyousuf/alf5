@@ -49,32 +49,38 @@ export const useImageManagement = () => {
 
           const usage = [];
 
-          // Check products
+          // Check products - now checking both full URL and just filename
           products?.forEach(product => {
-            if (product.images?.includes(publicUrl)) {
+            if (product.images?.some((img: string) => 
+              img === publicUrl || img.includes(file.name)
+            )) {
               usage.push({ type: 'Product', name: product.name });
             }
           });
 
-          // Check sliders
+          // Check sliders - checking both full URL and filename
           sliders?.forEach(slider => {
-            if (slider.image_url === publicUrl) {
+            if (slider.image_url === publicUrl || 
+                (slider.image_url && slider.image_url.includes(file.name))) {
               usage.push({ type: 'Slider', name: slider.title });
             }
           });
 
-          // Check collections
+          // Check collections - checking both full URL and filename
           collections?.forEach(collection => {
-            if (collection.image_url === publicUrl) {
+            if (collection.image_url === publicUrl || 
+                (collection.image_url && collection.image_url.includes(file.name))) {
               usage.push({ type: 'Collection', name: collection.name });
             }
           });
 
-          // Check logo and favicon
-          if (settings?.logo_url === publicUrl) {
+          // Check logo and favicon - checking both full URL and filename
+          if (settings?.logo_url === publicUrl || 
+              (settings?.logo_url && settings.logo_url.includes(file.name))) {
             usage.push({ type: 'Website', name: 'Logo' });
           }
-          if (settings?.favicon_url === publicUrl) {
+          if (settings?.favicon_url === publicUrl || 
+              (settings?.favicon_url && settings.favicon_url.includes(file.name))) {
             usage.push({ type: 'Website', name: 'Favicon' });
           }
 
