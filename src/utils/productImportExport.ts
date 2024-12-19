@@ -14,8 +14,8 @@ interface CSVProduct {
   featured?: boolean | string | null;
   brand?: string | null;
   custom_label?: string | null;
-  category_id?: string | null;
-  subcategory_id?: string | null;
+  category?: string | null;  // Changed from category_id
+  subcategory?: string | null;  // Changed from subcategory_id
 }
 
 const convertToBoolean = (value: string | boolean | null | undefined): boolean => {
@@ -52,6 +52,41 @@ const processImages = (images: string | string[] | null | undefined): string[] =
   return [];
 };
 
+async function getCategoryId(categoryName: string | null): Promise<string | null> {
+  if (!categoryName) return null;
+  
+  const { data, error } = await supabase
+    .from('categories')
+    .select('id')
+    .ilike('name', categoryName.trim())
+    .single();
+
+  if (error || !data) {
+    console.error('Error finding category:', categoryName, error);
+    return null;
+  }
+
+  return data.id;
+}
+
+async function getSubcategoryId(subcategoryName: string | null, categoryId: string | null): Promise<string | null> {
+  if (!subcategoryName || !categoryId) return null;
+
+  const { data, error } = await supabase
+    .from('subcategories')
+    .select('id')
+    .ilike('name', subcategoryName.trim())
+    .eq('category_id', categoryId)
+    .single();
+
+  if (error || !data) {
+    console.error('Error finding subcategory:', subcategoryName, error);
+    return null;
+  }
+
+  return data.id;
+}
+
 export const handleProductImport = async (
   file: File,
   currentProducts: ProductsRow[] | undefined,
@@ -79,6 +114,9 @@ export const handleProductImport = async (
           let updatedCount = 0;
 
           for (const product of validProducts) {
+            const categoryId = await getCategoryId(product.category);
+            const subcategoryId = await getSubcategoryId(product.subcategory, categoryId);
+
             const processedProduct = {
               name: product.name.trim(),
               description: product.description || null,
@@ -90,8 +128,8 @@ export const handleProductImport = async (
               featured: convertToBoolean(product.featured),
               brand: product.brand || null,
               custom_label: product.custom_label || null,
-              category_id: product.category_id || null,
-              subcategory_id: product.subcategory_id || null,
+              category_id: categoryId,
+              subcategory_id: subcategoryId,
             };
 
             if (product.id) {
@@ -160,8 +198,8 @@ export const exportProducts = async (
     featured: product.featured ? 'true' : 'false',
     brand: product.brand || '',
     custom_label: product.custom_label || '',
-    category_name: getCategoryName(product.category_id),
-    subcategory_name: getSubcategoryName(product.subcategory_id),
+    category: getCategoryName(product.category_id),
+    subcategory: getSubcategoryName(product.subcategory_id),
   }));
 
   const csv = Papa.unparse(exportProducts);
