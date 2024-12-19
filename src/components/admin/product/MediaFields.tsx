@@ -72,7 +72,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
 
           if (uploadError) throw uploadError;
 
-          return fileName; // Store only the filename
+          return fileName;
         })
       );
 
@@ -98,12 +98,11 @@ export function MediaFields({ form }: MediaFieldsProps) {
     try {
       setIsDeleting(prev => ({ ...prev, [indexToRemove]: true }));
       
-      // Extract the filename from the URL or use the filename directly
       const fileName = imageUrl.includes('/') ? imageUrl.split('/').pop()! : imageUrl;
       
       console.log("Attempting to delete file:", fileName);
 
-      const { error: deleteError, data } = await supabase.storage
+      const { error: deleteError } = await supabase.storage
         .from("product-images")
         .remove([fileName]);
 
@@ -111,8 +110,6 @@ export function MediaFields({ form }: MediaFieldsProps) {
         console.error("Error deleting from storage:", deleteError);
         throw deleteError;
       }
-
-      console.log("Storage deletion response:", data);
 
       const currentImages = form.getValues("images") || [];
       const updatedImages = currentImages.filter((_, index) => index !== indexToRemove);
@@ -136,9 +133,17 @@ export function MediaFields({ form }: MediaFieldsProps) {
   };
 
   const getImageUrl = (fileName: string) => {
+    // If it's already a full URL, return it as is
+    if (fileName.startsWith('http')) {
+      return fileName;
+    }
+    
+    // Otherwise, generate the Supabase storage URL
     const { data: { publicUrl } } = supabase.storage
       .from("product-images")
       .getPublicUrl(fileName);
+      
+    console.log("Generated public URL:", publicUrl); // Debug log
     return publicUrl;
   };
 
@@ -153,6 +158,10 @@ export function MediaFields({ form }: MediaFieldsProps) {
                 src={getImageUrl(fileName)}
                 alt={`Product image ${index + 1}`}
                 className="w-full h-full object-cover rounded-lg"
+                onError={(e) => {
+                  console.error("Error loading image:", fileName);
+                  e.currentTarget.src = "/placeholder.svg"; // Fallback image
+                }}
               />
               <button
                 type="button"
