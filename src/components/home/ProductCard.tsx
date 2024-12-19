@@ -92,17 +92,14 @@ export const ProductCard = ({
     }
   };
 
-  // Show sale price if it exists, is less than regular price, and sale is valid
   const showSalePrice = salePrice && 
     salePrice < price && 
     (!settings?.clearance_sale_active || isValidSale());
 
-  // Show discount price if there's no sale price and discount price exists and is lower
   const showDiscountPrice = !showSalePrice && 
     discountPrice && 
     discountPrice < price;
 
-  // Only show timer if global sale is active and not expired
   const showSaleTimer = settings?.clearance_sale_active && 
     settings?.clearance_sale_end_date && 
     isValidSale() && 
@@ -125,7 +122,14 @@ export const ProductCard = ({
               />
               {(showSalePrice || showDiscountPrice) && (
                 <div className="absolute top-2 left-2">
-                  <Badge variant="destructive">
+                  <Badge 
+                    style={{ 
+                      backgroundColor: showSalePrice 
+                        ? settings?.sale_color || '#ea384c'
+                        : settings?.discount_color || '#ea384c',
+                      color: 'white'
+                    }}
+                  >
                     {showSalePrice ? 'SALE' : 'DISCOUNT'}
                   </Badge>
                 </div>

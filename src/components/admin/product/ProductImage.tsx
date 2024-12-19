@@ -25,6 +25,7 @@ export function ProductImage({
   customLabel
 }: ProductImageProps) {
   const showSaleBadge = (salePrice && salePrice < price) || (discountPrice && discountPrice < price);
+  const showSalePrice = salePrice && salePrice < price;
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -62,8 +63,15 @@ export function ProductImage({
           />
           {showSaleBadge && (
             <div className="absolute top-2 left-2">
-              <Badge variant="destructive">
-                {salePrice && salePrice < price ? 'SALE' : 'DISCOUNT'}
+              <Badge 
+                style={{ 
+                  backgroundColor: showSalePrice 
+                    ? settings?.sale_color || '#ea384c'
+                    : settings?.discount_color || '#ea384c',
+                  color: 'white'
+                }}
+              >
+                {showSalePrice ? 'SALE' : 'DISCOUNT'}
               </Badge>
             </div>
           )}
