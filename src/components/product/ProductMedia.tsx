@@ -1,6 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 interface ProductMediaProps {
   images: string[] | null;
@@ -66,33 +73,45 @@ export const ProductMedia = ({
   };
 
   return (
-    <div className="relative">
+    <div className="space-y-4">
       {images && images.length > 0 && (
         <div className="relative">
-          <img
-            src={getImageUrl(images[0])}
-            alt={productName}
-            className="w-full rounded-lg"
-          />
-          {(showSalePrice || showDiscountPrice) && (
-            <div className="absolute top-2 left-2">
-              <Badge variant="destructive">
-                {showSalePrice ? 'SALE' : 'DISCOUNT'}
-              </Badge>
-            </div>
-          )}
-          {customLabel && (
-            <div className="absolute bottom-2 right-2">
-              <Badge 
-                style={{ 
-                  backgroundColor: settings?.primary_color || '#9b87f5',
-                  color: 'white'
-                }}
-              >
-                {customLabel}
-              </Badge>
-            </div>
-          )}
+          <Carousel className="w-full">
+            <CarouselContent>
+              {images.map((image, index) => (
+                <CarouselItem key={index}>
+                  <div className="relative aspect-square">
+                    <img
+                      src={getImageUrl(image)}
+                      alt={`${productName} ${index + 1}`}
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    {index === 0 && (showSalePrice || showDiscountPrice) && (
+                      <div className="absolute top-2 left-2">
+                        <Badge variant="destructive">
+                          {showSalePrice ? 'SALE' : 'DISCOUNT'}
+                        </Badge>
+                      </div>
+                    )}
+                    {index === 0 && customLabel && (
+                      <div className="absolute bottom-2 right-2">
+                        <Badge 
+                          style={{ 
+                            backgroundColor: settings?.primary_color || '#9b87f5',
+                            color: 'white'
+                          }}
+                        >
+                          {customLabel}
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="left-2" />
+            <CarouselNext className="right-2" />
+          </Carousel>
         </div>
       )}
       
@@ -101,10 +120,10 @@ export const ProductMedia = ({
         if (!videoId) return null;
         
         return (
-          <div key={index} className="mt-4">
+          <div key={index} className="aspect-video">
             <iframe
               width="100%"
-              height="315"
+              height="100%"
               src={`https://www.youtube.com/embed/${videoId}`}
               title={`${productName} video ${index + 1}`}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -116,13 +135,13 @@ export const ProductMedia = ({
       })}
       
       {images && images.length > 1 && (
-        <div className="grid grid-cols-4 gap-4 mt-4">
-          {images.slice(1).map((image, index) => (
+        <div className="grid grid-cols-4 gap-4">
+          {images.map((image, index) => (
             <img
               key={index}
               src={getImageUrl(image)}
-              alt={`${productName} ${index + 2}`}
-              className="w-full rounded-lg"
+              alt={`${productName} ${index + 1}`}
+              className="w-full aspect-square object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
             />
           ))}
         </div>
