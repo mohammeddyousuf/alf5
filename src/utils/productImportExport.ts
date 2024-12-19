@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
-import { supabase } from "@/integrations/supabase/client";
-import { ProductsRow, ProductsInsert } from "@/integrations/supabase/types/products";
+import { ProductsRow } from '@/integrations/supabase/types';
+import { supabase } from '@/integrations/supabase/client';
 
 interface CSVProduct {
   id?: string;
@@ -20,9 +20,8 @@ interface CSVProduct {
 
 const convertToBoolean = (value: string | boolean | null | undefined): boolean => {
   if (typeof value === 'boolean') return value;
-  if (typeof value === 'string') {
-    return value.toLowerCase() === 'true';
-  }
+  if (value === 'true') return true;
+  if (value === 'false') return false;
   return false;
 };
 
@@ -129,11 +128,11 @@ export const handleProductImport = async (
   });
 };
 
-export const exportProducts = async (
+export const exportProducts = (
   products: ProductsRow[] | undefined,
   categories: any[] | undefined,
   subcategories: any[] | undefined
-) => {
+): void => {
   if (!products) return;
 
   // Create a map of category and subcategory IDs to their names
@@ -162,11 +161,9 @@ export const exportProducts = async (
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-
   link.setAttribute('href', url);
   link.setAttribute('download', 'products.csv');
   link.style.visibility = 'hidden';
-
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
