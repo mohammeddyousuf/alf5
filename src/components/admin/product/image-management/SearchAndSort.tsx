@@ -29,14 +29,12 @@ export function SearchAndSort({
 }: SearchAndSortProps) {
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" className="w-full cursor-pointer" asChild>
-          <label htmlFor="bulk-upload-dialog" className="flex items-center justify-center gap-2">
-            <Upload className="h-4 w-4" />
-            Upload Images
-          </label>
-        </Button>
-      </div>
+      <Button variant="outline" className="w-full cursor-pointer" asChild>
+        <label htmlFor="bulk-upload-dialog" className="flex items-center justify-center gap-2">
+          <Upload className="h-4 w-4" />
+          Upload Images
+        </label>
+      </Button>
       <div className="flex items-center gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
