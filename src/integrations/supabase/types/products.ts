@@ -11,6 +11,7 @@ export interface Products {
     name: string
     price: number
     sale_price: number | null
+    discount_price: number | null
     status: "draft" | "published" | "archived" | null
     subcategory_id: string | null
     updated_at: string
@@ -29,6 +30,7 @@ export interface Products {
     name: string
     price: number
     sale_price?: number | null
+    discount_price?: number | null
     status?: "draft" | "published" | "archived" | null
     subcategory_id?: string | null
     updated_at?: string
@@ -47,6 +49,7 @@ export interface Products {
     name?: string
     price?: number
     sale_price?: number | null
+    discount_price?: number | null
     status?: "draft" | "published" | "archived" | null
     subcategory_id?: string | null
     updated_at?: string
