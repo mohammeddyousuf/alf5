@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,7 @@ import { useDeleteProduct } from "@/hooks/useDeleteProduct";
 import { ProductFilters } from "@/components/admin/product/ProductFilters";
 import { ProductHeader } from "@/components/admin/product/ProductHeader";
 import { useProductManagement } from "@/hooks/useProductManagement";
+import { useImageManagement } from "@/hooks/useImageManagement";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -33,17 +34,14 @@ const Products = () => {
   
   const { data: products } = useProducts();
   const deleteProduct = useDeleteProduct();
+  const { totalImages, folderSize, fetchTotalImages } = useImageManagement();
 
   const [showImageManager, setShowImageManager] = useState(false);
-  const [folderSize, setFolderSize] = useState<number>(0);
-  const [isUploading, setIsUploading] = useState(false);
-  const [images, setImages] = useState<any[]>([]);
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
-  const [totalImages, setTotalImages] = useState(0);
   const [showBulkUploadLimit, setShowBulkUploadLimit] = useState(false);
   const [bulkUploadLimitMessage, setBulkUploadLimitMessage] = useState("");
 
-  const { handleStatusChange } = useProductManagement(fetchTotalImages);
+  const { handleStatusChange } = useProductManagement(() => fetchTotalImages());
 
   const { data: systemLimits } = useQuery({
     queryKey: ["system-limits"],
@@ -100,30 +98,6 @@ const Products = () => {
       return data;
     },
   });
-
-  const fetchTotalImages = async () => {
-    try {
-      const { data, error } = await supabase.storage
-        .from("product-images")
-        .list();
-      
-      if (error) {
-        console.error("Error fetching images:", error);
-        return;
-      }
-
-      setTotalImages(data.length);
-      
-      const totalSize = data.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
-      setFolderSize(totalSize);
-    } catch (error) {
-      console.error("Error in fetchTotalImages:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchTotalImages();
-  }, []);
 
   const handleAddProduct = () => {
     const currentCount = products?.length || 0;
