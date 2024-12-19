@@ -72,15 +72,24 @@ export function ProductInfo({
 
   const isValidSale = () => {
     if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
-      return true;
+      return false;
     }
     const endDate = new Date(settings.clearance_sale_end_date);
     const now = new Date();
     return endDate > now;
   };
 
-  const showSalePrice = salePrice && salePrice < price && isValidSale();
-  const showDiscountPrice = !showSalePrice && discountPrice && discountPrice < price;
+  // Show sale price if it exists, is less than regular price, and either:
+  // 1. There's no global sale timer (regular product discount)
+  // 2. There's a global sale timer and it hasn't expired
+  const showSalePrice = salePrice && 
+    salePrice < price && 
+    (!settings?.clearance_sale_active || isValidSale());
+
+  // Only show discount price if there's no sale price active
+  const showDiscountPrice = !showSalePrice && 
+    discountPrice && 
+    discountPrice < price;
 
   const handleWhatsAppClick = () => {
     setOrderDialogOpen(true);

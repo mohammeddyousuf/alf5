@@ -74,8 +74,7 @@ export const ProductCard = ({
   const shortId = id.split('-')[0];
   const productUrl = `/products/${formatUrlSlug(name)}-${shortId}`;
 
-  // Check if sale is still valid
-  const isSaleValid = () => {
+  const isValidSale = () => {
     if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
       return false;
     }
@@ -89,8 +88,9 @@ export const ProductCard = ({
   // 2. There's a global sale timer and it hasn't expired
   const showSalePrice = salePrice && 
     salePrice < price && 
-    (!settings?.clearance_sale_active || isSaleValid());
+    (!settings?.clearance_sale_active || isValidSale());
 
+  // Only show discount price if there's no sale price active
   const showDiscountPrice = !showSalePrice && 
     discountPrice && 
     discountPrice < price;
@@ -98,7 +98,7 @@ export const ProductCard = ({
   // Only show timer if global sale is active and not expired
   const showSaleTimer = settings?.clearance_sale_active && 
     settings?.clearance_sale_end_date && 
-    isSaleValid() && 
+    isValidSale() && 
     showSalePrice;
 
   const effectivePrice = showSalePrice ? salePrice : 
