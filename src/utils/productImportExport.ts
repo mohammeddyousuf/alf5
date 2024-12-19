@@ -7,8 +7,8 @@ interface CSVProduct {
   name: string;
   description?: string | null;
   price: string | number;
-  sale_price?: string | number | null;
   discount_price?: string | number | null;
+  sale_price?: string | number | null;
   images?: string | string[] | null;
   status?: "draft" | "published" | "archived" | null;
   featured?: boolean | string | null;
@@ -56,7 +56,7 @@ export const handleProductImport = async (
   file: File,
   currentProducts: ProductsRow[] | undefined,
   systemLimits: any
-) => {
+): Promise<number> => {
   return new Promise<number>((resolve, reject) => {
     Papa.parse<CSVProduct>(file, {
       header: true,
@@ -83,8 +83,8 @@ export const handleProductImport = async (
               name: product.name.trim(),
               description: product.description || null,
               price: convertToNumber(product.price) || 0,
-              sale_price: convertToNumber(product.sale_price),
               discount_price: convertToNumber(product.discount_price),
+              sale_price: convertToNumber(product.sale_price),
               images: processImages(product.images),
               status: product.status || 'draft',
               featured: convertToBoolean(product.featured),
@@ -95,7 +95,6 @@ export const handleProductImport = async (
             };
 
             if (product.id) {
-              // Update existing product
               const { error: updateError } = await supabase
                 .from("products")
                 .update(processedProduct)
@@ -106,7 +105,6 @@ export const handleProductImport = async (
                 continue;
               }
             } else {
-              // Insert new product
               const { error: insertError } = await supabase
                 .from("products")
                 .insert([processedProduct]);
@@ -131,32 +129,82 @@ export const handleProductImport = async (
   });
 };
 
-export const exportProducts = (
+export const exportProducts = async (
   products: ProductsRow[] | undefined,
   categories: any[] | undefined,
   subcategories: any[] | undefined
-) => {
+): Promise<void> => {
   if (!products) return;
 
+  // Add template row for new products
+  const templateProduct = {
+    id: '', // Leave empty for new products
+    name: 'New Product Name',
+    description: 'Product Description',
+    price: '0',
+    discount_price: '0',
+    sale_price: '0',
+    images: '',
+    status: 'draft',
+    featured: 'false',
+    brand: '',
+    custom_label: '',
+    category_id: '',
+    subcategory_id: '',
+  };
+
+  // Get category and subcategory names
+  const getCategoryName = (id: string | null) => {
+    if (!id || !categories) return '';
+    const category = categories.find(c => c.id === id);
+    return category ? category.name : '';
+  };
+
+  const getSubcategoryName = (id: string | null) => {
+    if (!id || !subcategories) return '';
+    const subcategory = subcategories.find(s => s.id === id);
+    return subcategory ? subcategory.name : '';
+  };
+
   const exportProducts = products.map(product => ({
-    id: product.id, // Include ID in export
+    id: product.id,
     name: product.name,
-    description: product.description,
+    description: product.description || '',
     price: product.price,
-    sale_price: product.sale_price,
-    discount_price: product.discount_price,
-    images: product.images?.map(imageUrl =>
-      imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
-    ),
-    status: product.status,
-    featured: product.featured,
-    brand: product.brand,
-    custom_label: product.custom_label,
-    category_id: product.category_id,
-    subcategory_id: product.subcategory_id
+    discount_price: product.discount_price || '',
+    sale_price: product.sale_price || '',
+    images: product.images?.join(',') || '',
+    status: product.status || 'draft',
+    featured: product.featured ? 'true' : 'false',
+    brand: product.brand || '',
+    custom_label: product.custom_label || '',
+    category_id: product.category_id || '',
+    category_name: getCategoryName(product.category_id), // Added for reference
+    subcategory_id: product.subcategory_id || '',
+    subcategory_name: getSubcategoryName(product.subcategory_id), // Added for reference
   }));
 
-  const csv = Papa.unparse(exportProducts);
+  // Add instructions and template row
+  const instructions = {
+    id: '# Instructions',
+    name: '1. Leave ID empty for new products',
+    description: '2. Fill in all required fields',
+    price: '3. Price is required',
+    discount_price: '4. Optional',
+    sale_price: '5. Optional',
+    images: '6. Comma-separated image names',
+    status: '7. draft/published/archived',
+    featured: '8. true/false',
+    brand: '9. Optional',
+    custom_label: '10. Optional',
+    category_id: '11. From categories list',
+    category_name: '(Reference only)',
+    subcategory_id: '12. From subcategories list',
+    subcategory_name: '(Reference only)',
+  };
+
+  const csvData = [instructions, templateProduct, ...exportProducts];
+  const csv = Papa.unparse(csvData);
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
