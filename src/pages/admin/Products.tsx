@@ -181,7 +181,11 @@ const Products = () => {
   };
 
   const handleExport = async () => {
-    await exportProducts(products, categories, subcategories);
+    try {
+      await exportProducts(products, categories, subcategories);
+    } catch (error) {
+      console.error('Error exporting products:', error);
+    }
   };
 
   const handleStatusChange = async (id: string, currentStatus: string | null) => {

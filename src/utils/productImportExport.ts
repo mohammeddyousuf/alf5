@@ -133,44 +133,48 @@ export const exportProducts = async (
   categories: any[] | undefined,
   subcategories: any[] | undefined
 ): Promise<void> => {
-  return new Promise((resolve) => {
-    if (!products) {
+  return new Promise((resolve, reject) => {
+    try {
+      if (!products) {
+        resolve();
+        return;
+      }
+
+      // Create a map of category and subcategory IDs to their names
+      const categoryMap = new Map(categories?.map(cat => [cat.id, cat.name]));
+      const subcategoryMap = new Map(subcategories?.map(subcat => [subcat.id, subcat.name]));
+
+      const exportProducts = products.map(product => ({
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        discount_price: product.discount_price,
+        sale_price: product.sale_price,
+        images: product.images?.map(imageUrl =>
+          imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
+        ),
+        status: product.status,
+        featured: product.featured,
+        brand: product.brand,
+        custom_label: product.custom_label,
+        category: categoryMap.get(product.category_id || '') || '',
+        subcategory: subcategoryMap.get(product.subcategory_id || '') || ''
+      }));
+
+      const csv = Papa.unparse(exportProducts);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'products.csv');
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       resolve();
-      return;
+    } catch (error) {
+      reject(error);
     }
-
-    // Create a map of category and subcategory IDs to their names
-    const categoryMap = new Map(categories?.map(cat => [cat.id, cat.name]));
-    const subcategoryMap = new Map(subcategories?.map(subcat => [subcat.id, subcat.name]));
-
-    const exportProducts = products.map(product => ({
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      discount_price: product.discount_price,
-      sale_price: product.sale_price,
-      images: product.images?.map(imageUrl =>
-        imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
-      ),
-      status: product.status,
-      featured: product.featured,
-      brand: product.brand,
-      custom_label: product.custom_label,
-      category: categoryMap.get(product.category_id || '') || '',
-      subcategory: subcategoryMap.get(product.subcategory_id || '') || ''
-    }));
-
-    const csv = Papa.unparse(exportProducts);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'products.csv');
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    resolve();
   });
 };
