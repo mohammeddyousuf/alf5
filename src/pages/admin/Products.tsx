@@ -9,12 +9,12 @@ import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import { GlobalSaleControls } from "@/components/admin/product/GlobalSaleControls";
 import { Download, Upload, Loader2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import Papa from 'papaparse';
 import { useProducts } from "@/hooks/useProducts";
 import { ImageManagementDialog } from "@/components/admin/product/ImageManagementDialog";
 import { LimitExceededDialog } from "@/components/admin/product/LimitExceededDialog";
 import { BulkUploadLimitDialog } from "@/components/admin/product/BulkUploadLimitDialog";
 import { ProductListContainer } from "@/components/admin/product/ProductListContainer";
+import { handleProductImport, exportProducts } from "@/utils/productImportExport";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -162,170 +162,23 @@ const Products = () => {
     if (!file) return;
 
     try {
-      Papa.parse(file, {
-        header: true,
-        complete: async (results) => {
-          try {
-            const newProducts = results.data;
-            const totalProducts = (products?.length || 0) + newProducts.length;
-            
-            if (totalProducts > (systemLimits?.product_limit || 100)) {
-              toast({
-                variant: "destructive",
-                title: "Product Limit Exceeded",
-                description: `Cannot import ${newProducts.length} products. This would exceed your limit of ${systemLimits?.product_limit} products. Please contact your administrator.`
-              });
-              return;
-            }
-
-            for (const product of newProducts) {
-              const { error } = await supabase
-                .from("products")
-                .insert([product]);
-              
-              if (error) throw error;
-            }
-
-            toast({
-              title: "Success",
-              description: `${newProducts.length} products imported successfully`,
-            });
-
-            window.location.reload();
-          } catch (error: any) {
-            toast({
-              title: "Error",
-              description: `Failed to import products: ${error.message}`,
-              variant: "destructive",
-            });
-          }
-        },
-        error: (error) => {
-          toast({
-            title: "Error",
-            description: `Failed to parse CSV: ${error.message}`,
-            variant: "destructive",
-          });
-        }
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: `Failed to read file: ${error.message}`,
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleBulkUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
-
-    try {
-      const currentCount = products?.length || 0;
-      const limit = systemLimits?.product_limit || 100;
-      if (currentCount + files.length > limit) {
-        setBulkUploadLimitMessage(`Cannot upload ${files.length} products. This would exceed your limit of ${limit} products.`);
-        setShowBulkUploadLimit(true);
-        return;
-      }
-
-      const totalNewSize = Array.from(files).reduce((acc, file) => acc + file.size, 0);
-      const currentFolderSize = folderSize || 0;
-      const maxFolderSize = (systemLimits?.max_folder_size_mb || 500) * 1024 * 1024;
-
-      if (currentFolderSize + totalNewSize > maxFolderSize) {
-        setBulkUploadLimitMessage(`Upload would exceed maximum folder size of ${systemLimits?.max_folder_size_mb}MB.`);
-        setShowBulkUploadLimit(true);
-        return;
-      }
-
-      const maxFileSize = (systemLimits?.max_image_size_mb || 5) * 1024 * 1024;
-      const oversizedFiles = Array.from(files).filter(file => file.size > maxFileSize);
-      
-      if (oversizedFiles.length > 0) {
-        setBulkUploadLimitMessage(`${oversizedFiles.length} file(s) exceed the maximum file size of ${systemLimits?.max_image_size_mb}MB.`);
-        setShowBulkUploadLimit(true);
-        return;
-      }
-
-      setIsUploading(true);
-
-      await Promise.all(
-        Array.from(files).map(async (file) => {
-          const fileName = `product_${Date.now()}_${file.name}`;
-          const { error } = await supabase.storage
-            .from("product-images")
-            .upload(fileName, file, {
-              upsert: false
-            });
-
-          if (error) throw error;
-        })
-      );
-
+      const importedCount = await handleProductImport(file, products, systemLimits);
       toast({
         title: "Success",
-        description: "Images uploaded successfully"
+        description: `${importedCount} products imported/updated successfully`,
       });
-      
-      await fetchTotalImages();
-      setShowImageManager(true);
+      window.location.reload();
     } catch (error: any) {
       toast({
-        variant: "destructive",
         title: "Error",
-        description: error.message
+        description: error.message,
+        variant: "destructive",
       });
-    } finally {
-      setIsUploading(false);
-      if (event.target) {
-        event.target.value = "";
-      }
     }
   };
 
   const handleExport = () => {
-    if (!products || !categories || !subcategories) return;
-    
-    const exportProducts = products.map(product => {
-      const category = categories.find(cat => cat.id === product.category_id);
-      const subcategory = subcategories.find(subcat => subcat.id === product.subcategory_id);
-      
-      return {
-        featured: product.featured,
-        status: product.status,
-        custom_label: product.custom_label,
-        name: product.name,
-        brand: product.brand,
-        description: product.description,
-        category: category?.name || '',
-        subcategory: subcategory?.name || '',
-        price: product.price,
-        sale_price: product.sale_price,
-        discount_price: product.discount_price,
-        images: product.images?.map(imageUrl => 
-          imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
-        ),
-        video_urls: product.video_urls,
-        created_at: product.created_at,
-        updated_at: product.updated_at,
-        added_date: product.added_date
-      };
-    });
-    
-    const csv = Papa.unparse(exportProducts);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'products.csv');
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    exportProducts(products, categories, subcategories);
   };
 
   const handleStatusChange = async (id: string, currentStatus: string | null) => {
@@ -501,4 +354,3 @@ const Products = () => {
 };
 
 export default Products;
-
