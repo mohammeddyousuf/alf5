@@ -51,6 +51,18 @@ export function MediaFields({ form }: MediaFieldsProps) {
     return fileName;
   };
 
+  const getImageUrl = (imageUrl: string) => {
+    if (imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+    const { data: { publicUrl } } = supabase.storage
+      .from("product-images")
+      .getPublicUrl(imageUrl);
+    
+    console.log("Generated public URL for", imageUrl, ":", publicUrl);
+    return publicUrl;
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
@@ -77,7 +89,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
             .getPublicUrl(fileName);
 
           console.log("Uploaded file public URL:", publicUrl);
-          return publicUrl; // Store the full URL instead of just the filename
+          return publicUrl;
         })
       );
 
@@ -104,8 +116,8 @@ export function MediaFields({ form }: MediaFieldsProps) {
     try {
       setIsDeleting(prev => ({ ...prev, [indexToRemove]: true }));
       
-      // Extract filename from the full URL
-      const fileName = imageUrl.split('/').pop();
+      // Extract filename from the full URL or use the filename directly
+      const fileName = imageUrl.includes('/') ? imageUrl.split('/').pop() : imageUrl;
       if (!fileName) throw new Error("Invalid image URL");
       
       console.log("Attempting to delete file:", fileName);
@@ -148,7 +160,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
           {form.watch("images")?.map((imageUrl, index) => (
             <div key={imageUrl} className="relative group aspect-square">
               <img
-                src={imageUrl}
+                src={getImageUrl(imageUrl)}
                 alt={`Product image ${index + 1}`}
                 className="w-full h-full object-cover rounded-lg"
                 onError={(e) => {
