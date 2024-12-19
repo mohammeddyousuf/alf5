@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import { GlobalSaleControls } from "@/components/admin/product/GlobalSaleControls";
-import { Download, Upload, Loader2 } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useProducts } from "@/hooks/useProducts";
 import { ImageManagementDialog } from "@/components/admin/product/ImageManagementDialog";
@@ -15,6 +15,7 @@ import { LimitExceededDialog } from "@/components/admin/product/LimitExceededDia
 import { BulkUploadLimitDialog } from "@/components/admin/product/BulkUploadLimitDialog";
 import { ProductListContainer } from "@/components/admin/product/ProductListContainer";
 import { handleProductImport, exportProducts } from "@/utils/productImportExport";
+import { useDeleteProduct } from "@/hooks/useDeleteProduct";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ const Products = () => {
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
   
   const { data: products } = useProducts();
+  const deleteProduct = useDeleteProduct();
+
   const { data: systemLimits } = useQuery({
     queryKey: ["system-limits"],
     queryFn: async () => {
@@ -192,65 +195,6 @@ const Products = () => {
     fetchTotalImages();
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      const { data: product, error: fetchError } = await supabase
-        .from("products")
-        .select("images")
-        .eq("id", id)
-        .maybeSingle(); // Changed from single() to maybeSingle()
-
-      if (fetchError) throw fetchError;
-
-      // Check if product exists
-      if (!product) {
-        console.log("Product not found:", id);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Product not found",
-        });
-        return;
-      }
-
-      if (product?.images && product.images.length > 0) {
-        const fileNames = product.images.map(url => {
-          const fileName = decodeURIComponent(url.split("/").pop() || "");
-          return fileName;
-        });
-
-        const { error: storageError } = await supabase.storage
-          .from("product-images")
-          .remove(fileNames);
-
-        if (storageError) {
-          console.error("Error deleting images:", storageError);
-        }
-      }
-
-      const { error: deleteError } = await supabase
-        .from("products")
-        .delete()
-        .eq("id", id);
-      
-      if (deleteError) throw deleteError;
-
-      toast({
-        title: "Success",
-        description: "Product and associated images deleted successfully",
-      });
-
-      fetchTotalImages();
-    } catch (error: any) {
-      console.error("Error deleting product:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to delete product: " + error.message,
-      });
-    }
-  };
-
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'}`}>
@@ -344,7 +288,7 @@ const Products = () => {
         selectedCategory={selectedCategory}
         selectedSubcategory={selectedSubcategory}
         onStatusChange={handleStatusChange}
-        onDelete={handleDelete}
+        onDelete={(id) => deleteProduct.mutate(id)}
         onSuccess={fetchTotalImages}
       />
 
