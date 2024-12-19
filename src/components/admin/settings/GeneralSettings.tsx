@@ -50,7 +50,7 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
         refetch={refetch} 
       />
 
-      <div className="flex justify-center items-center space-x-2">
+      <div className="flex flex-col items-center justify-center space-y-2">
         <Switch
           id="show-news-ticker"
           checked={showNewsTicker}
