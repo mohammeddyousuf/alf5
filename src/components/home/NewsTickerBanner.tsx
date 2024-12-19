@@ -32,23 +32,17 @@ export const NewsTickerBanner = () => {
     },
   });
 
-  if (isLoading) {
-    return (
-      <div className="bg-primary text-primary-foreground py-2">
-        <div className="animate-marquee whitespace-nowrap">
-          <span className="mx-4">Welcome to {settings?.website_name || 'our store'}</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (!newsItems?.length) return null;
+  // Always show welcome message, followed by news items if they exist
+  const welcomeMessage = `Welcome to ${settings?.website_name || 'our store'}`;
+  const displayItems = newsItems?.length 
+    ? [welcomeMessage, ...newsItems.map(item => item.message)]
+    : [welcomeMessage];
 
   return (
     <div className="bg-primary text-primary-foreground py-2 overflow-hidden">
       <div className="animate-marquee whitespace-nowrap">
-        {newsItems.map((item) => (
-          <span key={item.id} className="mx-4">{item.message}</span>
+        {displayItems.map((message, index) => (
+          <span key={index} className="mx-4">{message}</span>
         ))}
       </div>
     </div>
