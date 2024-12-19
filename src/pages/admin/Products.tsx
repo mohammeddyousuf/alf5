@@ -1,20 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { ProductFilters } from "@/components/admin/product/ProductFilters";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { ProductList } from "@/components/admin/product/ProductList";
 import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import { GlobalSaleControls } from "@/components/admin/product/GlobalSaleControls";
-import { Download, Upload, FolderOpen, Loader2 } from "lucide-react";
+import { Download, Upload, Loader2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import Papa from 'papaparse';
 import { useProducts } from "@/hooks/useProducts";
 import { ImageManagementDialog } from "@/components/admin/product/ImageManagementDialog";
 import { LimitExceededDialog } from "@/components/admin/product/LimitExceededDialog";
 import { BulkUploadLimitDialog } from "@/components/admin/product/BulkUploadLimitDialog";
+import { ProductListContainer } from "@/components/admin/product/ProductListContainer";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -118,7 +118,6 @@ const Products = () => {
 
       setTotalImages(data.length);
       
-      // Calculate folder size
       const totalSize = data.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
       setFolderSize(totalSize);
     } catch (error) {
@@ -223,7 +222,6 @@ const Products = () => {
     if (!files || files.length === 0) return;
 
     try {
-      // Check product limit
       const currentCount = products?.length || 0;
       const limit = systemLimits?.product_limit || 100;
       if (currentCount + files.length > limit) {
@@ -232,20 +230,17 @@ const Products = () => {
         return;
       }
 
-      // Calculate total size of new files
       const totalNewSize = Array.from(files).reduce((acc, file) => acc + file.size, 0);
       const currentFolderSize = folderSize || 0;
-      const maxFolderSize = (systemLimits?.max_folder_size_mb || 500) * 1024 * 1024; // Convert MB to bytes
+      const maxFolderSize = (systemLimits?.max_folder_size_mb || 500) * 1024 * 1024;
 
-      // Check folder size limit
       if (currentFolderSize + totalNewSize > maxFolderSize) {
         setBulkUploadLimitMessage(`Upload would exceed maximum folder size of ${systemLimits?.max_folder_size_mb}MB.`);
         setShowBulkUploadLimit(true);
         return;
       }
 
-      // Check individual file size limits
-      const maxFileSize = (systemLimits?.max_image_size_mb || 5) * 1024 * 1024; // Convert MB to bytes
+      const maxFileSize = (systemLimits?.max_image_size_mb || 5) * 1024 * 1024;
       const oversizedFiles = Array.from(files).filter(file => file.size > maxFileSize);
       
       if (oversizedFiles.length > 0) {
@@ -293,13 +288,10 @@ const Products = () => {
   const handleExport = () => {
     if (!products || !categories || !subcategories) return;
     
-    // Create a deep copy of products and transform data
     const exportProducts = products.map(product => {
-      // Find category and subcategory names
       const category = categories.find(cat => cat.id === product.category_id);
       const subcategory = subcategories.find(subcat => subcat.id === product.subcategory_id);
       
-      // Create a new object with desired field order
       return {
         featured: product.featured,
         status: product.status,
@@ -333,6 +325,65 @@ const Products = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleStatusChange = async (id: string, currentStatus: string | null) => {
+    const newStatus = currentStatus === "published" ? "draft" : "published";
+    const { error } = await supabase
+      .from("products")
+      .update({ status: newStatus })
+      .eq("id", id);
+    
+    if (error) throw error;
+    fetchTotalImages();
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { data: product, error: fetchError } = await supabase
+        .from("products")
+        .select("images")
+        .eq("id", id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      if (product?.images && product.images.length > 0) {
+        const fileNames = product.images.map(url => {
+          const fileName = decodeURIComponent(url.split("/").pop() || "");
+          return fileName;
+        });
+
+        const { error: storageError } = await supabase.storage
+          .from("product-images")
+          .remove(fileNames);
+
+        if (storageError) {
+          console.error("Error deleting images:", storageError);
+        }
+      }
+
+      const { error: deleteError } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", id);
+      
+      if (deleteError) throw deleteError;
+
+      toast({
+        title: "Success",
+        description: "Product and associated images deleted successfully",
+      });
+
+      fetchTotalImages();
+    } catch (error: any) {
+      console.error("Error deleting product:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete product: " + error.message,
+      });
+    }
   };
 
   return (
@@ -415,7 +466,8 @@ const Products = () => {
         setSelectedSubcategory={setSelectedSubcategory}
       />
 
-      <ProductList 
+      <ProductListContainer 
+        products={products}
         search={search}
         showSaleProducts={showSaleProducts}
         showNonSaleProducts={showNonSaleProducts}
@@ -426,6 +478,9 @@ const Products = () => {
         selectedCustomLabel={selectedCustomLabel}
         selectedCategory={selectedCategory}
         selectedSubcategory={selectedSubcategory}
+        onStatusChange={handleStatusChange}
+        onDelete={handleDelete}
+        onSuccess={fetchTotalImages}
       />
 
       <LimitExceededDialog
