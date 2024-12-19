@@ -7,15 +7,15 @@ interface CSVProduct {
   name: string;
   description?: string | null;
   price: string | number;
-  discount_price?: string | number | null;
   sale_price?: string | number | null;
+  discount_price?: string | number | null;
   images?: string | string[] | null;
   status?: "draft" | "published" | "archived" | null;
   featured?: boolean | string | null;
   brand?: string | null;
   custom_label?: string | null;
-  category?: string | null;  // Changed from category_id
-  subcategory?: string | null;  // Changed from subcategory_id
+  category_id?: string | null;
+  subcategory_id?: string | null;
 }
 
 const convertToBoolean = (value: string | boolean | null | undefined): boolean => {
@@ -52,46 +52,11 @@ const processImages = (images: string | string[] | null | undefined): string[] =
   return [];
 };
 
-async function getCategoryId(categoryName: string | null): Promise<string | null> {
-  if (!categoryName) return null;
-  
-  const { data, error } = await supabase
-    .from('categories')
-    .select('id')
-    .ilike('name', categoryName.trim())
-    .single();
-
-  if (error || !data) {
-    console.error('Error finding category:', categoryName, error);
-    return null;
-  }
-
-  return data.id;
-}
-
-async function getSubcategoryId(subcategoryName: string | null, categoryId: string | null): Promise<string | null> {
-  if (!subcategoryName || !categoryId) return null;
-
-  const { data, error } = await supabase
-    .from('subcategories')
-    .select('id')
-    .ilike('name', subcategoryName.trim())
-    .eq('category_id', categoryId)
-    .single();
-
-  if (error || !data) {
-    console.error('Error finding subcategory:', subcategoryName, error);
-    return null;
-  }
-
-  return data.id;
-}
-
 export const handleProductImport = async (
   file: File,
   currentProducts: ProductsRow[] | undefined,
   systemLimits: any
-): Promise<number> => {
+) => {
   return new Promise<number>((resolve, reject) => {
     Papa.parse<CSVProduct>(file, {
       header: true,
@@ -114,25 +79,23 @@ export const handleProductImport = async (
           let updatedCount = 0;
 
           for (const product of validProducts) {
-            const categoryId = await getCategoryId(product.category);
-            const subcategoryId = await getSubcategoryId(product.subcategory, categoryId);
-
             const processedProduct = {
               name: product.name.trim(),
               description: product.description || null,
               price: convertToNumber(product.price) || 0,
-              discount_price: convertToNumber(product.discount_price),
               sale_price: convertToNumber(product.sale_price),
+              discount_price: convertToNumber(product.discount_price),
               images: processImages(product.images),
               status: product.status || 'draft',
               featured: convertToBoolean(product.featured),
               brand: product.brand || null,
               custom_label: product.custom_label || null,
-              category_id: categoryId,
-              subcategory_id: subcategoryId,
+              category_id: product.category_id || null,
+              subcategory_id: product.subcategory_id || null,
             };
 
             if (product.id) {
+              // Update existing product
               const { error: updateError } = await supabase
                 .from("products")
                 .update(processedProduct)
@@ -143,6 +106,7 @@ export const handleProductImport = async (
                 continue;
               }
             } else {
+              // Insert new product
               const { error: insertError } = await supabase
                 .from("products")
                 .insert([processedProduct]);
@@ -167,39 +131,29 @@ export const handleProductImport = async (
   });
 };
 
-export const exportProducts = async (
+export const exportProducts = (
   products: ProductsRow[] | undefined,
   categories: any[] | undefined,
   subcategories: any[] | undefined
-): Promise<void> => {
+) => {
   if (!products) return;
 
-  const getCategoryName = (id: string | null) => {
-    if (!id || !categories) return '';
-    const category = categories.find(c => c.id === id);
-    return category ? category.name : '';
-  };
-
-  const getSubcategoryName = (id: string | null) => {
-    if (!id || !subcategories) return '';
-    const subcategory = subcategories.find(s => s.id === id);
-    return subcategory ? subcategory.name : '';
-  };
-
   const exportProducts = products.map(product => ({
-    id: product.id,
+    id: product.id, // Include ID in export
     name: product.name,
-    description: product.description || '',
+    description: product.description,
     price: product.price,
-    discount_price: product.discount_price || '',
-    sale_price: product.sale_price || '',
-    images: product.images?.join(',') || '',
-    status: product.status || 'draft',
-    featured: product.featured ? 'true' : 'false',
-    brand: product.brand || '',
-    custom_label: product.custom_label || '',
-    category: getCategoryName(product.category_id),
-    subcategory: getSubcategoryName(product.subcategory_id),
+    sale_price: product.sale_price,
+    discount_price: product.discount_price,
+    images: product.images?.map(imageUrl =>
+      imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
+    ),
+    status: product.status,
+    featured: product.featured,
+    brand: product.brand,
+    custom_label: product.custom_label,
+    category_id: product.category_id,
+    subcategory_id: product.subcategory_id
   }));
 
   const csv = Papa.unparse(exportProducts);

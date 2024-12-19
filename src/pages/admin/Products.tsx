@@ -1,44 +1,37 @@
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { ProductFilters } from "@/components/admin/product/ProductFilters";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import { GlobalSaleControls } from "@/components/admin/product/GlobalSaleControls";
+import { Download, Upload, Loader2 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useProducts } from "@/hooks/useProducts";
 import { ImageManagementDialog } from "@/components/admin/product/ImageManagementDialog";
 import { LimitExceededDialog } from "@/components/admin/product/LimitExceededDialog";
 import { BulkUploadLimitDialog } from "@/components/admin/product/BulkUploadLimitDialog";
+import { ProductListContainer } from "@/components/admin/product/ProductListContainer";
 import { handleProductImport, exportProducts } from "@/utils/productImportExport";
-import { ProductHeader } from "@/components/admin/product/ProductHeader";
-import { useImageManagement } from "@/hooks/useImageManagement";
-import { ProductsContainer } from "@/components/admin/product/ProductsContainer";
-import { useProducts } from "@/hooks/useProducts";
-import { ProductFilters } from "@/components/admin/product/ProductFilters";
-import { useQuery } from "@tanstack/react-query";
 
 const Products = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const { totalImages, folderSize, fetchTotalImages } = useImageManagement();
-  const { data: productsData } = useProducts();
-
-  // State for filters
   const [search, setSearch] = useState("");
   const [showSaleProducts, setShowSaleProducts] = useState(true);
   const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState("all");
-  const [sortBy, setSortBy] = useState("date-desc");
+  const [sortBy, setSortBy] = useState("name-asc");
   const [showFeatured, setShowFeatured] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedCustomLabel, setSelectedCustomLabel] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
-
-  const [showImageManager, setShowImageManager] = useState(false);
-  const [showLimitExceeded, setShowLimitExceeded] = useState(false);
-  const [showBulkUploadLimit, setShowBulkUploadLimit] = useState(false);
-  const [bulkUploadLimitMessage, setBulkUploadLimitMessage] = useState("");
-
+  
+  const { data: products } = useProducts();
   const { data: systemLimits } = useQuery({
     queryKey: ["system-limits"],
     queryFn: async () => {
@@ -48,9 +41,13 @@ const Products = () => {
         .order('created_at', { ascending: false })
         .limit(1);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching limits:", error);
+        throw error;
+      }
       
       if (!existingLimits || existingLimits.length === 0) {
+        console.log("No limits found, creating default");
         const defaultLimit = {
           product_limit: 100,
           max_image_size_mb: 5,
@@ -63,7 +60,11 @@ const Products = () => {
           .select()
           .single();
           
-        if (insertError) throw insertError;
+        if (insertError) {
+          console.error("Error creating default limits:", insertError);
+          throw insertError;
+        }
+
         return insertedData;
       }
       
@@ -71,47 +72,83 @@ const Products = () => {
     },
   });
 
-  const handleStatusChange = async (id: string, currentStatus: string | null) => {
-    const { error } = await supabase
-      .from("products")
-      .update({ status: currentStatus })
-      .eq("id", id);
+  const { data: categories } = useQuery({
+    queryKey: ["admin-categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
 
+  const { data: subcategories } = useQuery({
+    queryKey: ["admin-subcategories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subcategories")
+        .select("*")
+        .order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const [showImageManager, setShowImageManager] = useState(false);
+  const [folderSize, setFolderSize] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [images, setImages] = useState<any[]>([]);
+  const [showLimitExceeded, setShowLimitExceeded] = useState(false);
+  const [totalImages, setTotalImages] = useState(0);
+  const [showBulkUploadLimit, setShowBulkUploadLimit] = useState(false);
+  const [bulkUploadLimitMessage, setBulkUploadLimitMessage] = useState("");
+
+  const fetchTotalImages = async () => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("product-images")
+        .list();
+      
+      if (error) {
+        console.error("Error fetching images:", error);
+        return;
+      }
+
+      setTotalImages(data.length);
+      
+      const totalSize = data.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
+      setFolderSize(totalSize);
+    } catch (error) {
+      console.error("Error in fetchTotalImages:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalImages();
+  }, []);
+
+  const calculateFolderSize = async () => {
+    const { data, error } = await supabase.storage
+      .from("product-images")
+      .list();
+    
     if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update product status",
-        variant: "destructive",
-      });
+      console.error("Error fetching folder size:", error);
       return;
     }
 
-    toast({
-      title: "Success",
-      description: "Product status updated successfully",
-    });
+    const totalSize = data.reduce((acc, file) => acc + (file.metadata?.size || 0), 0);
+    setFolderSize(totalSize);
   };
 
-  const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("products").delete().eq("id", id);
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete product",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    toast({
-      title: "Success",
-      description: "Product deleted successfully",
-    });
-  };
+  useEffect(() => {
+    calculateFolderSize();
+  }, []);
 
   const handleAddProduct = () => {
-    const currentCount = productsData?.length || 0;
+    const currentCount = products?.length || 0;
     const limit = systemLimits?.product_limit || 100;
     if (currentCount >= limit) {
       setShowLimitExceeded(true);
@@ -125,7 +162,7 @@ const Products = () => {
     if (!file) return;
 
     try {
-      const importedCount = await handleProductImport(file, productsData, systemLimits);
+      const importedCount = await handleProductImport(file, products, systemLimits);
       toast({
         title: "Success",
         description: `${importedCount} products imported/updated successfully`,
@@ -141,26 +178,135 @@ const Products = () => {
   };
 
   const handleExport = () => {
-    exportProducts(productsData);
+    exportProducts(products, categories, subcategories);
   };
 
-  const handleSuccess = async () => {
-    await fetchTotalImages();
+  const handleStatusChange = async (id: string, currentStatus: string | null) => {
+    const newStatus = currentStatus === "published" ? "draft" : "published";
+    const { error } = await supabase
+      .from("products")
+      .update({ status: newStatus })
+      .eq("id", id);
+    
+    if (error) throw error;
+    fetchTotalImages();
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const { data: product, error: fetchError } = await supabase
+        .from("products")
+        .select("images")
+        .eq("id", id)
+        .maybeSingle(); // Changed from single() to maybeSingle()
+
+      if (fetchError) throw fetchError;
+
+      // Check if product exists
+      if (!product) {
+        console.log("Product not found:", id);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Product not found",
+        });
+        return;
+      }
+
+      if (product?.images && product.images.length > 0) {
+        const fileNames = product.images.map(url => {
+          const fileName = decodeURIComponent(url.split("/").pop() || "");
+          return fileName;
+        });
+
+        const { error: storageError } = await supabase.storage
+          .from("product-images")
+          .remove(fileNames);
+
+        if (storageError) {
+          console.error("Error deleting images:", storageError);
+        }
+      }
+
+      const { error: deleteError } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", id);
+      
+      if (deleteError) throw deleteError;
+
+      toast({
+        title: "Success",
+        description: "Product and associated images deleted successfully",
+      });
+
+      fetchTotalImages();
+    } catch (error: any) {
+      console.error("Error deleting product:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete product: " + error.message,
+      });
+    }
   };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <ProductHeader 
-        productsCount={productsData?.length || 0}
-        totalImages={totalImages}
+      <div className={`flex ${isMobile ? 'flex-col space-y-4' : 'justify-between items-center'}`}>
+        <div className="space-y-1 text-left">
+          <h1 className="text-3xl font-bold">Products</h1>
+          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1 ml-1">
+            <li>Total Products: {products?.length || 0}/{systemLimits?.product_limit || '...'}</li>
+            <li>Total Images: {totalImages}</li>
+            {folderSize > 0 && (
+              <li>Images Folder Size: {(folderSize / (1024 * 1024)).toFixed(2)} MB / {systemLimits?.max_folder_size_mb || '...'} MB</li>
+            )}
+          </ul>
+        </div>
+        <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-4'}`}>
+          <BackToDashboard />
+          <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center gap-2'}`}>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowImageManager(true)}
+              className="w-full"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Images
+            </Button>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleImport}
+              className="hidden"
+              id="import-file"
+            />
+            <label htmlFor="import-file">
+              <Button variant="outline" className="cursor-pointer w-full" asChild>
+                <div className="flex items-center gap-2">
+                  <Upload className="h-4 w-4" />
+                  Import CSV
+                </div>
+              </Button>
+            </label>
+            <Button variant="outline" onClick={handleExport} className="w-full">
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </Button>
+            <Button onClick={handleAddProduct} className="w-full">Add Product</Button>
+          </div>
+        </div>
+      </div>
+
+      <ImageManagementDialog
+        open={showImageManager}
+        onOpenChange={setShowImageManager}
+        onImageUpload={calculateFolderSize}
         folderSize={folderSize}
-        systemLimits={systemLimits}
-        onAddProduct={handleAddProduct}
-        onImport={handleImport}
-        onExport={handleExport}
-        onShowImageManager={() => setShowImageManager(true)}
-        isMobile={isMobile}
       />
+
+      <GlobalSaleControls />
 
       <ProductFilters
         search={search}
@@ -185,10 +331,8 @@ const Products = () => {
         setSelectedSubcategory={setSelectedSubcategory}
       />
 
-      <GlobalSaleControls />
-
-      <ProductsContainer 
-        products={productsData}
+      <ProductListContainer 
+        products={products}
         search={search}
         showSaleProducts={showSaleProducts}
         showNonSaleProducts={showNonSaleProducts}
@@ -201,20 +345,13 @@ const Products = () => {
         selectedSubcategory={selectedSubcategory}
         onStatusChange={handleStatusChange}
         onDelete={handleDelete}
-        onSuccess={handleSuccess}
-      />
-
-      <ImageManagementDialog
-        open={showImageManager}
-        onOpenChange={setShowImageManager}
-        onImageUpload={fetchTotalImages}
-        folderSize={folderSize}
+        onSuccess={fetchTotalImages}
       />
 
       <LimitExceededDialog
         open={showLimitExceeded}
         onOpenChange={setShowLimitExceeded}
-        currentCount={productsData?.length || 0}
+        currentCount={products?.length || 0}
         limit={systemLimits?.product_limit || 100}
       />
 
