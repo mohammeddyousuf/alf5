@@ -7,15 +7,15 @@ interface CSVProduct {
   name: string;
   description?: string | null;
   price: string | number;
-  sale_price?: string | number | null;
   discount_price?: string | number | null;
+  sale_price?: string | number | null;
   images?: string | string[] | null;
   status?: "draft" | "published" | "archived" | null;
   featured?: boolean | string | null;
   brand?: string | null;
   custom_label?: string | null;
-  category_id?: string | null;
-  subcategory_id?: string | null;
+  category?: string | null;
+  subcategory?: string | null;
 }
 
 const convertToBoolean = (value: string | boolean | null | undefined): boolean => {
@@ -90,8 +90,6 @@ export const handleProductImport = async (
               featured: convertToBoolean(product.featured),
               brand: product.brand || null,
               custom_label: product.custom_label || null,
-              category_id: product.category_id || null,
-              subcategory_id: product.subcategory_id || null,
             };
 
             if (product.id) {
@@ -131,20 +129,24 @@ export const handleProductImport = async (
   });
 };
 
-export const exportProducts = (
+export const exportProducts = async (
   products: ProductsRow[] | undefined,
   categories: any[] | undefined,
   subcategories: any[] | undefined
 ) => {
   if (!products) return;
 
+  // Create a map of category and subcategory IDs to their names
+  const categoryMap = new Map(categories?.map(cat => [cat.id, cat.name]));
+  const subcategoryMap = new Map(subcategories?.map(subcat => [subcat.id, subcat.name]));
+
   const exportProducts = products.map(product => ({
-    id: product.id, // Include ID in export
+    id: product.id,
     name: product.name,
     description: product.description,
     price: product.price,
-    sale_price: product.sale_price,
     discount_price: product.discount_price,
+    sale_price: product.sale_price,
     images: product.images?.map(imageUrl =>
       imageUrl.includes('/') ? decodeURIComponent(imageUrl.split('/').pop() || '') : imageUrl
     ),
@@ -152,8 +154,8 @@ export const exportProducts = (
     featured: product.featured,
     brand: product.brand,
     custom_label: product.custom_label,
-    category_id: product.category_id,
-    subcategory_id: product.subcategory_id
+    category: categoryMap.get(product.category_id || '') || '',
+    subcategory: subcategoryMap.get(product.subcategory_id || '') || ''
   }));
 
   const csv = Papa.unparse(exportProducts);
