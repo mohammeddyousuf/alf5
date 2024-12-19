@@ -179,31 +179,12 @@ export const exportProducts = async (
     brand: product.brand || '',
     custom_label: product.custom_label || '',
     category_id: product.category_id || '',
-    category_name: getCategoryName(product.category_id), // Added for reference
+    category_name: getCategoryName(product.category_id),
     subcategory_id: product.subcategory_id || '',
-    subcategory_name: getSubcategoryName(product.subcategory_id), // Added for reference
+    subcategory_name: getSubcategoryName(product.subcategory_id),
   }));
 
-  // Add instructions and template row
-  const instructions = {
-    id: '# Instructions',
-    name: '1. Leave ID empty for new products',
-    description: '2. Fill in all required fields',
-    price: '3. Price is required',
-    discount_price: '4. Optional',
-    sale_price: '5. Optional',
-    images: '6. Comma-separated image names',
-    status: '7. draft/published/archived',
-    featured: '8. true/false',
-    brand: '9. Optional',
-    custom_label: '10. Optional',
-    category_id: '11. From categories list',
-    category_name: '(Reference only)',
-    subcategory_id: '12. From subcategories list',
-    subcategory_name: '(Reference only)',
-  };
-
-  const csvData = [instructions, templateProduct, ...exportProducts];
+  const csvData = [templateProduct, ...exportProducts];
   const csv = Papa.unparse(csvData);
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
