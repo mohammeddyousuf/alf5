@@ -136,22 +136,6 @@ export const exportProducts = async (
 ): Promise<void> => {
   if (!products) return;
 
-  const templateProduct = {
-    id: '',
-    name: 'New Product Name',
-    description: 'Product Description',
-    price: '0',
-    discount_price: '0',
-    sale_price: '0',
-    images: '',
-    status: 'draft',
-    featured: 'false',
-    brand: '',
-    custom_label: '',
-    category_name: '',
-    subcategory_name: '',
-  };
-
   const getCategoryName = (id: string | null) => {
     if (!id || !categories) return '';
     const category = categories.find(c => c.id === id);
@@ -180,8 +164,7 @@ export const exportProducts = async (
     subcategory_name: getSubcategoryName(product.subcategory_id),
   }));
 
-  const csvData = [templateProduct, ...exportProducts];
-  const csv = Papa.unparse(csvData);
+  const csv = Papa.unparse(exportProducts);
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
