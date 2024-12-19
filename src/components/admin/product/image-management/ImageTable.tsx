@@ -75,47 +75,51 @@ export function ImageTable({
   }
 
   return (
-    <div className="bg-background">
+    <div className="bg-background rounded-md">
       <Table>
         <TableHeader>
-          <TableRow className="hover:bg-transparent border-0">
-            <TableHead className="w-[50px] border-0">
+          <TableRow className="hover:bg-transparent">
+            <TableHead className="w-[50px]">
               <Checkbox 
                 checked={selectedImages.length === sortedImages.length && sortedImages.length > 0}
                 onCheckedChange={handleSelectAll}
               />
             </TableHead>
-            <TableHead className="border-0">Image</TableHead>
-            <TableHead className="border-0">Name</TableHead>
-            <TableHead className="border-0">Usage</TableHead>
-            <TableHead className="w-[100px] border-0">Actions</TableHead>
+            <TableHead>Image</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Usage</TableHead>
+            <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedImages.map((image) => (
-            <TableRow key={image.name} className="hover:bg-muted/50 border-0">
-              <TableCell className="border-0">
+            <TableRow key={image.name} className="hover:bg-muted/50">
+              <TableCell>
                 <Checkbox 
                   checked={selectedImages.includes(image.name)}
                   onCheckedChange={(checked) => handleSelectImage(image.name, checked as boolean)}
                 />
               </TableCell>
-              <TableCell className="border-0">
+              <TableCell>
                 <img
                   src={image.url}
                   alt={image.name}
                   className="w-20 h-20 object-cover rounded-lg"
                 />
               </TableCell>
-              <TableCell className="font-medium border-0">{image.name}</TableCell>
-              <TableCell className="border-0">
-                {image.usage?.map((item: any, index: number) => (
-                  <span key={index} className="block text-sm text-muted-foreground">
-                    {item.type}: {item.name}
-                  </span>
-                ))}
+              <TableCell className="font-medium">{image.name}</TableCell>
+              <TableCell>
+                {image.usage && image.usage.length > 0 ? (
+                  image.usage.map((item: any, index: number) => (
+                    <span key={index} className="block text-sm text-muted-foreground">
+                      {item.type}: {item.name}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-sm text-muted-foreground">Not in use</span>
+                )}
               </TableCell>
-              <TableCell className="border-0">
+              <TableCell>
                 <Button
                   variant="destructive"
                   size="icon"
