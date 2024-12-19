@@ -23,7 +23,7 @@ export default function Collections() {
       const { data, error } = await supabase
         .from("collections")
         .select("*")
-        .order("name");
+        .order('created_at', { ascending: true }); // Changed to ascending true to show oldest first
       if (error) throw error;
       return data;
     },
