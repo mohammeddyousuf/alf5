@@ -36,12 +36,13 @@ export const WebsiteSettings = () => {
           accent_color: "#6E59A5",
           background_color: "#FFFFFF",
           foreground_color: "#000000",
-          sale_color: "#ea384c",      // Add default sale color
-          discount_color: "#ea384c",   // Add default discount color
+          sale_color: "#ea384c",      
+          discount_color: "#ea384c",   
           clearance_sale_active: false,
           clearance_sale_end_date: null,
           tracking_codes: "",
-          whatsapp_number: "" // Required field
+          whatsapp_number: "",
+          show_news_ticker: true  // Add default value for show_news_ticker
         };
 
         const { data: newSettings, error: insertError } = await supabase
