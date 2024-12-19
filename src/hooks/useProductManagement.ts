@@ -2,7 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-export const useProductManagement = (onSuccess: () => void) => {
+export const useProductManagement = (onSuccess: () => Promise<void>) => {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,7 +22,7 @@ export const useProductManagement = (onSuccess: () => void) => {
         description: `Product status changed to ${newStatus}`,
       });
       
-      onSuccess();
+      await onSuccess();
     } catch (error) {
       console.error("Error updating status:", error);
       toast({

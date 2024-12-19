@@ -1,47 +1,28 @@
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { GlobalSaleControls } from "@/components/admin/product/GlobalSaleControls";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useProducts } from "@/hooks/useProducts";
 import { ImageManagementDialog } from "@/components/admin/product/ImageManagementDialog";
 import { LimitExceededDialog } from "@/components/admin/product/LimitExceededDialog";
 import { BulkUploadLimitDialog } from "@/components/admin/product/BulkUploadLimitDialog";
-import { ProductListContainer } from "@/components/admin/product/ProductListContainer";
 import { handleProductImport, exportProducts } from "@/utils/productImportExport";
-import { useDeleteProduct } from "@/hooks/useDeleteProduct";
-import { ProductFilters } from "@/components/admin/product/ProductFilters";
 import { ProductHeader } from "@/components/admin/product/ProductHeader";
-import { useProductManagement } from "@/hooks/useProductManagement";
 import { useImageManagement } from "@/hooks/useImageManagement";
+import { ProductsContainer } from "@/components/admin/product/ProductsContainer";
+import { useQuery } from "@tanstack/react-query";
 
 const Products = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const [search, setSearch] = useState("");
-  const [showSaleProducts, setShowSaleProducts] = useState(true);
-  const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
-  const [selectedBrand, setSelectedBrand] = useState("all");
-  const [sortBy, setSortBy] = useState("name-asc");
-  const [showFeatured, setShowFeatured] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [selectedCustomLabel, setSelectedCustomLabel] = useState("all");
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedSubcategory, setSelectedSubcategory] = useState("all");
-  
-  const { data: products } = useProducts();
-  const deleteProduct = useDeleteProduct();
   const { totalImages, folderSize, fetchTotalImages } = useImageManagement();
 
   const [showImageManager, setShowImageManager] = useState(false);
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
   const [showBulkUploadLimit, setShowBulkUploadLimit] = useState(false);
   const [bulkUploadLimitMessage, setBulkUploadLimitMessage] = useState("");
-
-  const { handleStatusChange } = useProductManagement(() => fetchTotalImages());
 
   const { data: systemLimits } = useQuery({
     queryKey: ["system-limits"],
@@ -156,45 +137,9 @@ const Products = () => {
 
       <GlobalSaleControls />
 
-      <ProductFilters
-        search={search}
-        setSearch={setSearch}
-        showSaleProducts={showSaleProducts}
-        setShowSaleProducts={setShowSaleProducts}
-        showNonSaleProducts={showNonSaleProducts}
-        setShowNonSaleProducts={setShowNonSaleProducts}
-        selectedBrand={selectedBrand}
-        setSelectedBrand={setSelectedBrand}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-        showFeatured={showFeatured}
-        setShowFeatured={setShowFeatured}
-        selectedStatus={selectedStatus}
-        setSelectedStatus={setSelectedStatus}
-        selectedCustomLabel={selectedCustomLabel}
-        setSelectedCustomLabel={setSelectedCustomLabel}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        selectedSubcategory={selectedSubcategory}
-        setSelectedSubcategory={setSelectedSubcategory}
-      />
-
-      <ProductListContainer 
-        products={products}
-        search={search}
-        showSaleProducts={showSaleProducts}
-        showNonSaleProducts={showNonSaleProducts}
-        selectedBrand={selectedBrand}
-        sortBy={sortBy}
-        showFeatured={showFeatured}
-        selectedStatus={selectedStatus}
-        selectedCustomLabel={selectedCustomLabel}
-        selectedCategory={selectedCategory}
-        selectedSubcategory={selectedSubcategory}
-        onStatusChange={handleStatusChange}
-        onDelete={(id) => deleteProduct.mutate(id)}
-        onSuccess={fetchTotalImages}
-      />
+      <ProductsContainer onSuccess={async () => {
+        await fetchTotalImages();
+      }} />
 
       <LimitExceededDialog
         open={showLimitExceeded}
