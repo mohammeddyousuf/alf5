@@ -10,6 +10,8 @@ import { SearchBar } from "@/components/shop/SearchBar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useShopUrlParams } from "@/hooks/useShopUrlParams";
+import { useFilteredProducts } from "@/hooks/useFilteredProducts";
+import { Product } from "@/types/product";
 
 const Shop = () => {
   const location = useLocation();
@@ -20,9 +22,9 @@ const Shop = () => {
   const [searchQuery, setSearchQuery] = useState(getUrlParam("search") || "");
   const [priceRange, setPriceRange] = useState([
     Number(getUrlParam("minPrice")) || 0,
-    Number(getUrlParam("maxPrice")) || 0
+    Number(getUrlParam("maxPrice")) || 0,
   ]);
-  
+
   // Initialize filter states from location.state if available
   const [showSaleOnly, setShowSaleOnly] = useState(
     location.state?.showSaleOnly || getUrlParam("sale") === "true"
@@ -36,15 +38,22 @@ const Shop = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">(
     (getUrlParam("sort") as "asc" | "desc" | "default") || "default"
   );
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(getUrlParam("category"));
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(getUrlParam("subcategory"));
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(getUrlParam("brand"));
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    getUrlParam("category")
+  );
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(
+    getUrlParam("subcategory")
+  );
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(
+    getUrlParam("brand")
+  );
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Effect to update filters when location.state changes
   useEffect(() => {
     if (location.state) {
-      const { showFeaturedOnly: featured, showNewArrivalsOnly: newArrivals } = location.state;
+      const { showFeaturedOnly: featured, showNewArrivalsOnly: newArrivals } =
+        location.state;
       setShowFeaturedOnly(featured || false);
       setShowNewArrivalsOnly(newArrivals || false);
     }
@@ -62,7 +71,7 @@ const Shop = () => {
       sort: sortOrder !== "default" ? sortOrder : null,
       category: selectedCategory,
       subcategory: selectedSubcategory,
-      brand: selectedBrand
+      brand: selectedBrand,
     });
   }, [
     searchQuery,
@@ -82,17 +91,24 @@ const Shop = () => {
       const { data, error } = await supabase
         .from("settings")
         .select("*")
-        .order('created_at', { ascending: false })
+        .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
-      
+
       if (error) throw error;
       return data;
     },
   });
 
   const { data: products, isLoading, error } = useQuery({
-    queryKey: ["shop-products", selectedCategory, selectedSubcategory, showFeaturedOnly, showSaleOnly, showNewArrivalsOnly],
+    queryKey: [
+      "shop-products",
+      selectedCategory,
+      selectedSubcategory,
+      showFeaturedOnly,
+      showSaleOnly,
+      showNewArrivalsOnly,
+    ],
     queryFn: async () => {
       console.log("Fetching products with filters:", {
         category: selectedCategory,
@@ -100,12 +116,14 @@ const Shop = () => {
         featured: showFeaturedOnly,
         sale: showSaleOnly,
         newArrivals: showNewArrivalsOnly,
-        priceRange
+        priceRange,
       });
 
       let query = supabase
         .from("products")
-        .select("id, name, price, sale_price, discount_price, images, brand, custom_label, category_id, subcategory_id, featured, created_at")
+        .select(
+          "id, name, price, sale_price, discount_price, images, brand, custom_label, description, category_id, subcategory_id, featured, created_at"
+        )
         .eq("status", "published");
 
       if (selectedCategory) {
@@ -123,11 +141,11 @@ const Shop = () => {
       if (showNewArrivalsOnly) {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        query = query.gte('created_at', thirtyDaysAgo.toISOString());
+        query = query.gte("created_at", thirtyDaysAgo.toISOString());
       }
 
       const { data, error } = await query;
-      
+
       if (error) {
         console.error("Error fetching products:", error);
         toast({
@@ -137,58 +155,25 @@ const Shop = () => {
         });
         throw error;
       }
-      
+
       console.log("Fetched products:", data);
-      return data || [];
+      return data as Product[];
     },
   });
 
-  const isSaleValid = () => {
-    if (!settings?.clearance_sale_active || !settings?.clearance_sale_end_date) {
-      return true; // If no global sale timer, individual sale prices are valid
-    }
-    const endDate = new Date(settings.clearance_sale_end_date);
-    const now = new Date();
-    return endDate > now;
-  };
-
-  // Helper function to determine if a product is on sale
-  const isProductOnSale = (product: any) => {
-    return product.sale_price && 
-           product.sale_price < product.price && 
-           (!settings?.clearance_sale_active || isSaleValid());
-  };
-
-  const filteredProducts = products?.filter((product) => {
-    console.log("Filtering product:", {
-      name: product.name,
-      price: product.price,
-      priceRange,
-      meetsPrice: priceRange[0] === 0 && priceRange[1] === 0 ? true : 
-                  (product.sale_price || product.price) >= priceRange[0] && 
-                  (product.sale_price || product.price) <= (priceRange[1] || Infinity)
-    });
-
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (product.description?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (product.brand?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (product.custom_label?.toLowerCase().includes(searchQuery.toLowerCase()));
-    
-    const price = isProductOnSale(product) ? product.sale_price : product.price;
-    const meetsPrice = priceRange[0] === 0 && priceRange[1] === 0 ? true :
-                      price >= priceRange[0] && 
-                      (priceRange[1] === 0 ? true : price <= priceRange[1]);
-    
-    const meetsSale = showSaleOnly ? isProductOnSale(product) : true;
-    const meetsBrand = selectedBrand ? product.brand === selectedBrand : true;
-
-    return matchesSearch && meetsPrice && meetsSale && meetsBrand;
+  const { filteredProducts, isProductOnSale } = useFilteredProducts({
+    products,
+    searchQuery,
+    priceRange,
+    showSaleOnly,
+    selectedBrand,
+    settings,
   });
 
   const sortedProducts = [...(filteredProducts || [])].sort((a, b) => {
     if (sortOrder === "default") return 0;
-    const priceA = isProductOnSale(a) ? a.sale_price : a.price;
-    const priceB = isProductOnSale(b) ? b.sale_price : b.price;
+    const priceA = isProductOnSale(a) ? a.sale_price! : a.price;
+    const priceB = isProductOnSale(b) ? b.sale_price! : b.price;
     return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
   });
 
