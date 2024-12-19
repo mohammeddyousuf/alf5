@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ImagePagination } from "./ImagePagination";
 
 interface ImageTableProps {
   images: any[];
@@ -28,8 +27,6 @@ export function ImageTable({
   showUnassigned
 }: ImageTableProps) {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const imagesPerPage = 5;
 
   const sortImages = (images: any[]) => {
     let filteredImages = [...images];
@@ -68,19 +65,23 @@ export function ImageTable({
   };
 
   const sortedImages = sortImages(images);
-  const totalPages = Math.ceil(sortedImages.length / imagesPerPage);
-  const startIndex = (currentPage - 1) * imagesPerPage;
-  const endIndex = startIndex + imagesPerPage;
-  const currentImages = sortedImages.slice(startIndex, endIndex);
+
+  if (sortedImages.length === 0) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        No images found
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div className="rounded-lg">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="hover:bg-transparent border-b">
             <TableHead className="w-[50px]">
               <Checkbox 
-                checked={currentImages.length > 0 && selectedImages.length === currentImages.length}
+                checked={selectedImages.length === sortedImages.length && sortedImages.length > 0}
                 onCheckedChange={handleSelectAll}
               />
             </TableHead>
@@ -91,8 +92,8 @@ export function ImageTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {currentImages.map((image) => (
-            <TableRow key={image.name}>
+          {sortedImages.map((image) => (
+            <TableRow key={image.name} className="border-b last:border-0">
               <TableCell>
                 <Checkbox 
                   checked={selectedImages.includes(image.name)}
@@ -121,24 +122,13 @@ export function ImageTable({
                   onClick={() => onDeleteClick([image.name])}
                   disabled={isDeleting}
                 >
-                  {isDeleting ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4" />
-                  )}
+                  <Trash2 className="h-4 w-4" />
                 </Button>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      {sortedImages.length > imagesPerPage && (
-        <ImagePagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
-      )}
     </div>
   );
 }
