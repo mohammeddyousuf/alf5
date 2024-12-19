@@ -198,9 +198,20 @@ const Products = () => {
         .from("products")
         .select("images")
         .eq("id", id)
-        .single();
+        .maybeSingle(); // Changed from single() to maybeSingle()
 
       if (fetchError) throw fetchError;
+
+      // Check if product exists
+      if (!product) {
+        console.log("Product not found:", id);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Product not found",
+        });
+        return;
+      }
 
       if (product?.images && product.images.length > 0) {
         const fileNames = product.images.map(url => {
