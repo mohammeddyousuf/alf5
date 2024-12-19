@@ -144,6 +144,10 @@ const Products = () => {
     exportProducts(productsData);
   };
 
+  const handleSuccess = async () => {
+    await fetchTotalImages();
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <ProductHeader 
@@ -197,9 +201,7 @@ const Products = () => {
         selectedSubcategory={selectedSubcategory}
         onStatusChange={handleStatusChange}
         onDelete={handleDelete}
-        onSuccess={async () => {
-          await fetchTotalImages();
-        }}
+        onSuccess={handleSuccess}
       />
 
       <ImageManagementDialog
