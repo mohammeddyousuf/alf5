@@ -12,7 +12,7 @@ interface PriceFieldsProps {
 
 export function PriceFields({ form }: PriceFieldsProps) {
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-3 gap-4">
       <FormField
         control={form.control}
         name="price"
@@ -41,6 +41,28 @@ export function PriceFields({ form }: PriceFieldsProps) {
         render={({ field }) => (
           <FormItem>
             <FormLabel>Sale Price (Optional)</FormLabel>
+            <FormControl>
+              <Input 
+                type="number"
+                {...field} 
+                value={field.value ?? ''} 
+                onChange={(e) => {
+                  const value = e.target.value === '' ? null : Math.floor(Number(e.target.value));
+                  field.onChange(value);
+                }}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="discount_price"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Discount Price (Optional)</FormLabel>
             <FormControl>
               <Input 
                 type="number"
