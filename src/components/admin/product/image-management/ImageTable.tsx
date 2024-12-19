@@ -75,47 +75,47 @@ export function ImageTable({
   }
 
   return (
-    <div className="rounded-lg border">
+    <div className="bg-background">
       <Table>
         <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="w-[50px]">
+          <TableRow className="hover:bg-transparent border-0">
+            <TableHead className="w-[50px] border-0">
               <Checkbox 
                 checked={selectedImages.length === sortedImages.length && sortedImages.length > 0}
                 onCheckedChange={handleSelectAll}
               />
             </TableHead>
-            <TableHead>Image</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Usage</TableHead>
-            <TableHead className="w-[100px]">Actions</TableHead>
+            <TableHead className="border-0">Image</TableHead>
+            <TableHead className="border-0">Name</TableHead>
+            <TableHead className="border-0">Usage</TableHead>
+            <TableHead className="w-[100px] border-0">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {sortedImages.map((image) => (
-            <TableRow key={image.name} className="hover:bg-muted/50">
-              <TableCell>
+            <TableRow key={image.name} className="hover:bg-muted/50 border-0">
+              <TableCell className="border-0">
                 <Checkbox 
                   checked={selectedImages.includes(image.name)}
                   onCheckedChange={(checked) => handleSelectImage(image.name, checked as boolean)}
                 />
               </TableCell>
-              <TableCell>
+              <TableCell className="border-0">
                 <img
                   src={image.url}
                   alt={image.name}
                   className="w-20 h-20 object-cover rounded-lg"
                 />
               </TableCell>
-              <TableCell className="font-medium">{image.name}</TableCell>
-              <TableCell>
+              <TableCell className="font-medium border-0">{image.name}</TableCell>
+              <TableCell className="border-0">
                 {image.usage?.map((item: any, index: number) => (
                   <span key={index} className="block text-sm text-muted-foreground">
                     {item.type}: {item.name}
                   </span>
                 ))}
               </TableCell>
-              <TableCell>
+              <TableCell className="border-0">
                 <Button
                   variant="destructive"
                   size="icon"
