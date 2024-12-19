@@ -75,10 +75,10 @@ export function ImageTable({
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden">
+    <div className="rounded-lg">
       <Table>
         <TableHeader>
-          <TableRow className="hover:bg-transparent">
+          <TableRow className="hover:bg-transparent border-b">
             <TableHead className="w-[50px]">
               <Checkbox 
                 checked={selectedImages.length === sortedImages.length && sortedImages.length > 0}
@@ -93,7 +93,7 @@ export function ImageTable({
         </TableHeader>
         <TableBody>
           {sortedImages.map((image) => (
-            <TableRow key={image.name}>
+            <TableRow key={image.name} className="border-b last:border-0">
               <TableCell>
                 <Checkbox 
                   checked={selectedImages.includes(image.name)}
