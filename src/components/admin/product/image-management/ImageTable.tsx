@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ImagePagination } from "./ImagePagination";
 
 interface ImageTableProps {
   images: any[];
@@ -27,6 +28,8 @@ export function ImageTable({
   showUnassigned
 }: ImageTableProps) {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const imagesPerPage = 5;
 
   const sortImages = (images: any[]) => {
     let filteredImages = [...images];
@@ -65,60 +68,77 @@ export function ImageTable({
   };
 
   const sortedImages = sortImages(images);
+  const totalPages = Math.ceil(sortedImages.length / imagesPerPage);
+  const startIndex = (currentPage - 1) * imagesPerPage;
+  const endIndex = startIndex + imagesPerPage;
+  const currentImages = sortedImages.slice(startIndex, endIndex);
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[50px]">
-            <Checkbox 
-              checked={selectedImages.length === sortedImages.length && sortedImages.length > 0}
-              onCheckedChange={handleSelectAll}
-            />
-          </TableHead>
-          <TableHead>Image</TableHead>
-          <TableHead>Name</TableHead>
-          <TableHead>Usage</TableHead>
-          <TableHead className="w-[100px]">Actions</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {sortedImages.map((image) => (
-          <TableRow key={image.name}>
-            <TableCell>
+    <div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[50px]">
               <Checkbox 
-                checked={selectedImages.includes(image.name)}
-                onCheckedChange={(checked) => handleSelectImage(image.name, checked as boolean)}
+                checked={currentImages.length > 0 && selectedImages.length === currentImages.length}
+                onCheckedChange={handleSelectAll}
               />
-            </TableCell>
-            <TableCell>
-              <img
-                src={image.url}
-                alt={image.name}
-                className="w-20 h-20 object-cover rounded-lg"
-              />
-            </TableCell>
-            <TableCell className="font-medium">{image.name}</TableCell>
-            <TableCell>
-              {image.usage?.map((item: any, index: number) => (
-                <span key={index} className="block text-sm text-muted-foreground">
-                  {item.type}: {item.name}
-                </span>
-              ))}
-            </TableCell>
-            <TableCell>
-              <Button
-                variant="destructive"
-                size="icon"
-                onClick={() => onDeleteClick([image.name])}
-                disabled={isDeleting}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </TableCell>
+            </TableHead>
+            <TableHead>Image</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Usage</TableHead>
+            <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {currentImages.map((image) => (
+            <TableRow key={image.name}>
+              <TableCell>
+                <Checkbox 
+                  checked={selectedImages.includes(image.name)}
+                  onCheckedChange={(checked) => handleSelectImage(image.name, checked as boolean)}
+                />
+              </TableCell>
+              <TableCell>
+                <img
+                  src={image.url}
+                  alt={image.name}
+                  className="w-20 h-20 object-cover rounded-lg"
+                />
+              </TableCell>
+              <TableCell className="font-medium">{image.name}</TableCell>
+              <TableCell>
+                {image.usage?.map((item: any, index: number) => (
+                  <span key={index} className="block text-sm text-muted-foreground">
+                    {item.type}: {item.name}
+                  </span>
+                ))}
+              </TableCell>
+              <TableCell>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => onDeleteClick([image.name])}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {sortedImages.length > imagesPerPage && (
+        <ImagePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
+    </div>
   );
 }
