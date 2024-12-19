@@ -110,8 +110,8 @@ export const ProductCard = ({
                         price;
 
   return (
-    <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg">
-      <Link to={productUrl}>
+    <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg h-full flex flex-col">
+      <Link to={productUrl} className="flex-none">
         <div className="aspect-square overflow-hidden relative">
           {imageUrl ? (
             <>
@@ -158,14 +158,14 @@ export const ProductCard = ({
             </div>
           )}
         </div>
-        <CardContent className="p-4 text-left">
-          <h3 className="font-semibold line-clamp-2">{name}</h3>
+        <CardContent className="p-4 text-left flex-none">
+          <h3 className="font-semibold line-clamp-2 min-h-[2.5rem]">{name}</h3>
           {brand && (
             <p className="text-sm text-muted-foreground mt-1">{brand}</p>
           )}
         </CardContent>
       </Link>
-      <CardFooter className="p-4 pt-0 flex flex-col gap-3">
+      <CardFooter className="p-4 pt-0 flex flex-col gap-3 mt-auto">
         <div className="flex flex-col">
           {(showSalePrice || showDiscountPrice) ? (
             <>
