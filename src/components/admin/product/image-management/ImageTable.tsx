@@ -75,10 +75,10 @@ export function ImageTable({
   }
 
   return (
-    <div className="bg-background rounded-md">
+    <div className="bg-background">
       <Table>
         <TableHeader>
-          <TableRow className="hover:bg-transparent">
+          <TableRow className="hover:bg-transparent border-b border-border">
             <TableHead className="w-[50px]">
               <Checkbox 
                 checked={selectedImages.length === sortedImages.length && sortedImages.length > 0}
@@ -93,22 +93,22 @@ export function ImageTable({
         </TableHeader>
         <TableBody>
           {sortedImages.map((image) => (
-            <TableRow key={image.name} className="hover:bg-muted/50">
-              <TableCell>
+            <TableRow key={image.name} className="hover:bg-muted/50 border-none">
+              <TableCell className="py-2">
                 <Checkbox 
                   checked={selectedImages.includes(image.name)}
                   onCheckedChange={(checked) => handleSelectImage(image.name, checked as boolean)}
                 />
               </TableCell>
-              <TableCell>
+              <TableCell className="py-2">
                 <img
                   src={image.url}
                   alt={image.name}
                   className="w-20 h-20 object-cover rounded-lg"
                 />
               </TableCell>
-              <TableCell className="font-medium">{image.name}</TableCell>
-              <TableCell>
+              <TableCell className="font-medium py-2">{image.name}</TableCell>
+              <TableCell className="py-2">
                 {image.usage && image.usage.length > 0 ? (
                   image.usage.map((item: any, index: number) => (
                     <span key={index} className="block text-sm text-muted-foreground">
@@ -119,7 +119,7 @@ export function ImageTable({
                   <span className="text-sm text-muted-foreground">Not in use</span>
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell className="py-2">
                 <Button
                   variant="destructive"
                   size="icon"

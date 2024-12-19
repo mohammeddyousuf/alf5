@@ -149,7 +149,7 @@ export function ImageManagementDialog({
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
         >
-          <SheetHeader className="mb-4">
+          <SheetHeader className="mb-2">
             <SheetTitle className="flex justify-between items-center">
               Product Images
               <span className="text-sm font-normal text-muted-foreground">
@@ -157,23 +157,6 @@ export function ImageManagementDialog({
               </span>
             </SheetTitle>
           </SheetHeader>
-
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => {
-              if (e.target.files && e.target.files.length > 0) {
-                handleDrop({ 
-                  preventDefault: () => {},
-                  dataTransfer: { files: e.target.files } 
-                } as any);
-              }
-              e.target.value = '';
-            }}
-            className="hidden"
-            id="bulk-upload-dialog"
-          />
 
           <SearchAndSort
             searchQuery={searchQuery}
@@ -185,14 +168,14 @@ export function ImageManagementDialog({
           />
 
           <div className="flex-1 min-h-0 mt-2">
-            <ScrollArea className="h-[calc(100vh-280px)]">
+            <ScrollArea className="h-[calc(100vh-220px)]">
               {isLoading ? (
                 <div className="flex justify-center items-center h-32">
                   <Loader2 className="h-6 w-6 animate-spin" />
                 </div>
               ) : (
                 <div 
-                  className={`rounded-lg transition-colors ${
+                  className={`transition-colors ${
                     isDragging ? 'bg-muted/50 border-2 border-dashed border-primary' : ''
                   }`}
                 >
@@ -208,7 +191,7 @@ export function ImageManagementDialog({
             </ScrollArea>
           </div>
 
-          <div className="mt-4 pt-4 border-t">
+          <div className="mt-2 pt-2 border-t">
             <ImagePagination
               currentPage={currentPage}
               totalPages={totalPages}
