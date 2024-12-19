@@ -16,25 +16,26 @@ export function ImagePagination({
 }: ImagePaginationProps) {
   return (
     <div className="flex items-center justify-between border-t pt-4 mt-4">
-      <div className="text-sm text-muted-foreground">
-        Showing {Math.min(12 * (currentPage - 1) + 1, totalImages)}-
-        {Math.min(12 * currentPage, totalImages)} of {totalImages} images
-      </div>
-      <div className="flex items-center space-x-2">
+      <span className="text-sm text-muted-foreground">
+        {totalImages} images
+      </span>
+      <div className="flex items-center gap-2">
         <Button
           variant="outline"
-          size="sm"
+          size="icon"
+          className="h-8 w-8"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <div className="text-sm">
-          Page {currentPage} of {totalPages}
-        </div>
+        <span className="text-sm min-w-[90px] text-center">
+          {currentPage} / {totalPages}
+        </span>
         <Button
           variant="outline"
-          size="sm"
+          size="icon"
+          className="h-8 w-8"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
         >
