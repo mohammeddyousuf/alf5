@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { updateThemeColor, initializeThemeColors } from "@/utils/themeUtils";
 import { supabase } from "@/integrations/supabase/client";
+import { ColorInput } from "./theme/ColorInput";
+import { defaultColors } from "./theme/defaultColors";
+import { Button } from "@/components/ui/button";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 interface ThemeSettingsProps {
   settings: any;
@@ -13,26 +15,19 @@ interface ThemeSettingsProps {
 
 export const ThemeSettings = ({ settings, refetch }: ThemeSettingsProps) => {
   const { toast } = useToast();
-  const [colors, setColors] = useState({
-    primary: settings?.primary_color || "#9b87f5",
-    secondary: settings?.secondary_color || "#7E69AB",
-    accent: settings?.accent_color || "#6E59A5",
-    background: settings?.background_color || "#FFFFFF",
-    foreground: settings?.foreground_color || "#000000",
-    sale: settings?.sale_color || "#ea384c",
-    discount: settings?.discount_color || "#ea384c",
-  });
+  const [colors, setColors] = useState(defaultColors);
+  const [isResetting, setIsResetting] = useState(false);
 
   useEffect(() => {
     if (settings) {
       setColors({
-        primary: settings.primary_color || "#9b87f5",
-        secondary: settings.secondary_color || "#7E69AB",
-        accent: settings.accent_color || "#6E59A5",
-        background: settings.background_color || "#FFFFFF",
-        foreground: settings.foreground_color || "#000000",
-        sale: settings.sale_color || "#ea384c",
-        discount: settings.discount_color || "#ea384c",
+        primary: settings.primary_color || defaultColors.primary,
+        secondary: settings.secondary_color || defaultColors.secondary,
+        accent: settings.accent_color || defaultColors.accent,
+        background: settings.background_color || defaultColors.background,
+        foreground: settings.foreground_color || defaultColors.foreground,
+        sale: settings.sale_color || defaultColors.sale,
+        discount: settings.discount_color || defaultColors.discount,
       });
       initializeThemeColors(settings);
     }
@@ -60,147 +55,116 @@ export const ThemeSettings = ({ settings, refetch }: ThemeSettingsProps) => {
         title: "Theme Updated",
         description: `${colorKey} color has been updated`,
       });
-    } catch (error) {
-      console.error('Error updating theme color:', error);
+    } catch (error: any) {
       toast({
-        title: "Error",
-        description: "Failed to update theme color",
         variant: "destructive",
+        description: error.message
       });
+    }
+  };
+
+  const handleReset = async () => {
+    if (!settings?.id) return;
+    
+    setIsResetting(true);
+    try {
+      const updates = Object.entries(defaultColors).reduce((acc, [key, value]) => ({
+        ...acc,
+        [`${key}_color`]: value
+      }), {});
+
+      const { error } = await supabase
+        .from('settings')
+        .update(updates)
+        .eq('id', settings.id);
+
+      if (error) throw error;
+
+      setColors(defaultColors);
+      Object.entries(defaultColors).forEach(([key, value]) => {
+        updateThemeColor(key as keyof typeof defaultColors, value);
+      });
+
+      await refetch();
+      toast({
+        title: "Theme Reset",
+        description: "Colors have been reset to default values",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        description: error.message
+      });
+    } finally {
+      setIsResetting(false);
     }
   };
 
   return (
     <div className="grid gap-4">
-      <div className="space-y-2">
-        <Label htmlFor="primaryColor">Primary Color</Label>
-        <div className="flex gap-2">
-          <Input
-            id="primaryColor"
-            type="color"
-            value={colors.primary}
-            onChange={(e) => handleColorChange('primary', e.target.value)}
-            className="h-10 w-20"
-          />
-          <Input 
-            value={colors.primary}
-            onChange={(e) => handleColorChange('primary', e.target.value)}
-            placeholder="#000000"
-          />
-        </div>
+      <div className="flex justify-end">
+        <Button 
+          variant="outline" 
+          onClick={handleReset}
+          disabled={isResetting}
+        >
+          {isResetting && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
+          Reset to Default Colors
+        </Button>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="secondaryColor">Secondary Color</Label>
-        <div className="flex gap-2">
-          <Input
-            id="secondaryColor"
-            type="color"
-            value={colors.secondary}
-            onChange={(e) => handleColorChange('secondary', e.target.value)}
-            className="h-10 w-20"
-          />
-          <Input 
-            value={colors.secondary}
-            onChange={(e) => handleColorChange('secondary', e.target.value)}
-            placeholder="#000000"
-          />
-        </div>
-      </div>
+      <ColorInput
+        label="Primary Color"
+        id="primaryColor"
+        value={colors.primary}
+        onChange={(value) => handleColorChange('primary', value)}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor="accentColor">Accent Color</Label>
-        <div className="flex gap-2">
-          <Input
-            id="accentColor"
-            type="color"
-            value={colors.accent}
-            onChange={(e) => handleColorChange('accent', e.target.value)}
-            className="h-10 w-20"
-          />
-          <Input 
-            value={colors.accent}
-            onChange={(e) => handleColorChange('accent', e.target.value)}
-            placeholder="#000000"
-          />
-        </div>
-      </div>
+      <ColorInput
+        label="Secondary Color"
+        id="secondaryColor"
+        value={colors.secondary}
+        onChange={(value) => handleColorChange('secondary', value)}
+      />
+
+      <ColorInput
+        label="Accent Color"
+        id="accentColor"
+        value={colors.accent}
+        onChange={(value) => handleColorChange('accent', value)}
+      />
 
       <Separator className="my-4" />
 
-      <div className="space-y-2">
-        <Label htmlFor="backgroundColor">Background Color</Label>
-        <div className="flex gap-2">
-          <Input
-            id="backgroundColor"
-            type="color"
-            value={colors.background}
-            onChange={(e) => handleColorChange('background', e.target.value)}
-            className="h-10 w-20"
-          />
-          <Input 
-            value={colors.background}
-            onChange={(e) => handleColorChange('background', e.target.value)}
-            placeholder="#FFFFFF"
-          />
-        </div>
-      </div>
+      <ColorInput
+        label="Background Color"
+        id="backgroundColor"
+        value={colors.background}
+        onChange={(value) => handleColorChange('background', value)}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor="foregroundColor">Text Color</Label>
-        <div className="flex gap-2">
-          <Input
-            id="foregroundColor"
-            type="color"
-            value={colors.foreground}
-            onChange={(e) => handleColorChange('foreground', e.target.value)}
-            className="h-10 w-20"
-          />
-          <Input 
-            value={colors.foreground}
-            onChange={(e) => handleColorChange('foreground', e.target.value)}
-            placeholder="#000000"
-          />
-        </div>
-      </div>
+      <ColorInput
+        label="Text Color"
+        id="foregroundColor"
+        value={colors.foreground}
+        onChange={(value) => handleColorChange('foreground', value)}
+      />
 
       <Separator className="my-4" />
 
-      <div className="space-y-2">
-        <Label htmlFor="saleColor">Sale Color</Label>
-        <div className="flex gap-2">
-          <Input
-            id="saleColor"
-            type="color"
-            value={colors.sale}
-            onChange={(e) => handleColorChange('sale', e.target.value)}
-            className="h-10 w-20"
-          />
-          <Input 
-            value={colors.sale}
-            onChange={(e) => handleColorChange('sale', e.target.value)}
-            placeholder="#ea384c"
-          />
-        </div>
-      </div>
+      <ColorInput
+        label="Sale Color"
+        id="saleColor"
+        value={colors.sale}
+        onChange={(value) => handleColorChange('sale', value)}
+      />
 
-      <div className="space-y-2">
-        <Label htmlFor="discountColor">Discount Color</Label>
-        <div className="flex gap-2">
-          <Input
-            id="discountColor"
-            type="color"
-            value={colors.discount}
-            onChange={(e) => handleColorChange('discount', e.target.value)}
-            className="h-10 w-20"
-          />
-          <Input 
-            value={colors.discount}
-            onChange={(e) => handleColorChange('discount', e.target.value)}
-            placeholder="#ea384c"
-          />
-        </div>
-      </div>
+      <ColorInput
+        label="Discount Color"
+        id="discountColor"
+        value={colors.discount}
+        onChange={(value) => handleColorChange('discount', value)}
+      />
     </div>
   );
 };
