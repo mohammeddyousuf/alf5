@@ -6,12 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ColorInput } from "./theme/ColorInput";
 import { defaultColors } from "./theme/defaultColors";
 import { Button } from "@/components/ui/button";
-import { ReloadIcon } from "@radix-ui/react-icons";
-
-interface ThemeSettingsProps {
-  settings: any;
-  refetch: () => Promise<any>;
-}
+import { RefreshCw } from "lucide-react";
 
 export const ThemeSettings = ({ settings, refetch }: ThemeSettingsProps) => {
   const { toast } = useToast();
@@ -108,7 +103,7 @@ export const ThemeSettings = ({ settings, refetch }: ThemeSettingsProps) => {
           onClick={handleReset}
           disabled={isResetting}
         >
-          {isResetting && <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />}
+          {isResetting && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
           Reset to Default Colors
         </Button>
       </div>
@@ -168,3 +163,8 @@ export const ThemeSettings = ({ settings, refetch }: ThemeSettingsProps) => {
     </div>
   );
 };
+
+interface ThemeSettingsProps {
+  settings: any;
+  refetch: () => Promise<any>;
+}
