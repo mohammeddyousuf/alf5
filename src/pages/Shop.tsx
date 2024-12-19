@@ -42,6 +42,9 @@ const Shop = () => {
   const [selectedBrand, setSelectedBrand] = useState<string | null>(
     getUrlParam("brand")
   );
+  const [selectedLabel, setSelectedLabel] = useState<string | null>(
+    getUrlParam("label")
+  );
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Update URL when filters change
@@ -58,6 +61,7 @@ const Shop = () => {
       category: selectedCategory,
       subcategory: selectedSubcategory,
       brand: selectedBrand,
+      label: selectedLabel,
     });
   }, [
     searchQuery,
@@ -70,6 +74,7 @@ const Shop = () => {
     selectedCategory,
     selectedSubcategory,
     selectedBrand,
+    selectedLabel,
   ]);
 
   const { data: settings } = useQuery({
@@ -96,6 +101,7 @@ const Shop = () => {
       showSaleOnly,
       showDiscountOnly,
       showNewArrivalsOnly,
+      selectedLabel,
     ],
     queryFn: async () => {
       console.log("Fetching products with filters:", {
@@ -105,6 +111,7 @@ const Shop = () => {
         sale: showSaleOnly,
         discount: showDiscountOnly,
         newArrivals: showNewArrivalsOnly,
+        label: selectedLabel,
         priceRange,
       });
 
@@ -125,6 +132,10 @@ const Shop = () => {
 
       if (showFeaturedOnly) {
         query = query.eq("featured", true);
+      }
+
+      if (selectedLabel) {
+        query = query.eq("custom_label", selectedLabel);
       }
 
       if (showNewArrivalsOnly) {
@@ -156,6 +167,7 @@ const Shop = () => {
     showSaleOnly,
     showDiscountOnly,
     selectedBrand,
+    selectedLabel,
     settings,
   });
 
@@ -219,6 +231,8 @@ const Shop = () => {
                   setShowNewArrivalsOnly={setShowNewArrivalsOnly}
                   selectedBrand={selectedBrand}
                   setSelectedBrand={setSelectedBrand}
+                  selectedLabel={selectedLabel}
+                  setSelectedLabel={setSelectedLabel}
                 />
               </div>
             </SheetContent>
@@ -246,6 +260,8 @@ const Shop = () => {
             setShowNewArrivalsOnly={setShowNewArrivalsOnly}
             selectedBrand={selectedBrand}
             setSelectedBrand={setSelectedBrand}
+            selectedLabel={selectedLabel}
+            setSelectedLabel={setSelectedLabel}
           />
         </div>
 

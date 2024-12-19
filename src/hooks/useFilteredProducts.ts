@@ -7,6 +7,7 @@ interface FilterParams {
   showSaleOnly: boolean;
   showDiscountOnly: boolean;
   selectedBrand: string | null;
+  selectedLabel: string | null;
   settings: any;
 }
 
@@ -17,6 +18,7 @@ export const useFilteredProducts = ({
   showSaleOnly,
   showDiscountOnly,
   selectedBrand,
+  selectedLabel,
   settings,
 }: FilterParams) => {
   const isSaleValid = () => {
@@ -57,8 +59,9 @@ export const useFilteredProducts = ({
     const meetsSale = showSaleOnly ? isProductOnSale(product) : true;
     const meetsDiscount = showDiscountOnly ? hasDiscount(product) : true;
     const meetsBrand = selectedBrand ? product.brand === selectedBrand : true;
+    const meetsLabel = selectedLabel ? product.custom_label === selectedLabel : true;
 
-    return matchesSearch && meetsPrice && meetsSale && meetsDiscount && meetsBrand;
+    return matchesSearch && meetsPrice && meetsSale && meetsDiscount && meetsBrand && meetsLabel;
   });
 
   return { filteredProducts, isProductOnSale };

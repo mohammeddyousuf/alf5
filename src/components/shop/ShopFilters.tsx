@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { PriceRangeFilter } from "./filters/PriceRangeFilter";
 import { BrandFilter } from "./filters/BrandFilter";
+import { CustomLabelFilter } from "./filters/CustomLabelFilter";
 
 interface ShopFiltersProps {
   priceRange: [number, number];
@@ -32,6 +33,8 @@ interface ShopFiltersProps {
   setSelectedBrand: (brand: string | null) => void;
   showDiscountOnly: boolean;
   setShowDiscountOnly: (show: boolean) => void;
+  selectedLabel: string | null;
+  setSelectedLabel: (label: string | null) => void;
 }
 
 export function ShopFilters({
@@ -53,6 +56,8 @@ export function ShopFilters({
   setSelectedBrand,
   showDiscountOnly,
   setShowDiscountOnly,
+  selectedLabel,
+  setSelectedLabel,
 }: ShopFiltersProps) {
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -96,6 +101,22 @@ export function ShopFilters({
       
       const uniqueBrands = Array.from(new Set(data.map(p => p.brand))).filter(Boolean);
       return uniqueBrands;
+    },
+  });
+
+  const { data: labels } = useQuery({
+    queryKey: ["labels"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("custom_label")
+        .not("custom_label", "is", null)
+        .order("custom_label");
+      
+      if (error) throw error;
+      
+      const uniqueLabels = Array.from(new Set(data.map(p => p.custom_label))).filter(Boolean);
+      return uniqueLabels;
     },
   });
 
@@ -159,6 +180,14 @@ export function ShopFilters({
             </Select>
           </div>
         )}
+
+        <Separator />
+
+        <CustomLabelFilter
+          selectedLabel={selectedLabel}
+          setSelectedLabel={setSelectedLabel}
+          labels={labels}
+        />
 
         <Separator />
         
