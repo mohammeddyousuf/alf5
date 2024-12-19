@@ -19,7 +19,7 @@ const Index = () => {
       console.log("Fetching latest products");
       const { data, error } = await supabase
         .from("products")
-        .select("*")
+        .select("id, name, price, sale_price, discount_price, images, brand, custom_label")
         .eq("status", "published")
         .order("created_at", { ascending: false })
         .limit(8);
@@ -40,7 +40,7 @@ const Index = () => {
       console.log("Fetching featured products");
       const { data, error } = await supabase
         .from("products")
-        .select("*")
+        .select("id, name, price, sale_price, discount_price, images, brand, custom_label")
         .eq("status", "published")
         .eq("featured", true)
         .limit(8);
@@ -109,6 +109,7 @@ const Index = () => {
                   name={product.name}
                   price={product.price}
                   salePrice={product.sale_price}
+                  discountPrice={product.discount_price}
                   imageUrl={product.images?.[0]}
                   brand={product.brand}
                   customLabel={product.custom_label}
@@ -133,6 +134,7 @@ const Index = () => {
                     name={product.name}
                     price={product.price}
                     salePrice={product.sale_price}
+                    discountPrice={product.discount_price}
                     imageUrl={product.images?.[0]}
                     brand={product.brand}
                     customLabel={product.custom_label}
