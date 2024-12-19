@@ -11,8 +11,9 @@ import { handleProductImport, exportProducts } from "@/utils/productImportExport
 import { ProductHeader } from "@/components/admin/product/ProductHeader";
 import { useImageManagement } from "@/hooks/useImageManagement";
 import { ProductsContainer } from "@/components/admin/product/ProductsContainer";
-import { useQuery } from "@tanstack/react-query";
 import { useProducts } from "@/hooks/useProducts";
+import { ProductFilters } from "@/components/admin/product/ProductFilters";
+import { useQuery } from "@tanstack/react-query";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -20,6 +21,18 @@ const Products = () => {
   const isMobile = useIsMobile();
   const { totalImages, folderSize, fetchTotalImages } = useImageManagement();
   const { data: productsData } = useProducts();
+
+  // State for filters
+  const [search, setSearch] = useState("");
+  const [showSaleProducts, setShowSaleProducts] = useState(true);
+  const [showNonSaleProducts, setShowNonSaleProducts] = useState(true);
+  const [selectedBrand, setSelectedBrand] = useState("all");
+  const [sortBy, setSortBy] = useState("date-desc");
+  const [showFeatured, setShowFeatured] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedCustomLabel, setSelectedCustomLabel] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedSubcategory, setSelectedSubcategory] = useState("all");
 
   const [showImageManager, setShowImageManager] = useState(false);
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
@@ -58,29 +71,44 @@ const Products = () => {
     },
   });
 
-  const { data: categories } = useQuery({
-    queryKey: ["admin-categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("*")
-        .order("name");
-      if (error) throw error;
-      return data;
-    },
-  });
+  const handleStatusChange = async (id: string, currentStatus: string | null) => {
+    const { error } = await supabase
+      .from("products")
+      .update({ status: currentStatus })
+      .eq("id", id);
 
-  const { data: subcategories } = useQuery({
-    queryKey: ["admin-subcategories"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("subcategories")
-        .select("*")
-        .order("name");
-      if (error) throw error;
-      return data;
-    },
-  });
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update product status",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "Product status updated successfully",
+    });
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from("products").delete().eq("id", id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete product",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "Product deleted successfully",
+    });
+  };
 
   const handleAddProduct = () => {
     const currentCount = productsData?.length || 0;
@@ -113,7 +141,7 @@ const Products = () => {
   };
 
   const handleExport = () => {
-    exportProducts(productsData, categories, subcategories);
+    exportProducts(productsData);
   };
 
   return (
@@ -130,18 +158,56 @@ const Products = () => {
         isMobile={isMobile}
       />
 
+      <ProductFilters
+        search={search}
+        setSearch={setSearch}
+        showSaleProducts={showSaleProducts}
+        setShowSaleProducts={setShowSaleProducts}
+        showNonSaleProducts={showNonSaleProducts}
+        setShowNonSaleProducts={setShowNonSaleProducts}
+        selectedBrand={selectedBrand}
+        setSelectedBrand={setSelectedBrand}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        showFeatured={showFeatured}
+        setShowFeatured={setShowFeatured}
+        selectedStatus={selectedStatus}
+        setSelectedStatus={setSelectedStatus}
+        selectedCustomLabel={selectedCustomLabel}
+        setSelectedCustomLabel={setSelectedCustomLabel}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        selectedSubcategory={selectedSubcategory}
+        setSelectedSubcategory={setSelectedSubcategory}
+      />
+
+      <GlobalSaleControls />
+
+      <ProductsContainer 
+        products={productsData}
+        search={search}
+        showSaleProducts={showSaleProducts}
+        showNonSaleProducts={showNonSaleProducts}
+        selectedBrand={selectedBrand}
+        sortBy={sortBy}
+        showFeatured={showFeatured}
+        selectedStatus={selectedStatus}
+        selectedCustomLabel={selectedCustomLabel}
+        selectedCategory={selectedCategory}
+        selectedSubcategory={selectedSubcategory}
+        onStatusChange={handleStatusChange}
+        onDelete={handleDelete}
+        onSuccess={async () => {
+          await fetchTotalImages();
+        }}
+      />
+
       <ImageManagementDialog
         open={showImageManager}
         onOpenChange={setShowImageManager}
         onImageUpload={fetchTotalImages}
         folderSize={folderSize}
       />
-
-      <GlobalSaleControls />
-
-      <ProductsContainer onSuccess={async () => {
-        await fetchTotalImages();
-      }} />
 
       <LimitExceededDialog
         open={showLimitExceeded}
