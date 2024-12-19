@@ -158,22 +158,32 @@ export function ImageManagementDialog({
             </SheetTitle>
           </SheetHeader>
 
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => {
-              if (e.target.files && e.target.files.length > 0) {
-                handleDrop({ 
-                  preventDefault: () => {},
-                  dataTransfer: { files: e.target.files } 
-                } as any);
-              }
-              e.target.value = '';
-            }}
-            className="hidden"
-            id="bulk-upload-dialog"
-          />
+          <div className="mb-4">
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  handleDrop({ 
+                    preventDefault: () => {},
+                    dataTransfer: { files: e.target.files } 
+                  } as any);
+                }
+                e.target.value = '';
+              }}
+              className="hidden"
+              id="bulk-upload-dialog"
+            />
+            <label htmlFor="bulk-upload-dialog">
+              <Button variant="outline" className="w-full cursor-pointer" asChild>
+                <div className="flex items-center justify-center gap-2">
+                  <Upload className="h-4 w-4" />
+                  Upload Images
+                </div>
+              </Button>
+            </label>
+          </div>
 
           <SearchAndSort
             searchQuery={searchQuery}
@@ -184,8 +194,8 @@ export function ImageManagementDialog({
             onShowUnassignedChange={setShowUnassigned}
           />
 
-          <div className="flex-1 min-h-0 mt-2">
-            <ScrollArea className="h-[calc(100vh-280px)]">
+          <div className="flex-1 min-h-0 mt-4">
+            <ScrollArea className="h-[calc(100vh-350px)]">
               {isLoading ? (
                 <div className="flex justify-center items-center h-32">
                   <Loader2 className="h-6 w-6 animate-spin" />

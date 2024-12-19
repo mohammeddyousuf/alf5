@@ -75,10 +75,10 @@ export function ImageTable({
   }
 
   return (
-    <div className="bg-background rounded-md">
+    <div className="rounded-lg">
       <Table>
         <TableHeader>
-          <TableRow className="hover:bg-transparent">
+          <TableRow className="hover:bg-transparent border-b">
             <TableHead className="w-[50px]">
               <Checkbox 
                 checked={selectedImages.length === sortedImages.length && sortedImages.length > 0}
@@ -93,7 +93,7 @@ export function ImageTable({
         </TableHeader>
         <TableBody>
           {sortedImages.map((image) => (
-            <TableRow key={image.name} className="hover:bg-muted/50">
+            <TableRow key={image.name} className="border-b last:border-0">
               <TableCell>
                 <Checkbox 
                   checked={selectedImages.includes(image.name)}
@@ -109,15 +109,11 @@ export function ImageTable({
               </TableCell>
               <TableCell className="font-medium">{image.name}</TableCell>
               <TableCell>
-                {image.usage && image.usage.length > 0 ? (
-                  image.usage.map((item: any, index: number) => (
-                    <span key={index} className="block text-sm text-muted-foreground">
-                      {item.type}: {item.name}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-sm text-muted-foreground">Not in use</span>
-                )}
+                {image.usage?.map((item: any, index: number) => (
+                  <span key={index} className="block text-sm text-muted-foreground">
+                    {item.type}: {item.name}
+                  </span>
+                ))}
               </TableCell>
               <TableCell>
                 <Button
