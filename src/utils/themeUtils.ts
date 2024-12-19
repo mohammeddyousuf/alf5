@@ -61,6 +61,12 @@ export const updateThemeColor = (colorKey: string, value: string) => {
     case 'foreground':
       root.style.setProperty('--foreground', hslValue);
       break;
+    case 'sale':
+      root.style.setProperty('--sale', hslValue);
+      break;
+    case 'discount':
+      root.style.setProperty('--discount', hslValue);
+      break;
   }
 };
 
@@ -83,5 +89,11 @@ export const initializeThemeColors = (settings: any) => {
   }
   if (settings.foreground_color) {
     updateThemeColor('foreground', settings.foreground_color);
+  }
+  if (settings.sale_color) {
+    updateThemeColor('sale', settings.sale_color);
+  }
+  if (settings.discount_color) {
+    updateThemeColor('discount', settings.discount_color);
   }
 };

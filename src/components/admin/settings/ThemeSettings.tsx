@@ -19,6 +19,8 @@ export const ThemeSettings = ({ settings, refetch }: ThemeSettingsProps) => {
     accent: settings?.accent_color || "#6E59A5",
     background: settings?.background_color || "#FFFFFF",
     foreground: settings?.foreground_color || "#000000",
+    sale: settings?.sale_color || "#ea384c",
+    discount: settings?.discount_color || "#ea384c",
   });
 
   useEffect(() => {
@@ -143,6 +145,44 @@ export const ThemeSettings = ({ settings, refetch }: ThemeSettingsProps) => {
             value={colors.foreground}
             onChange={(e) => handleColorChange('foreground', e.target.value)}
             placeholder="#000000"
+          />
+        </div>
+      </div>
+
+      <Separator className="my-4" />
+
+      <div className="space-y-2">
+        <Label htmlFor="saleColor">Sale Color</Label>
+        <div className="flex gap-2">
+          <Input
+            id="saleColor"
+            type="color"
+            value={colors.sale}
+            onChange={(e) => handleColorChange('sale', e.target.value)}
+            className="h-10 w-20"
+          />
+          <Input 
+            value={colors.sale}
+            onChange={(e) => handleColorChange('sale', e.target.value)}
+            placeholder="#ea384c"
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="discountColor">Discount Color</Label>
+        <div className="flex gap-2">
+          <Input
+            id="discountColor"
+            type="color"
+            value={colors.discount}
+            onChange={(e) => handleColorChange('discount', e.target.value)}
+            className="h-10 w-20"
+          />
+          <Input 
+            value={colors.discount}
+            onChange={(e) => handleColorChange('discount', e.target.value)}
+            placeholder="#ea384c"
           />
         </div>
       </div>
