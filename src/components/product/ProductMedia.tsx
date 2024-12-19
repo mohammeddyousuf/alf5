@@ -55,12 +55,22 @@ export const ProductMedia = ({
     discountPrice !== null && 
     discountPrice < price;
 
+  const getImageUrl = (fileName: string) => {
+    if (fileName.startsWith('http')) {
+      return fileName;
+    }
+    const { data: { publicUrl } } = supabase.storage
+      .from("product-images")
+      .getPublicUrl(fileName);
+    return publicUrl;
+  };
+
   return (
     <div className="relative">
       {images && images.length > 0 && (
         <div className="relative">
           <img
-            src={images[0]}
+            src={getImageUrl(images[0])}
             alt={productName}
             className="w-full rounded-lg"
           />
@@ -110,7 +120,7 @@ export const ProductMedia = ({
           {images.slice(1).map((image, index) => (
             <img
               key={index}
-              src={image}
+              src={getImageUrl(image)}
               alt={`${productName} ${index + 2}`}
               className="w-full rounded-lg"
             />
