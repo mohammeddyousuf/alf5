@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SaleCountdownProps {
   endDate: string;
@@ -16,6 +18,21 @@ export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
   
   const queryClient = useQueryClient();
 
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("*")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
 
@@ -24,7 +41,6 @@ export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
         const difference = new Date(endDate).getTime() - new Date().getTime();
         
         if (difference <= 0) {
-          // Immediately invalidate queries and refetch when timer expires
           console.log("Sale timer expired - invalidating queries");
           queryClient.invalidateQueries({ queryKey: ["settings"] });
           queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -47,28 +63,22 @@ export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
       const newTimeLeft = calculateTimeLeft();
       setTimeLeft(newTimeLeft);
       
-      // If timer has expired, clear the interval and force refetch
       if (newTimeLeft.days === 0 && 
           newTimeLeft.hours === 0 && 
           newTimeLeft.minutes === 0 && 
           newTimeLeft.seconds === 0) {
         clearInterval(timer);
-        // Force an immediate refetch
         queryClient.refetchQueries({ queryKey: ["settings"] });
         queryClient.refetchQueries({ queryKey: ["products"] });
       }
     };
 
-    // Initial calculation
     updateTimer();
-
-    // Update every second
     timer = setInterval(updateTimer, 1000);
 
     return () => clearInterval(timer);
   }, [endDate, queryClient]);
 
-  // Don't render if all values are 0
   if (timeLeft.days === 0 && 
       timeLeft.hours === 0 && 
       timeLeft.minutes === 0 && 
@@ -76,11 +86,16 @@ export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
     return null;
   }
 
-  // Format numbers to ensure consistent width
   const formatNumber = (num: number) => num.toString().padStart(2, '0');
 
   return (
-    <div className={`bg-destructive text-destructive-foreground px-2 py-1 rounded-md text-xs font-mono tabular-nums ${className}`}>
+    <div 
+      className={`text-destructive-foreground px-2 py-1 rounded-md text-xs font-mono tabular-nums ${className}`}
+      style={{ 
+        backgroundColor: settings?.sale_color || '#ea384c',
+        color: 'white'
+      }}
+    >
       {formatNumber(timeLeft.days)}d {formatNumber(timeLeft.hours)}h {formatNumber(timeLeft.minutes)}m {formatNumber(timeLeft.seconds)}s
     </div>
   );
