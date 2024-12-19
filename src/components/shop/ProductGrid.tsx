@@ -5,6 +5,7 @@ interface Product {
   name: string;
   price: number;
   sale_price: number | null;
+  discount_price: number | null;
   images: string[];
   brand: string | null;
   custom_label: string | null;
@@ -32,6 +33,7 @@ export function ProductGrid({ products }: ProductGridProps) {
           name={product.name}
           price={product.price}
           salePrice={product.sale_price}
+          discountPrice={product.discount_price}
           imageUrl={product.images?.[0]}
           brand={product.brand}
           customLabel={product.custom_label}

@@ -105,7 +105,7 @@ const Shop = () => {
 
       let query = supabase
         .from("products")
-        .select("*")
+        .select("id, name, price, sale_price, discount_price, images, brand, custom_label, category_id, subcategory_id, featured, created_at")
         .eq("status", "published");
 
       if (selectedCategory) {
@@ -273,7 +273,7 @@ const Shop = () => {
 
         <div className="flex-1">
           <SearchBar value={searchQuery} onChange={setSearchQuery} />
-          <ProductGrid products={filteredProducts} />
+          <ProductGrid products={sortedProducts} />
         </div>
       </div>
     </div>
