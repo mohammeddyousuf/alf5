@@ -136,9 +136,8 @@ export const exportProducts = async (
 ): Promise<void> => {
   if (!products) return;
 
-  // Add template row for new products
   const templateProduct = {
-    id: '', // Leave empty for new products
+    id: '',
     name: 'New Product Name',
     description: 'Product Description',
     price: '0',
@@ -149,11 +148,10 @@ export const exportProducts = async (
     featured: 'false',
     brand: '',
     custom_label: '',
-    category_id: '',
-    subcategory_id: '',
+    category_name: '',
+    subcategory_name: '',
   };
 
-  // Get category and subcategory names
   const getCategoryName = (id: string | null) => {
     if (!id || !categories) return '';
     const category = categories.find(c => c.id === id);
@@ -178,9 +176,7 @@ export const exportProducts = async (
     featured: product.featured ? 'true' : 'false',
     brand: product.brand || '',
     custom_label: product.custom_label || '',
-    category_id: product.category_id || '',
     category_name: getCategoryName(product.category_id),
-    subcategory_id: product.subcategory_id || '',
     subcategory_name: getSubcategoryName(product.subcategory_id),
   }));
 
