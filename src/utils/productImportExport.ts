@@ -14,8 +14,8 @@ interface CSVProduct {
   featured?: boolean | string | null;
   brand?: string | null;
   custom_label?: string | null;
-  category_id?: string | null;
-  subcategory_id?: string | null;
+  category?: string | null;
+  subcategory?: string | null;
 }
 
 const convertToBoolean = (value: string | boolean | null | undefined): boolean => {
@@ -76,6 +76,18 @@ export const handleProductImport = async (
             return;
           }
 
+          // Fetch categories and subcategories for mapping
+          const { data: categories } = await supabase
+            .from('categories')
+            .select('id, name');
+          
+          const { data: subcategories } = await supabase
+            .from('subcategories')
+            .select('id, name');
+
+          const categoryMap = new Map(categories?.map(cat => [cat.name, cat.id]));
+          const subcategoryMap = new Map(subcategories?.map(subcat => [subcat.name, subcat.id]));
+
           let updatedCount = 0;
 
           for (const product of validProducts) {
@@ -90,12 +102,11 @@ export const handleProductImport = async (
               featured: convertToBoolean(product.featured),
               brand: product.brand || null,
               custom_label: product.custom_label || null,
-              category_id: product.category_id || null,
-              subcategory_id: product.subcategory_id || null,
+              category_id: product.category ? categoryMap.get(product.category) : null,
+              subcategory_id: product.subcategory ? subcategoryMap.get(product.subcategory) : null,
             };
 
             if (product.id) {
-              // Update existing product
               const { error: updateError } = await supabase
                 .from("products")
                 .update(processedProduct)
@@ -106,7 +117,6 @@ export const handleProductImport = async (
                 continue;
               }
             } else {
-              // Insert new product
               const { error: insertError } = await supabase
                 .from("products")
                 .insert([processedProduct]);
@@ -131,15 +141,19 @@ export const handleProductImport = async (
   });
 };
 
-export const exportProducts = (
-  products: ProductsRow[] | undefined,
-  categories: any[] | undefined,
+export const exportProducts = async (
+  products: ProductsRow[] | undefined, 
+  categories: any[] | undefined, 
   subcategories: any[] | undefined
 ) => {
   if (!products) return;
 
+  // Create maps for category and subcategory lookups
+  const categoryMap = new Map(categories?.map(cat => [cat.id, cat.name]));
+  const subcategoryMap = new Map(subcategories?.map(subcat => [subcat.id, subcat.name]));
+
   const exportProducts = products.map(product => ({
-    id: product.id, // Include ID in export
+    id: product.id,
     name: product.name,
     description: product.description,
     price: product.price,
@@ -152,8 +166,8 @@ export const exportProducts = (
     featured: product.featured,
     brand: product.brand,
     custom_label: product.custom_label,
-    category_id: product.category_id,
-    subcategory_id: product.subcategory_id
+    category: product.category_id ? categoryMap.get(product.category_id) : null,
+    subcategory: product.subcategory_id ? subcategoryMap.get(product.subcategory_id) : null
   }));
 
   const csv = Papa.unparse(exportProducts);
