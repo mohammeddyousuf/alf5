@@ -3,6 +3,21 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
 export const NewsTickerBanner = () => {
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("website_name")
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const { data: newsItems, isLoading } = useQuery({
     queryKey: ["news-ticker"],
     queryFn: async () => {
@@ -19,8 +34,10 @@ export const NewsTickerBanner = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-primary text-primary-foreground py-2 flex items-center justify-center">
-        <Loader2 className="h-4 w-4 animate-spin" />
+      <div className="bg-primary text-primary-foreground py-2">
+        <div className="animate-marquee whitespace-nowrap">
+          <span className="mx-4">Welcome to {settings?.website_name || 'our store'}</span>
+        </div>
       </div>
     );
   }
