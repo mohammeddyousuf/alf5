@@ -92,7 +92,6 @@ export const handleProductImport = async (
             };
 
             if (product.id) {
-              // Update existing product
               const { error: updateError } = await supabase
                 .from("products")
                 .update(processedProduct)
@@ -103,7 +102,6 @@ export const handleProductImport = async (
                 continue;
               }
             } else {
-              // Insert new product
               const { error: insertError } = await supabase
                 .from("products")
                 .insert([processedProduct]);
@@ -144,6 +142,7 @@ export const exportProducts = async (
       const categoryMap = new Map(categories?.map(cat => [cat.id, cat.name]));
       const subcategoryMap = new Map(subcategories?.map(subcat => [subcat.id, subcat.name]));
 
+      // Create export data with existing products
       const exportProducts = products.map(product => ({
         id: product.id,
         name: product.name,
@@ -162,8 +161,37 @@ export const exportProducts = async (
         subcategory: subcategoryMap.get(product.subcategory_id || '') || ''
       }));
 
+      // Add a template row for new products
+      exportProducts.push({
+        id: '', // Leave empty for new products
+        name: 'New Product Name',
+        description: 'Product Description',
+        price: 0,
+        discount_price: null,
+        sale_price: null,
+        images: [],
+        status: 'draft',
+        featured: false,
+        brand: '',
+        custom_label: '',
+        category: '',
+        subcategory: ''
+      });
+
       const csv = Papa.unparse(exportProducts);
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      
+      // Add instructions at the top of the CSV
+      const instructions = `
+# Instructions for editing and adding products:
+# 1. For existing products: Keep the ID to update them
+# 2. For new products: Remove the ID or leave it empty
+# 3. Status can be: draft, published, or archived
+# 4. Featured should be true or false
+# 5. Images should be comma-separated filenames
+# 6. Price must be a whole number
+# 7. Use the last row as a template for new products\n\n`;
+
+      const blob = new Blob([instructions + csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
