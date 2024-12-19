@@ -141,7 +141,7 @@ export function ImageManagementDialog({
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent 
-          className="w-[90vw] sm:max-w-[900px]"
+          className="w-[90vw] sm:max-w-[900px] flex flex-col"
           onDragOver={(e) => {
             e.preventDefault();
             setIsDragging(true);
@@ -194,34 +194,38 @@ export function ImageManagementDialog({
             onShowUnassignedChange={setShowUnassigned}
           />
 
-          <ScrollArea className="h-[calc(100vh-350px)] mt-6">
-            {isLoading ? (
-              <div className="flex justify-center items-center h-32">
-                <Loader2 className="h-6 w-6 animate-spin" />
-              </div>
-            ) : (
-              <div 
-                className={`rounded-lg transition-colors ${
-                  isDragging ? 'bg-muted/50 border-2 border-dashed border-primary' : ''
-                }`}
-              >
-                <ImageTable
-                  images={paginatedImages}
-                  isDeleting={isDeleting}
-                  onDeleteClick={setImagesToDelete}
-                  sortOrder={sortOrder}
-                  showUnassigned={showUnassigned}
-                />
-              </div>
-            )}
-          </ScrollArea>
+          <div className="flex-1 flex flex-col min-h-0 mt-6">
+            <ScrollArea className="flex-1">
+              {isLoading ? (
+                <div className="flex justify-center items-center h-32">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              ) : (
+                <div 
+                  className={`rounded-lg transition-colors ${
+                    isDragging ? 'bg-muted/50 border-2 border-dashed border-primary' : ''
+                  }`}
+                >
+                  <ImageTable
+                    images={paginatedImages}
+                    isDeleting={isDeleting}
+                    onDeleteClick={setImagesToDelete}
+                    sortOrder={sortOrder}
+                    showUnassigned={showUnassigned}
+                  />
+                </div>
+              )}
+            </ScrollArea>
 
-          <ImagePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            totalImages={totalImages}
-          />
+            <div className="mt-4 pt-4 border-t">
+              <ImagePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                totalImages={totalImages}
+              />
+            </div>
+          </div>
         </SheetContent>
       </Sheet>
 
