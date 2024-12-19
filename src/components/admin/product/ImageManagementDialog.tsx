@@ -141,7 +141,7 @@ export function ImageManagementDialog({
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent 
-          className="w-[90vw] sm:max-w-[900px] flex flex-col"
+          className="w-[90vw] sm:max-w-[900px] flex flex-col h-full max-h-screen p-4"
           onDragOver={(e) => {
             e.preventDefault();
             setIsDragging(true);
@@ -149,7 +149,7 @@ export function ImageManagementDialog({
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
         >
-          <SheetHeader>
+          <SheetHeader className="mb-4">
             <SheetTitle className="flex justify-between items-center">
               Product Images
               <span className="text-sm font-normal text-muted-foreground">
@@ -158,7 +158,7 @@ export function ImageManagementDialog({
             </SheetTitle>
           </SheetHeader>
 
-          <div className="mt-6">
+          <div className="mb-4">
             <input
               type="file"
               accept="image/*"
@@ -194,8 +194,8 @@ export function ImageManagementDialog({
             onShowUnassignedChange={setShowUnassigned}
           />
 
-          <div className="flex-1 flex flex-col min-h-0 mt-6">
-            <ScrollArea className="flex-1">
+          <div className="flex-1 min-h-0 mt-4">
+            <ScrollArea className="h-[calc(100vh-350px)]">
               {isLoading ? (
                 <div className="flex justify-center items-center h-32">
                   <Loader2 className="h-6 w-6 animate-spin" />
@@ -216,15 +216,15 @@ export function ImageManagementDialog({
                 </div>
               )}
             </ScrollArea>
+          </div>
 
-            <div className="mt-4 pt-4 border-t">
-              <ImagePagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-                totalImages={totalImages}
-              />
-            </div>
+          <div className="mt-4 pt-4 border-t">
+            <ImagePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              totalImages={totalImages}
+            />
           </div>
         </SheetContent>
       </Sheet>
