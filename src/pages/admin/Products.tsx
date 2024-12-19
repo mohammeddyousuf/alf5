@@ -12,12 +12,14 @@ import { ProductHeader } from "@/components/admin/product/ProductHeader";
 import { useImageManagement } from "@/hooks/useImageManagement";
 import { ProductsContainer } from "@/components/admin/product/ProductsContainer";
 import { useQuery } from "@tanstack/react-query";
+import { useProducts } from "@/hooks/useProducts";
 
 const Products = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const { totalImages, folderSize, fetchTotalImages } = useImageManagement();
+  const { data: productsData } = useProducts();
 
   const [showImageManager, setShowImageManager] = useState(false);
   const [showLimitExceeded, setShowLimitExceeded] = useState(false);
@@ -81,7 +83,7 @@ const Products = () => {
   });
 
   const handleAddProduct = () => {
-    const currentCount = products?.length || 0;
+    const currentCount = productsData?.length || 0;
     const limit = systemLimits?.product_limit || 100;
     if (currentCount >= limit) {
       setShowLimitExceeded(true);
@@ -95,7 +97,7 @@ const Products = () => {
     if (!file) return;
 
     try {
-      const importedCount = await handleProductImport(file, products, systemLimits);
+      const importedCount = await handleProductImport(file, productsData, systemLimits);
       toast({
         title: "Success",
         description: `${importedCount} products imported/updated successfully`,
@@ -111,13 +113,13 @@ const Products = () => {
   };
 
   const handleExport = () => {
-    exportProducts(products, categories, subcategories);
+    exportProducts(productsData, categories, subcategories);
   };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
       <ProductHeader 
-        productsCount={products?.length || 0}
+        productsCount={productsData?.length || 0}
         totalImages={totalImages}
         folderSize={folderSize}
         systemLimits={systemLimits}
@@ -144,7 +146,7 @@ const Products = () => {
       <LimitExceededDialog
         open={showLimitExceeded}
         onOpenChange={setShowLimitExceeded}
-        currentCount={products?.length || 0}
+        currentCount={productsData?.length || 0}
         limit={systemLimits?.product_limit || 100}
       />
 

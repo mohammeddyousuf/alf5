@@ -37,6 +37,10 @@ export const ProductsContainer = ({
   const deleteProduct = useDeleteProduct();
   const { handleStatusChange } = useProductManagement(onSuccess);
 
+  const handleSuccess = async () => {
+    await onSuccess();
+  };
+
   return (
     <>
       <ProductFilters
@@ -76,7 +80,7 @@ export const ProductsContainer = ({
         selectedSubcategory={selectedSubcategory}
         onStatusChange={handleStatusChange}
         onDelete={(id) => deleteProduct.mutate(id)}
-        onSuccess={onSuccess}
+        onSuccess={handleSuccess}
       />
     </>
   );
