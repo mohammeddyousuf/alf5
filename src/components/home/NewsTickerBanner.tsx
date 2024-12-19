@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
 
 export const NewsTickerBanner = () => {
   const { data: settings } = useQuery({
@@ -8,7 +7,7 @@ export const NewsTickerBanner = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("settings")
-        .select("website_name")
+        .select("website_name, show_news_ticker")
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -32,8 +31,13 @@ export const NewsTickerBanner = () => {
     },
   });
 
+  // Don't show the banner if news ticker is disabled in settings
+  if (settings?.show_news_ticker === false) {
+    return null;
+  }
+
   // Always show welcome message, followed by news items if they exist
-  const welcomeMessage = `Welcome to ${settings?.website_name || 'our store'}`;
+  const welcomeMessage = `Welcome to ${settings?.website_name || 'our store'}.`;
   const displayItems = newsItems?.length 
     ? [welcomeMessage, ...newsItems.map(item => item.message)]
     : [welcomeMessage];
