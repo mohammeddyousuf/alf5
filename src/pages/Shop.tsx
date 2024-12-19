@@ -20,7 +20,9 @@ const Shop = () => {
 
   // Initialize state from URL parameters or location state
   const [searchQuery, setSearchQuery] = useState(getUrlParam("search") || "");
-  const [priceRange, setPriceRange] = useState([
+  
+  // Initialize priceRange as a tuple with two numbers
+  const [priceRange, setPriceRange] = useState<[number, number]>([
     Number(getUrlParam("minPrice")) || 0,
     Number(getUrlParam("maxPrice")) || 0,
   ]);

@@ -2,8 +2,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
 interface PriceRangeFilterProps {
-  priceRange: number[];
-  setPriceRange: (range: number[]) => void;
+  priceRange: [number, number];
+  setPriceRange: (range: [number, number]) => void;
 }
 
 export function PriceRangeFilter({ priceRange, setPriceRange }: PriceRangeFilterProps) {
