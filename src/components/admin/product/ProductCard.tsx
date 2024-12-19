@@ -105,7 +105,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
   };
 
   return (
-    <Card key={product.id} className="p-4">
+    <Card key={product.id} className="p-4 flex flex-col h-full">
       <ProductImage 
         images={product.images}
         name={product.name}
@@ -117,30 +117,32 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
         customLabel={product.custom_label}
       />
       
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="font-semibold">{product.name}</h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onStatusChange(product.id, product.status)}
-          className="hover:bg-transparent"
-        >
-          <Badge
-            variant={getStatusBadgeVariant(product.status)}
-            className="cursor-pointer"
+      <div className="flex-1 flex flex-col min-h-[120px]">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-semibold line-clamp-2">{product.name}</h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onStatusChange(product.id, product.status)}
+            className="hover:bg-transparent shrink-0 ml-2"
           >
-            {product.status || "draft"}
-          </Badge>
-        </Button>
+            <Badge
+              variant={getStatusBadgeVariant(product.status)}
+              className="cursor-pointer"
+            >
+              {product.status || "draft"}
+            </Badge>
+          </Button>
+        </div>
+
+        <ProductPrice 
+          price={product.price}
+          discountPrice={shouldShowDiscountPrice() ? product.discount_price : null}
+          salePrice={shouldShowSalePrice() ? product.sale_price : null}
+        />
       </div>
 
-      <ProductPrice 
-        price={product.price}
-        discountPrice={shouldShowDiscountPrice() ? product.discount_price : null}
-        salePrice={shouldShowSalePrice() ? product.sale_price : null}
-      />
-
-      <div className="flex gap-2">
+      <div className="flex gap-2 mt-4">
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="default" className="flex-1">
