@@ -22,6 +22,9 @@ export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
         const difference = new Date(endDate).getTime() - new Date().getTime();
         
         if (difference <= 0) {
+          // Invalidate queries when timer expires
+          queryClient.invalidateQueries({ queryKey: ["settings"] });
+          queryClient.invalidateQueries({ queryKey: ["products"] });
           return { days: 0, hours: 0, minutes: 0, seconds: 0 };
         }
 
@@ -45,14 +48,12 @@ export function SaleCountdown({ endDate, className = "" }: SaleCountdownProps) {
       const newTimeLeft = calculateTimeLeft();
       setTimeLeft(newTimeLeft);
       
-      // If timer has expired, clear the interval and invalidate queries
+      // If timer has expired, clear the interval
       if (newTimeLeft.days === 0 && 
           newTimeLeft.hours === 0 && 
           newTimeLeft.minutes === 0 && 
           newTimeLeft.seconds === 0) {
         clearInterval(timer);
-        // Invalidate settings query to trigger a refetch
-        queryClient.invalidateQueries({ queryKey: ["settings"] });
       }
     }, 1000);
 
