@@ -97,7 +97,7 @@ export const ThemeSettings = ({ settings, refetch }: ThemeSettingsProps) => {
 
   return (
     <div className="grid gap-4">
-      <div className="flex justify-end">
+      <div className="flex justify-center">
         <Button 
           variant="outline" 
           onClick={handleReset}
