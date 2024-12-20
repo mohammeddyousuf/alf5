@@ -222,6 +222,14 @@ export function ImageManagementDialog({
             <div className="flex justify-between items-center gap-2">
               <SheetTitle>Product Images</SheetTitle>
               <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  multiple
+                  className="hidden"
+                  onChange={handleFileInput}
+                  accept="image/*"
+                />
                 {imagesToDelete.length > 0 && (
                   <Button 
                     variant="destructive"
@@ -237,14 +245,6 @@ export function ImageManagementDialog({
                     Delete Selected ({imagesToDelete.length})
                   </Button>
                 )}
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  multiple
-                  className="hidden"
-                  onChange={handleFileInput}
-                  accept="image/*"
-                />
                 <Button 
                   variant="outline" 
                   onClick={handleUploadClick}
@@ -291,27 +291,6 @@ export function ImageManagementDialog({
                     isDragging ? 'bg-muted/50 border-2 border-dashed border-primary' : ''
                   }`}
                 >
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    multiple
-                    className="hidden"
-                    onChange={handleFileInput}
-                    accept="image/*"
-                  />
-                  <Button 
-                    variant="outline" 
-                    className="w-full mb-4"
-                    onClick={handleUploadClick}
-                    disabled={isUploading}
-                  >
-                    {isUploading ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    ) : (
-                      <Upload className="h-4 w-4 mr-2" />
-                    )}
-                    {isUploading ? "Uploading..." : "Upload Images"}
-                  </Button>
                   <ImageTable
                     images={paginatedImages}
                     isDeleting={isDeleting}
