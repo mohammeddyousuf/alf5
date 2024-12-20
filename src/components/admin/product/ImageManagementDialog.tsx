@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchAndSort } from "./image-management/SearchAndSort";
 import { ImageTable } from "./image-management/ImageTable";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useImageManagement } from "./hooks/useImageManagement";
 import { ImagePagination } from "./image-management/ImagePagination";
 
@@ -26,6 +26,7 @@ export function ImageManagementDialog({
   folderSize 
 }: ImageManagementDialogProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -75,6 +76,7 @@ export function ImageManagementDialog({
 
       await loadImages();
       onImageUpload();
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -115,6 +117,7 @@ export function ImageManagementDialog({
       
       await loadImages();
       onImageUpload();
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -127,6 +130,8 @@ export function ImageManagementDialog({
   useEffect(() => {
     if (open) {
       loadImages();
+    } else {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     }
   }, [open]);
 
