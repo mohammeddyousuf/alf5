@@ -142,9 +142,17 @@ export function ImageManagementDialog({
     searchQuery
   );
 
+  const handleOpenChange = (newOpen: boolean) => {
+    // Only allow closing through the explicit close button
+    if (newOpen === false) {
+      return;
+    }
+    onOpenChange(newOpen);
+  };
+
   return (
     <>
-      <Sheet open={open} onOpenChange={onOpenChange}>
+      <Sheet open={open} onOpenChange={handleOpenChange}>
         <SheetContent 
           className="w-[90vw] sm:max-w-[900px] flex flex-col h-full max-h-screen p-4"
           onDragOver={(e) => {
@@ -155,12 +163,19 @@ export function ImageManagementDialog({
           onDrop={handleDrop}
         >
           <SheetHeader className="mb-2">
-            <SheetTitle className="flex justify-between items-center">
-              Product Images
-              <span className="text-sm font-normal text-muted-foreground">
-                Total images: {images.length} • Folder size: {(folderSize / (1024 * 1024)).toFixed(2)} MB / {systemLimits?.max_folder_size_mb || '...'} MB
-              </span>
-            </SheetTitle>
+            <div className="flex justify-between items-center">
+              <SheetTitle>Product Images</SheetTitle>
+              <Button 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+                className="ml-auto"
+              >
+                Close
+              </Button>
+            </div>
+            <span className="text-sm font-normal text-muted-foreground">
+              Total images: {images.length} • Folder size: {(folderSize / (1024 * 1024)).toFixed(2)} MB / {systemLimits?.max_folder_size_mb || '...'} MB
+            </span>
           </SheetHeader>
 
           <SearchAndSort
