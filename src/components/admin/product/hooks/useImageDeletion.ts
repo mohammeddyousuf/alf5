@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export const useImageDeletion = (onImageUpload: () => void) => {
+export const useImageDeletion = (onImageUpload: () => void, loadImages?: () => Promise<void>) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -62,6 +62,11 @@ export const useImageDeletion = (onImageUpload: () => void) => {
         description: `${imagesToDelete.length} image(s) deleted successfully`
       });
 
+      // Refresh the images list
+      if (loadImages) {
+        await loadImages();
+      }
+      
       onImageUpload();
       queryClient.invalidateQueries({ queryKey: ["products"] });
     } catch (error: any) {

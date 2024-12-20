@@ -42,7 +42,7 @@ export function ImageManagementDialog({
     getPaginatedImages
   } = useImageManagement();
 
-  const { isDeleting, handleDelete } = useImageDeletion(onImageUpload);
+  const { isDeleting, handleDelete } = useImageDeletion(onImageUpload, loadImages);
 
   const { data: systemLimits } = useQuery({
     queryKey: ["system-limits"],
