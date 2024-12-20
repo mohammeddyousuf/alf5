@@ -5,11 +5,12 @@ import { z } from "zod";
 import { productFormSchema } from "./schema";
 import { Button } from "@/components/ui/button";
 import { ImagePlus, Loader2, X } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { ImageDeleteDialog } from "./ImageDeleteDialog";
 import { useQueryClient } from "@tanstack/react-query";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 type FormData = z.infer<typeof productFormSchema>;
 
@@ -23,25 +24,60 @@ export function MediaFields({ form }: MediaFieldsProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState<Record<number, boolean>>({});
   const [imageToDelete, setImageToDelete] = useState<{ index: number; url: string } | null>(null);
+  const [duplicateFile, setDuplicateFile] = useState<{ file: File, autoRename: boolean } | null>(null);
 
-  const generateUniqueFileName = async (originalFileName: string): Promise<string> => {
-    const extension = originalFileName.split('.').pop() || '';
-    const baseName = originalFileName.slice(0, -(extension.length + 1));
-    let fileName = `product_${baseName}.${extension}`;
-    let counter = 1;
+  const handleDuplicateFile = async (autoRename: boolean) => {
+    if (!duplicateFile) return;
 
-    const { data } = await supabase.storage
-      .from("product-images")
-      .list();
+    try {
+      let fileName = duplicateFile.file.name;
+      
+      if (autoRename) {
+        const extension = fileName.split('.').pop() || '';
+        const baseName = fileName.slice(0, -(extension.length + 1));
+        let counter = 1;
+        
+        while (true) {
+          const newFileName = `${baseName}_${counter}.${extension}`;
+          const { data } = await supabase.storage
+            .from("product-images")
+            .list();
+          
+          const exists = data?.some(file => file.name === newFileName);
+          if (!exists) {
+            fileName = newFileName;
+            break;
+          }
+          counter++;
+        }
+      }
 
-    const existingFiles = data?.map(file => file.name) || [];
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(fileName, duplicateFile.file, {
+          upsert: false
+        });
 
-    while (existingFiles.includes(fileName)) {
-      fileName = `product_${baseName}_${counter}.${extension}`;
-      counter++;
+      if (uploadError) throw uploadError;
+
+      const currentImages = form.getValues("images") || [];
+      form.setValue("images", [...currentImages, fileName]);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+      });
+    } finally {
+      setDuplicateFile(null);
+      setIsUploading(false);
     }
-
-    return fileName;
   };
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,27 +85,32 @@ export function MediaFields({ form }: MediaFieldsProps) {
     if (!files || files.length === 0) return;
 
     setIsUploading(true);
-    const currentImages = form.getValues("images") || [];
 
     try {
-      const newImages = await Promise.all(
-        Array.from(files).map(async (file) => {
-          const fileName = await generateUniqueFileName(file.name);
-          console.log("Generated unique filename:", fileName);
+      for (const file of Array.from(files)) {
+        const { data } = await supabase.storage
+          .from("product-images")
+          .list();
 
-          const { error: uploadError } = await supabase.storage
-            .from("product-images")
-            .upload(fileName, file, {
-              upsert: false
-            });
+        const exists = data?.some(existingFile => existingFile.name === file.name);
+        
+        if (exists) {
+          setDuplicateFile({ file, autoRename: false });
+          return;
+        }
 
-          if (uploadError) throw uploadError;
+        const { error: uploadError } = await supabase.storage
+          .from("product-images")
+          .upload(file.name, file, {
+            upsert: false
+          });
 
-          return fileName;
-        })
-      );
+        if (uploadError) throw uploadError;
 
-      form.setValue("images", [...currentImages, ...newImages]);
+        const currentImages = form.getValues("images") || [];
+        form.setValue("images", [...currentImages, file.name]);
+      }
+
       queryClient.invalidateQueries({ queryKey: ["products"] });
       
       toast({
@@ -188,6 +229,23 @@ export function MediaFields({ form }: MediaFieldsProps) {
         onConfirm={() => imageToDelete && removeImage(imageToDelete.index, imageToDelete.url)}
         imageName={imageToDelete?.url || ''}
       />
+
+      <AlertDialog open={!!duplicateFile} onOpenChange={() => setDuplicateFile(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Duplicate File Name</AlertDialogTitle>
+            <AlertDialogDescription>
+              An image with the name "{duplicateFile?.file.name}" already exists. Would you like to rename it automatically or choose a different file?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDuplicateFile(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => handleDuplicateFile(true)}>
+              Auto Rename
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

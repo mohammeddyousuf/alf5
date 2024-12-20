@@ -32,6 +32,7 @@ export function ImageManagementDialog({
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"name-asc" | "name-desc" | "date-asc" | "date-desc">("date-desc");
   const [showUnassigned, setShowUnassigned] = useState(false);
+  const [duplicateFile, setDuplicateFile] = useState<{ file: File, autoRename: boolean } | null>(null);
 
   const {
     images,
@@ -59,6 +60,58 @@ export function ImageManagementDialog({
     },
   });
 
+  const handleDuplicateFile = async (autoRename: boolean) => {
+    if (!duplicateFile) return;
+
+    try {
+      let fileName = duplicateFile.file.name;
+      
+      if (autoRename) {
+        const extension = fileName.split('.').pop() || '';
+        const baseName = fileName.slice(0, -(extension.length + 1));
+        let counter = 1;
+        
+        while (true) {
+          const newFileName = `${baseName}_${counter}.${extension}`;
+          const { data } = await supabase.storage
+            .from("product-images")
+            .list();
+          
+          const exists = data?.some(file => file.name === newFileName);
+          if (!exists) {
+            fileName = newFileName;
+            break;
+          }
+          counter++;
+        }
+      }
+
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(fileName, duplicateFile.file, {
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      toast({
+        title: "Success",
+        description: "Image uploaded successfully"
+      });
+      
+      await loadImages();
+      onImageUpload();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message
+      });
+    } finally {
+      setDuplicateFile(null);
+    }
+  };
+
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
@@ -67,18 +120,26 @@ export function ImageManagementDialog({
     if (files.length === 0) return;
 
     try {
-      await Promise.all(
-        files.map(async (file) => {
-          const fileName = `product_${Date.now()}_${file.name}`;
-          const { error } = await supabase.storage
-            .from("product-images")
-            .upload(fileName, file, {
-              upsert: false
-            });
+      for (const file of files) {
+        const { data } = await supabase.storage
+          .from("product-images")
+          .list();
 
-          if (error) throw error;
-        })
-      );
+        const exists = data?.some(existingFile => existingFile.name === file.name);
+        
+        if (exists) {
+          setDuplicateFile({ file, autoRename: false });
+          return;
+        }
+
+        const { error: uploadError } = await supabase.storage
+          .from("product-images")
+          .upload(file.name, file, {
+            upsert: false
+          });
+
+        if (uploadError) throw uploadError;
+      }
 
       toast({
         title: "Success",
@@ -194,6 +255,23 @@ export function ImageManagementDialog({
         onConfirm={() => handleDelete(imagesToDelete)}
         count={imagesToDelete.length}
       />
+
+      <AlertDialog open={!!duplicateFile} onOpenChange={() => setDuplicateFile(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Duplicate File Name</AlertDialogTitle>
+            <AlertDialogDescription>
+              An image with the name "{duplicateFile?.file.name}" already exists. Would you like to rename it automatically or choose a different file?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDuplicateFile(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => handleDuplicateFile(true)}>
+              Auto Rename
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
