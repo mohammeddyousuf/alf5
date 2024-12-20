@@ -8,8 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchAndSort } from "./image-management/SearchAndSort";
 import { ImageTable } from "./image-management/ImageTable";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useImageManagement } from "./hooks/useImageManagement";
+import { useImageDeletion } from "./hooks/useImageDeletion";
 import { ImagePagination } from "./image-management/ImagePagination";
 
 interface ImageManagementDialogProps {
@@ -26,9 +27,7 @@ export function ImageManagementDialog({
   folderSize 
 }: ImageManagementDialogProps) {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"name-asc" | "name-desc" | "date-asc" | "date-desc">("date-desc");
@@ -42,6 +41,8 @@ export function ImageManagementDialog({
     loadImages,
     getPaginatedImages
   } = useImageManagement();
+
+  const { isDeleting, handleDelete } = useImageDeletion(onImageUpload);
 
   const { data: systemLimits } = useQuery({
     queryKey: ["system-limits"],
@@ -57,37 +58,6 @@ export function ImageManagementDialog({
       return existingLimits;
     },
   });
-
-  const handleDelete = async () => {
-    if (!imagesToDelete.length) return;
-
-    try {
-      setIsDeleting(true);
-      const { error } = await supabase.storage
-        .from("product-images")
-        .remove(imagesToDelete);
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: `${imagesToDelete.length} image(s) deleted successfully`
-      });
-
-      await loadImages();
-      onImageUpload();
-      queryClient.invalidateQueries({ queryKey: ["products"] });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message
-      });
-    } finally {
-      setIsDeleting(false);
-      setImagesToDelete([]);
-    }
-  };
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -117,7 +87,6 @@ export function ImageManagementDialog({
       
       await loadImages();
       onImageUpload();
-      queryClient.invalidateQueries({ queryKey: ["products"] });
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -130,8 +99,6 @@ export function ImageManagementDialog({
   useEffect(() => {
     if (open) {
       loadImages();
-    } else {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
     }
   }, [open]);
 
@@ -143,7 +110,6 @@ export function ImageManagementDialog({
   );
 
   const handleOpenChange = (newOpen: boolean) => {
-    // Only allow closing through the explicit close button
     if (newOpen === false) {
       return;
     }
@@ -225,7 +191,7 @@ export function ImageManagementDialog({
       <ImageDeleteDialog
         open={imagesToDelete.length > 0}
         onOpenChange={(open) => !open && setImagesToDelete([])}
-        onConfirm={handleDelete}
+        onConfirm={() => handleDelete(imagesToDelete)}
         count={imagesToDelete.length}
       />
     </>
