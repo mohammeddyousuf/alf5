@@ -12,6 +12,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useImageManagement } from "./hooks/useImageManagement";
 import { useImageDeletion } from "./hooks/useImageDeletion";
 import { ImagePagination } from "./image-management/ImagePagination";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ImageManagementDialogProps {
   open: boolean;
@@ -275,3 +285,4 @@ export function ImageManagementDialog({
     </>
   );
 }
+
