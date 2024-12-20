@@ -34,6 +34,7 @@ export function ImageManagementDialog({
   const [sortOrder, setSortOrder] = useState<"name-asc" | "name-desc" | "date-asc" | "date-desc">("date-desc");
   const [showUnassigned, setShowUnassigned] = useState(false);
   const [duplicateFile, setDuplicateFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -101,21 +102,29 @@ export function ImageManagementDialog({
   };
 
   const uploadFile = async (file: File, fileName: string) => {
-    const { error: uploadError } = await supabase.storage
-      .from("product-images")
-      .upload(fileName, file, {
-        upsert: false
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from("product-images")
+        .upload(fileName, file, {
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      toast({
+        title: "Success",
+        description: `${fileName} uploaded successfully`
       });
-
-    if (uploadError) throw uploadError;
-
-    toast({
-      title: "Success",
-      description: "Image uploaded successfully"
-    });
-    
-    await loadImages();
-    onImageUpload();
+      
+      await loadImages();
+      onImageUpload();
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: `Failed to upload ${fileName}: ${error.message}`
+      });
+    }
   };
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
@@ -134,6 +143,7 @@ export function ImageManagementDialog({
 
   const handleFiles = async (files: File[]) => {
     if (files.length === 0) return;
+    setIsUploading(true);
 
     try {
       const { data: existingFiles } = await supabase.storage
@@ -145,7 +155,7 @@ export function ImageManagementDialog({
         
         if (exists) {
           setDuplicateFile(file);
-          return;
+          continue;
         }
 
         await uploadFile(file, file.name);
@@ -156,6 +166,8 @@ export function ImageManagementDialog({
         title: "Error",
         description: error.message
       });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -244,9 +256,14 @@ export function ImageManagementDialog({
                     variant="outline" 
                     className="w-full mb-4"
                     onClick={handleUploadClick}
+                    disabled={isUploading}
                   >
-                    <Upload className="h-4 w-4 mr-2" />
-                    Upload Images
+                    {isUploading ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Upload className="h-4 w-4 mr-2" />
+                    )}
+                    {isUploading ? "Uploading..." : "Upload Images"}
                   </Button>
                   <ImageTable
                     images={paginatedImages}
