@@ -1,7 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Upload, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -30,12 +29,6 @@ export function SearchAndSort({
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <Button variant="outline" className="whitespace-nowrap" asChild>
-          <label htmlFor="bulk-upload-dialog" className="flex items-center justify-center gap-2 cursor-pointer">
-            <Upload className="h-4 w-4" />
-            Upload Images
-          </label>
-        </Button>
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
