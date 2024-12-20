@@ -14,19 +14,35 @@ import { Button } from "@/components/ui/button";
 interface ImageTableProps {
   images: any[];
   isDeleting: boolean;
-  onDeleteClick: (imageNames: string[]) => void;
+  selectedImages: string[];
+  onSelectedImagesChange: (imageNames: string[]) => void;
   sortOrder: "name-asc" | "name-desc" | "date-asc" | "date-desc";
   showUnassigned: boolean;
 }
 
 export function ImageTable({ 
   images, 
-  isDeleting, 
-  onDeleteClick,
+  isDeleting,
+  selectedImages,
+  onSelectedImagesChange,
   sortOrder,
   showUnassigned
 }: ImageTableProps) {
-  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      onSelectedImagesChange(sortedImages.map(image => image.name));
+    } else {
+      onSelectedImagesChange([]);
+    }
+  };
+
+  const handleSelectImage = (imageName: string, checked: boolean) => {
+    if (checked) {
+      onSelectedImagesChange([...selectedImages, imageName]);
+    } else {
+      onSelectedImagesChange(selectedImages.filter(name => name !== imageName));
+    }
+  };
 
   const sortImages = (images: any[]) => {
     let filteredImages = [...images];
@@ -46,22 +62,6 @@ export function ImageTable({
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
     });
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      setSelectedImages(sortedImages.map(image => image.name));
-    } else {
-      setSelectedImages([]);
-    }
-  };
-
-  const handleSelectImage = (imageName: string, checked: boolean) => {
-    if (checked) {
-      setSelectedImages(prev => [...prev, imageName]);
-    } else {
-      setSelectedImages(prev => prev.filter(name => name !== imageName));
-    }
   };
 
   const sortedImages = sortImages(images);
@@ -88,7 +88,6 @@ export function ImageTable({
             <TableHead>Image</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Usage</TableHead>
-            <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -118,16 +117,6 @@ export function ImageTable({
                 ) : (
                   <span className="text-sm text-muted-foreground">Not in use</span>
                 )}
-              </TableCell>
-              <TableCell className="py-2">
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => onDeleteClick([image.name])}
-                  disabled={isDeleting}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
               </TableCell>
             </TableRow>
           ))}

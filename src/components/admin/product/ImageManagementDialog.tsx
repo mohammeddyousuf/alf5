@@ -292,7 +292,8 @@ export function ImageManagementDialog({
                   <ImageTable
                     images={paginatedImages}
                     isDeleting={isDeleting}
-                    onDeleteClick={setImagesToDelete}
+                    selectedImages={imagesToDelete}
+                    onSelectedImagesChange={setImagesToDelete}
                     sortOrder={sortOrder}
                     showUnassigned={showUnassigned}
                   />
