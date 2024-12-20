@@ -88,30 +88,34 @@ export function ImageManagementDialog({
         }
       }
 
-      const { error: uploadError } = await supabase.storage
-        .from("product-images")
-        .upload(fileName, duplicateFile, {
-          upsert: false
-        });
-
-      if (uploadError) throw uploadError;
-
-      toast({
-        title: "Success",
-        description: "Image uploaded successfully"
-      });
-      
-      await loadImages();
-      onImageUpload();
+      await uploadFile(duplicateFile, fileName);
+      setDuplicateFile(null);
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message
       });
-    } finally {
       setDuplicateFile(null);
     }
+  };
+
+  const uploadFile = async (file: File, fileName: string) => {
+    const { error: uploadError } = await supabase.storage
+      .from("product-images")
+      .upload(fileName, file, {
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    toast({
+      title: "Success",
+      description: "Image uploaded successfully"
+    });
+    
+    await loadImages();
+    onImageUpload();
   };
 
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
@@ -128,42 +132,24 @@ export function ImageManagementDialog({
     e.target.value = '';
   };
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
-
   const handleFiles = async (files: File[]) => {
     if (files.length === 0) return;
 
     try {
-      for (const file of files) {
-        const { data } = await supabase.storage
-          .from("product-images")
-          .list();
+      const { data: existingFiles } = await supabase.storage
+        .from("product-images")
+        .list();
 
-        const exists = data?.some(existingFile => existingFile.name === file.name);
+      for (const file of files) {
+        const exists = existingFiles?.some(existingFile => existingFile.name === file.name);
         
         if (exists) {
           setDuplicateFile(file);
           return;
         }
 
-        const { error: uploadError } = await supabase.storage
-          .from("product-images")
-          .upload(file.name, file, {
-            upsert: false
-          });
-
-        if (uploadError) throw uploadError;
+        await uploadFile(file, file.name);
       }
-
-      toast({
-        title: "Success",
-        description: "Images uploaded successfully"
-      });
-      
-      await loadImages();
-      onImageUpload();
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -171,6 +157,10 @@ export function ImageManagementDialog({
         description: error.message
       });
     }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
   };
 
   useEffect(() => {
