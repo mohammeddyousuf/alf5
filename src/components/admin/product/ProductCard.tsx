@@ -5,7 +5,7 @@ import { Database } from "@/integrations/supabase/types";
 import { Pencil } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ProductForm } from "./ProductForm";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   AlertDialog,
@@ -32,6 +32,8 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: ProductCardProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -104,6 +106,12 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
     }
   };
 
+  const handleEditSuccess = () => {
+    onSuccess();
+    setIsEditDialogOpen(false);
+    queryClient.invalidateQueries({ queryKey: ["products"] });
+  };
+
   return (
     <Card key={product.id} className="p-4 flex flex-col h-full">
       <ProductImage 
@@ -143,7 +151,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
       </div>
 
       <div className="flex gap-2 mt-4">
-        <Dialog>
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
           <DialogTrigger asChild>
             <Button variant="default" className="flex-1">
               <Pencil className="h-4 w-4 mr-2" />
@@ -154,7 +162,7 @@ export function ProductCard({ product, onStatusChange, onDelete, onSuccess }: Pr
             <DialogHeader>
               <DialogTitle>Edit Product</DialogTitle>
             </DialogHeader>
-            <ProductForm product={product} onSuccess={onSuccess} />
+            <ProductForm product={product} onSuccess={handleEditSuccess} />
           </DialogContent>
         </Dialog>
 
