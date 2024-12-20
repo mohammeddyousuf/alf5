@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, Trash2 } from "lucide-react";
 import {
@@ -10,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 
 interface ImageTableProps {
   images: any[];
@@ -64,13 +64,6 @@ export function ImageTable({
     }
   };
 
-  const handleDelete = () => {
-    if (selectedImages.length > 0) {
-      onDeleteClick(selectedImages);
-      setSelectedImages([]);
-    }
-  };
-
   const sortedImages = sortImages(images);
 
   if (sortedImages.length === 0) {
@@ -83,23 +76,6 @@ export function ImageTable({
 
   return (
     <div className="bg-background">
-      <div className="flex justify-end mb-4">
-        {selectedImages.length > 0 && (
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
-            {isDeleting ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <Trash2 className="h-4 w-4 mr-2" />
-            )}
-            Delete Selected ({selectedImages.length})
-          </Button>
-        )}
-      </div>
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent border-b border-border">
