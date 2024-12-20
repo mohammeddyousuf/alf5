@@ -12,16 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useImageManagement } from "./hooks/useImageManagement";
 import { useImageDeletion } from "./hooks/useImageDeletion";
 import { ImagePagination } from "./image-management/ImagePagination";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { DuplicateFileDialog } from "./image-management/DuplicateFileDialog";
 
 interface ImageManagementDialogProps {
   open: boolean;
@@ -42,7 +33,7 @@ export function ImageManagementDialog({
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"name-asc" | "name-desc" | "date-asc" | "date-desc">("date-desc");
   const [showUnassigned, setShowUnassigned] = useState(false);
-  const [duplicateFile, setDuplicateFile] = useState<{ file: File, autoRename: boolean } | null>(null);
+  const [duplicateFile, setDuplicateFile] = useState<File | null>(null);
 
   const {
     images,
@@ -74,7 +65,7 @@ export function ImageManagementDialog({
     if (!duplicateFile) return;
 
     try {
-      let fileName = duplicateFile.file.name;
+      let fileName = duplicateFile.name;
       
       if (autoRename) {
         const extension = fileName.split('.').pop() || '';
@@ -98,7 +89,7 @@ export function ImageManagementDialog({
 
       const { error: uploadError } = await supabase.storage
         .from("product-images")
-        .upload(fileName, duplicateFile.file, {
+        .upload(fileName, duplicateFile, {
           upsert: false
         });
 
@@ -127,6 +118,16 @@ export function ImageManagementDialog({
     setIsDragging(false);
     
     const files = Array.from(e.dataTransfer.files);
+    await handleFiles(files);
+  };
+
+  const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    await handleFiles(files);
+    e.target.value = '';
+  };
+
+  const handleFiles = async (files: File[]) => {
     if (files.length === 0) return;
 
     try {
@@ -138,7 +139,7 @@ export function ImageManagementDialog({
         const exists = data?.some(existingFile => existingFile.name === file.name);
         
         if (exists) {
-          setDuplicateFile({ file, autoRename: false });
+          setDuplicateFile(file);
           return;
         }
 
@@ -236,6 +237,23 @@ export function ImageManagementDialog({
                     isDragging ? 'bg-muted/50 border-2 border-dashed border-primary' : ''
                   }`}
                 >
+                  <input
+                    type="file"
+                    id="file-upload"
+                    multiple
+                    className="hidden"
+                    onChange={handleFileInput}
+                    accept="image/*"
+                  />
+                  <label 
+                    htmlFor="file-upload" 
+                    className="block w-full cursor-pointer"
+                  >
+                    <Button variant="outline" className="w-full mb-4">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload Images
+                    </Button>
+                  </label>
                   <ImageTable
                     images={paginatedImages}
                     isDeleting={isDeleting}
@@ -266,22 +284,12 @@ export function ImageManagementDialog({
         count={imagesToDelete.length}
       />
 
-      <AlertDialog open={!!duplicateFile} onOpenChange={() => setDuplicateFile(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Duplicate File Name</AlertDialogTitle>
-            <AlertDialogDescription>
-              An image with the name "{duplicateFile?.file.name}" already exists. Would you like to rename it automatically or choose a different file?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDuplicateFile(null)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => handleDuplicateFile(true)}>
-              Auto Rename
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DuplicateFileDialog
+        file={duplicateFile}
+        open={!!duplicateFile}
+        onOpenChange={(open) => !open && setDuplicateFile(null)}
+        onConfirm={handleDuplicateFile}
+      />
     </>
   );
 }
