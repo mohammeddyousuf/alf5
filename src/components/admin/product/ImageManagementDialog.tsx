@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageDeleteDialog } from "@/components/admin/shared/ImageDeleteDialog";
 import { useToast } from "@/hooks/use-toast";
@@ -219,15 +219,51 @@ export function ImageManagementDialog({
           onDrop={handleDrop}
         >
           <SheetHeader className="mb-2">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center gap-2">
               <SheetTitle>Product Images</SheetTitle>
-              <Button 
-                variant="outline" 
-                onClick={() => onOpenChange(false)}
-                className="ml-auto"
-              >
-                Close
-              </Button>
+              <div className="flex items-center gap-2">
+                {imagesToDelete.length > 0 && (
+                  <Button 
+                    variant="destructive"
+                    onClick={() => handleDelete(imagesToDelete)}
+                    disabled={isDeleting}
+                    className="whitespace-nowrap"
+                  >
+                    {isDeleting ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4 mr-2" />
+                    )}
+                    Delete Selected ({imagesToDelete.length})
+                  </Button>
+                )}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  multiple
+                  className="hidden"
+                  onChange={handleFileInput}
+                  accept="image/*"
+                />
+                <Button 
+                  variant="outline" 
+                  onClick={handleUploadClick}
+                  disabled={isUploading}
+                >
+                  {isUploading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4 mr-2" />
+                  )}
+                  {isUploading ? "Uploading..." : "Upload Images"}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => onOpenChange(false)}
+                >
+                  Close
+                </Button>
+              </div>
             </div>
             <span className="text-sm font-normal text-muted-foreground">
               Total images: {images.length} • Folder size: {(folderSize / (1024 * 1024)).toFixed(2)} MB / {systemLimits?.max_folder_size_mb || '...'} MB
