@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, Upload } from "lucide-react";
@@ -34,6 +34,7 @@ export function ImageManagementDialog({
   const [sortOrder, setSortOrder] = useState<"name-asc" | "name-desc" | "date-asc" | "date-desc">("date-desc");
   const [showUnassigned, setShowUnassigned] = useState(false);
   const [duplicateFile, setDuplicateFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     images,
@@ -125,6 +126,10 @@ export function ImageManagementDialog({
     const files = Array.from(e.target.files || []);
     await handleFiles(files);
     e.target.value = '';
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleFiles = async (files: File[]) => {
@@ -239,21 +244,20 @@ export function ImageManagementDialog({
                 >
                   <input
                     type="file"
-                    id="file-upload"
+                    ref={fileInputRef}
                     multiple
                     className="hidden"
                     onChange={handleFileInput}
                     accept="image/*"
                   />
-                  <label 
-                    htmlFor="file-upload" 
-                    className="block w-full cursor-pointer"
+                  <Button 
+                    variant="outline" 
+                    className="w-full mb-4"
+                    onClick={handleUploadClick}
                   >
-                    <Button variant="outline" className="w-full mb-4">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload Images
-                    </Button>
-                  </label>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Images
+                  </Button>
                   <ImageTable
                     images={paginatedImages}
                     isDeleting={isDeleting}
