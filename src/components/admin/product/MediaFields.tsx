@@ -8,16 +8,8 @@ import { ImagePlus, Loader2, X } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ImageDeleteDialog } from "./ImageDeleteDialog";
+import { useQueryClient } from "@tanstack/react-query";
 
 type FormData = z.infer<typeof productFormSchema>;
 
@@ -27,6 +19,7 @@ interface MediaFieldsProps {
 
 export function MediaFields({ form }: MediaFieldsProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState<Record<number, boolean>>({});
   const [imageToDelete, setImageToDelete] = useState<{ index: number; url: string } | null>(null);
@@ -72,11 +65,12 @@ export function MediaFields({ form }: MediaFieldsProps) {
 
           if (uploadError) throw uploadError;
 
-          return fileName; // Store only the filename
+          return fileName;
         })
       );
 
       form.setValue("images", [...currentImages, ...newImages]);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       
       toast({
         title: "Success",
@@ -98,7 +92,6 @@ export function MediaFields({ form }: MediaFieldsProps) {
     try {
       setIsDeleting(prev => ({ ...prev, [indexToRemove]: true }));
       
-      // Extract the filename from the URL or use the filename directly
       const fileName = imageUrl.includes('/') ? imageUrl.split('/').pop()! : imageUrl;
       
       console.log("Attempting to delete file:", fileName);
@@ -117,6 +110,7 @@ export function MediaFields({ form }: MediaFieldsProps) {
       const currentImages = form.getValues("images") || [];
       const updatedImages = currentImages.filter((_, index) => index !== indexToRemove);
       form.setValue("images", updatedImages);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
 
       toast({
         title: "Success",
@@ -188,25 +182,12 @@ export function MediaFields({ form }: MediaFieldsProps) {
         </div>
       </div>
 
-      <AlertDialog open={!!imageToDelete} onOpenChange={(open) => !open && setImageToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the image.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => imageToDelete && removeImage(imageToDelete.index, imageToDelete.url)}
-              className="bg-red-500 hover:bg-red-600"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ImageDeleteDialog
+        open={!!imageToDelete}
+        onOpenChange={(open) => !open && setImageToDelete(null)}
+        onConfirm={() => imageToDelete && removeImage(imageToDelete.index, imageToDelete.url)}
+        imageName={imageToDelete?.url || ''}
+      />
     </div>
   );
 }
