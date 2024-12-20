@@ -33,7 +33,7 @@ export function ImageManagementDialog({
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"name-asc" | "name-desc" | "date-asc" | "date-desc">("date-desc");
   const [showUnassigned, setShowUnassigned] = useState(false);
-  const [duplicateFile, setDuplicateFile] = useState<File | null>(null);
+  const [duplicateFiles, setDuplicateFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -63,41 +63,43 @@ export function ImageManagementDialog({
     },
   });
 
-  const handleDuplicateFile = async (autoRename: boolean) => {
-    if (!duplicateFile) return;
+  const handleDuplicateFiles = async (autoRename: boolean) => {
+    if (duplicateFiles.length === 0) return;
 
     try {
-      let fileName = duplicateFile.name;
-      
-      if (autoRename) {
-        const extension = fileName.split('.').pop() || '';
-        const baseName = fileName.slice(0, -(extension.length + 1));
-        let counter = 1;
+      for (const file of duplicateFiles) {
+        let fileName = file.name;
         
-        while (true) {
-          const newFileName = `${baseName}_${counter}.${extension}`;
-          const { data } = await supabase.storage
-            .from("product-images")
-            .list();
+        if (autoRename) {
+          const extension = fileName.split('.').pop() || '';
+          const baseName = fileName.slice(0, -(extension.length + 1));
+          let counter = 1;
           
-          const exists = data?.some(file => file.name === newFileName);
-          if (!exists) {
-            fileName = newFileName;
-            break;
+          while (true) {
+            const newFileName = `${baseName}_${counter}.${extension}`;
+            const { data } = await supabase.storage
+              .from("product-images")
+              .list();
+            
+            const exists = data?.some(file => file.name === newFileName);
+            if (!exists) {
+              fileName = newFileName;
+              break;
+            }
+            counter++;
           }
-          counter++;
         }
-      }
 
-      await uploadFile(duplicateFile, fileName);
-      setDuplicateFile(null);
+        await uploadFile(file, fileName);
+      }
+      setDuplicateFiles([]);
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message
       });
-      setDuplicateFile(null);
+      setDuplicateFiles([]);
     }
   };
 
@@ -150,14 +152,23 @@ export function ImageManagementDialog({
         .from("product-images")
         .list();
 
-      for (const file of files) {
-        const exists = existingFiles?.some(existingFile => existingFile.name === file.name);
-        
-        if (exists) {
-          setDuplicateFile(file);
-          continue;
-        }
+      const duplicates: File[] = [];
+      const toUpload: File[] = [];
 
+      files.forEach(file => {
+        const exists = existingFiles?.some(existingFile => existingFile.name === file.name);
+        if (exists) {
+          duplicates.push(file);
+        } else {
+          toUpload.push(file);
+        }
+      });
+
+      if (duplicates.length > 0) {
+        setDuplicateFiles(duplicates);
+      }
+
+      for (const file of toUpload) {
         await uploadFile(file, file.name);
       }
     } catch (error: any) {
@@ -296,10 +307,10 @@ export function ImageManagementDialog({
       />
 
       <DuplicateFileDialog
-        file={duplicateFile}
-        open={!!duplicateFile}
-        onOpenChange={(open) => !open && setDuplicateFile(null)}
-        onConfirm={handleDuplicateFile}
+        file={duplicateFiles[0]}
+        open={duplicateFiles.length > 0}
+        onOpenChange={(open) => !open && setDuplicateFiles([])}
+        onConfirm={handleDuplicateFiles}
       />
     </>
   );
