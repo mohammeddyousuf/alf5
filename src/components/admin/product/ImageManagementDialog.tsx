@@ -230,19 +230,21 @@ export function ImageManagementDialog({
                   onChange={handleFileInput}
                   accept="image/*"
                 />
-                <Button 
-                  variant="destructive"
-                  onClick={() => handleDelete(imagesToDelete)}
-                  disabled={isDeleting || imagesToDelete.length === 0}
-                  className="whitespace-nowrap"
-                >
-                  {isDeleting ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4 mr-2" />
-                  )}
-                  Delete Selected ({imagesToDelete.length})
-                </Button>
+                {imagesToDelete.length > 0 && (
+                  <Button 
+                    variant="destructive"
+                    onClick={() => handleDelete(imagesToDelete)}
+                    disabled={isDeleting}
+                    className="whitespace-nowrap"
+                  >
+                    {isDeleting ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4 mr-2" />
+                    )}
+                    Delete Selected ({imagesToDelete.length})
+                  </Button>
+                )}
                 <Button 
                   variant="outline" 
                   onClick={handleUploadClick}
@@ -292,8 +294,7 @@ export function ImageManagementDialog({
                   <ImageTable
                     images={paginatedImages}
                     isDeleting={isDeleting}
-                    selectedImages={imagesToDelete}
-                    onSelectedImagesChange={setImagesToDelete}
+                    onDeleteClick={setImagesToDelete}
                     sortOrder={sortOrder}
                     showUnassigned={showUnassigned}
                   />

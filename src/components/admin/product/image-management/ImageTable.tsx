@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Loader2, Trash2 } from "lucide-react";
 import {
@@ -9,40 +10,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 
 interface ImageTableProps {
   images: any[];
   isDeleting: boolean;
-  selectedImages: string[];
-  onSelectedImagesChange: (imageNames: string[]) => void;
+  onDeleteClick: (imageNames: string[]) => void;
   sortOrder: "name-asc" | "name-desc" | "date-asc" | "date-desc";
   showUnassigned: boolean;
 }
 
 export function ImageTable({ 
   images, 
-  isDeleting,
-  selectedImages,
-  onSelectedImagesChange,
+  isDeleting, 
+  onDeleteClick,
   sortOrder,
   showUnassigned
 }: ImageTableProps) {
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      onSelectedImagesChange(sortedImages.map(image => image.name));
-    } else {
-      onSelectedImagesChange([]);
-    }
-  };
-
-  const handleSelectImage = (imageName: string, checked: boolean) => {
-    if (checked) {
-      onSelectedImagesChange([...selectedImages, imageName]);
-    } else {
-      onSelectedImagesChange(selectedImages.filter(name => name !== imageName));
-    }
-  };
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
   const sortImages = (images: any[]) => {
     let filteredImages = [...images];
@@ -64,6 +48,29 @@ export function ImageTable({
     });
   };
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedImages(sortedImages.map(image => image.name));
+    } else {
+      setSelectedImages([]);
+    }
+  };
+
+  const handleSelectImage = (imageName: string, checked: boolean) => {
+    if (checked) {
+      setSelectedImages(prev => [...prev, imageName]);
+    } else {
+      setSelectedImages(prev => prev.filter(name => name !== imageName));
+    }
+  };
+
+  const handleDelete = () => {
+    if (selectedImages.length > 0) {
+      onDeleteClick(selectedImages);
+      setSelectedImages([]);
+    }
+  };
+
   const sortedImages = sortImages(images);
 
   if (sortedImages.length === 0) {
@@ -76,6 +83,23 @@ export function ImageTable({
 
   return (
     <div className="bg-background">
+      <div className="flex justify-end mb-4">
+        {selectedImages.length > 0 && (
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={handleDelete}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <Trash2 className="h-4 w-4 mr-2" />
+            )}
+            Delete Selected ({selectedImages.length})
+          </Button>
+        )}
+      </div>
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent border-b border-border">
@@ -88,6 +112,7 @@ export function ImageTable({
             <TableHead>Image</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Usage</TableHead>
+            <TableHead className="w-[100px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -117,6 +142,16 @@ export function ImageTable({
                 ) : (
                   <span className="text-sm text-muted-foreground">Not in use</span>
                 )}
+              </TableCell>
+              <TableCell className="py-2">
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  onClick={() => onDeleteClick([image.name])}
+                  disabled={isDeleting}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}
