@@ -29,6 +29,7 @@ export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
             <TableHead>Price</TableHead>
             <TableHead>Payment</TableHead>
             <TableHead>Message</TableHead>
+            <TableHead>WhatsApp</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>IP Address</TableHead>
             <TableHead>Source</TableHead>
@@ -68,6 +69,9 @@ export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
               </TableCell>
               <TableCell>
                 <div className="text-sm">{order.message || '-'}</div>
+              </TableCell>
+              <TableCell>
+                <div className="text-sm">{order.whatsapp_number || '-'}</div>
               </TableCell>
               <TableCell>
                 <div className="text-sm">{order.location || '-'}</div>

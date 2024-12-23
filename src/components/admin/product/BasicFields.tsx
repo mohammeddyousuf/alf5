@@ -20,6 +20,8 @@ interface BasicFieldsProps {
 }
 
 export function BasicFields({ form }: BasicFieldsProps) {
+  const whatsappNumber = form.watch("whatsapp_number");
+
   return (
     <>
       <div className="flex justify-between items-center">
@@ -82,7 +84,7 @@ export function BasicFields({ form }: BasicFieldsProps) {
             </FormControl>
             <FormMessage />
             <p className="text-sm text-muted-foreground">
-              Leave empty to use default WhatsApp number
+              {whatsappNumber ? `Currently using: ${whatsappNumber}` : 'Leave empty to use default WhatsApp number'}
             </p>
           </FormItem>
         )}
