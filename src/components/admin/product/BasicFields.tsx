@@ -37,7 +37,7 @@ export function BasicFields({ form }: BasicFieldsProps) {
     },
   });
 
-  console.log("Current WhatsApp number:", whatsappNumber);
+  console.log("Current WhatsApp number from form:", whatsappNumber);
   console.log("Settings WhatsApp number:", settings?.whatsapp_number);
 
   return (
@@ -98,7 +98,11 @@ export function BasicFields({ form }: BasicFieldsProps) {
           <FormItem>
             <FormLabel>WhatsApp Number Override</FormLabel>
             <FormControl>
-              <Input {...field} placeholder={`Default: ${settings?.whatsapp_number || 'Loading...'}`} />
+              <Input 
+                {...field} 
+                value={field.value || ''} 
+                placeholder={`Default: ${settings?.whatsapp_number || 'Loading...'}`}
+              />
             </FormControl>
             <FormMessage />
             <p className="text-sm text-muted-foreground">
