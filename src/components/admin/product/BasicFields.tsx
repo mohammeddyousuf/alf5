@@ -12,6 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 type FormData = z.infer<typeof productFormSchema>;
 
@@ -21,6 +23,19 @@ interface BasicFieldsProps {
 
 export function BasicFields({ form }: BasicFieldsProps) {
   const whatsappNumber = form.watch("whatsapp_number");
+
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("whatsapp_number")
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   return (
     <>
@@ -80,11 +95,14 @@ export function BasicFields({ form }: BasicFieldsProps) {
           <FormItem>
             <FormLabel>WhatsApp Number Override</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="Enter WhatsApp number (optional)" />
+              <Input {...field} placeholder={`Default: ${settings?.whatsapp_number || 'Loading...'}`} />
             </FormControl>
             <FormMessage />
             <p className="text-sm text-muted-foreground">
-              {whatsappNumber ? `Currently using: ${whatsappNumber}` : 'Leave empty to use default WhatsApp number'}
+              {whatsappNumber ? 
+                `Currently using: ${whatsappNumber}` : 
+                `Using default WhatsApp number: ${settings?.whatsapp_number || 'Loading...'}`
+              }
             </p>
           </FormItem>
         )}
