@@ -18,7 +18,7 @@ interface OrderDialogProps {
   productPrice: number;
   productId: string;
   onSubmit: (data: ExtendedOrderFormData) => void;
-  whatsappNumber?: string;
+  whatsappNumber?: string | null;
 }
 
 export function OrderDialog({
@@ -43,13 +43,15 @@ export function OrderDialog({
     },
   });
 
+  console.log("OrderDialog - Using WhatsApp number:", whatsappNumber);
+
   const { handleSubmit } = useOrderSubmission({
     productId,
     productName,
     productBrand,
     productPrice,
     onSubmit: async (data) => {
-      console.log("WhatsApp number being used:", whatsappNumber);
+      console.log("OrderDialog - Submitting with WhatsApp number:", whatsappNumber);
       if (data.whatsappUrl) {
         // First submit the form data
         onSubmit(data);

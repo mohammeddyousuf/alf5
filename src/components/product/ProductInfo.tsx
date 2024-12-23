@@ -13,7 +13,7 @@ interface ProductInfoProps {
   discountPrice: number | null;
   productId: string;
   onOrderSubmit: (formData: any) => void;
-  whatsappNumber?: string;
+  whatsappNumber?: string | null;
 }
 
 export function ProductInfo({ 
@@ -81,19 +81,16 @@ export function ProductInfo({
     return endDate > now;
   };
 
-  // Show sale price if it exists, is less than regular price, and either:
-  // 1. There's no global sale timer (regular product discount)
-  // 2. There's a global sale timer and it hasn't expired
   const showSalePrice = salePrice && 
     salePrice < price && 
     (!settings?.clearance_sale_active || isValidSale());
 
-  // Only show discount price if there's no sale price active
   const showDiscountPrice = !showSalePrice && 
     discountPrice && 
     discountPrice < price;
 
   const handleWhatsAppClick = () => {
+    console.log("Opening OrderDialog with WhatsApp number:", whatsappNumber);
     setOrderDialogOpen(true);
   };
 
