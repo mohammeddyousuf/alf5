@@ -22,16 +22,20 @@ export function generateWhatsAppUrl(data: ExtendedOrderFormData, customNumber?: 
 
   console.log("Generating WhatsApp URL with number:", customNumber);
   
-  // Clean the phone number by removing any non-digit characters
-  const phoneNumber = customNumber ? customNumber.replace(/[^0-9]/g, '') : '';
-  
-  if (!phoneNumber) {
+  if (!customNumber) {
     console.error('No WhatsApp number provided');
     return '';
   }
   
+  // Clean the phone number by removing any non-digit characters and + symbol
+  const phoneNumber = customNumber.replace(/[^0-9]/g, '');
+  
+  if (!phoneNumber) {
+    console.error('Invalid WhatsApp number after cleaning');
+    return '';
+  }
+  
   try {
-    // Use the official WhatsApp Click to Chat API format
     const message = generateWhatsAppMessage(data);
     const url = `https://wa.me/${phoneNumber}?text=${message}`;
     console.log("Generated WhatsApp URL:", url);

@@ -90,7 +90,7 @@ export function ProductInfo({
     discountPrice < price;
 
   const handleWhatsAppClick = () => {
-    console.log("Opening OrderDialog with WhatsApp number:", whatsappNumber);
+    console.log("Opening OrderDialog with WhatsApp number:", whatsappNumber || settings?.whatsapp_number);
     setOrderDialogOpen(true);
   };
 
@@ -106,6 +106,9 @@ export function ProductInfo({
   const displayPrice = showSalePrice ? salePrice! : 
                       showDiscountPrice ? discountPrice! : 
                       price;
+
+  // Use product override number if available, otherwise use default from settings
+  const effectiveWhatsAppNumber = whatsappNumber || settings?.whatsapp_number;
 
   return (
     <div className="space-y-6 text-left">
@@ -152,7 +155,7 @@ export function ProductInfo({
         productPrice={displayPrice}
         productId={productId}
         onSubmit={handleOrderSubmit}
-        whatsappNumber={whatsappNumber}
+        whatsappNumber={effectiveWhatsAppNumber}
       />
     </div>
   );
