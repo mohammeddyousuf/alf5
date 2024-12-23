@@ -17,13 +17,22 @@ interface OrdersTableProps {
 }
 
 export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
-  // Fetch products to get WhatsApp numbers
+  // Fetch products to get categories and subcategories
   const { data: products } = useQuery({
     queryKey: ["products"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, whatsapp_number");
+        .select(`
+          id, 
+          whatsapp_number,
+          categories!inner(
+            name
+          ),
+          subcategories!inner(
+            name
+          )
+        `);
       
       if (error) throw error;
       return data;
