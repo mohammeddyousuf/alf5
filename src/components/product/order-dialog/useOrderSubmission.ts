@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { OrderFormData, ExtendedOrderFormData } from "./types";
-import { constructWhatsAppMessage, createWhatsAppUrl } from "./whatsapp-utils";
+import { generateWhatsAppMessage, generateWhatsAppUrl } from "./whatsapp-utils";
 
 interface UseOrderSubmissionProps {
   productId: string;
@@ -60,25 +60,16 @@ export const useOrderSubmission = ({
     try {
       console.log("Form Data:", data);
       
-      const messageData = {
-        websiteName,
+      const extendedData: ExtendedOrderFormData = {
+        ...data,
         productName,
         productBrand,
-        productPrice: formatPrice(productPrice),
-        name: data.name,
-        email: data.email,
-        mobile: data.mobile,
-        address: data.address || "",
-        comments: data.comments || "",
-        paymentMode: data.paymentMode
+        productPrice: formatPrice(productPrice)
       };
       
-      console.log("Message Data:", messageData);
+      console.log("Extended Data:", extendedData);
       
-      const whatsappMessage = constructWhatsAppMessage(messageData);
-      console.log("WhatsApp Message:", whatsappMessage);
-      
-      const whatsappUrl = createWhatsAppUrl(whatsappMessage, whatsappNumber);
+      const whatsappUrl = generateWhatsAppUrl(extendedData, whatsappNumber);
       console.log("Generated WhatsApp URL:", whatsappUrl);
       
       const { error } = await supabase
@@ -113,10 +104,7 @@ export const useOrderSubmission = ({
       console.log("Order saved successfully");
       
       onSubmit({
-        ...data,
-        productName,
-        productBrand,
-        productPrice: formatPrice(productPrice),
+        ...extendedData,
         whatsappUrl
       });
       
