@@ -29,7 +29,6 @@ export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
             <TableHead>Price</TableHead>
             <TableHead>Payment</TableHead>
             <TableHead>Message</TableHead>
-            <TableHead>Customer WhatsApp</TableHead>
             <TableHead>Sent To WhatsApp</TableHead>
             <TableHead>Location</TableHead>
             <TableHead>IP Address</TableHead>
@@ -72,10 +71,7 @@ export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
                 <div className="text-sm">{order.message || '-'}</div>
               </TableCell>
               <TableCell>
-                <div className="text-sm">{order.whatsapp_number || '-'}</div>
-              </TableCell>
-              <TableCell>
-                <div className="text-sm font-medium">{order.sent_to_whatsapp || '-'}</div>
+                <div className="text-sm font-medium">{order.whatsapp_number || '+919900981857'}</div>
               </TableCell>
               <TableCell>
                 <div className="text-sm">{order.location || '-'}</div>
