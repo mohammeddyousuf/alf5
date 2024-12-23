@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SaleCountdown } from "@/components/product/SaleCountdown";
@@ -28,6 +28,8 @@ export const ProductCard = ({
   brand,
   customLabel 
 }: ProductCardProps) => {
+  const navigate = useNavigate();
+
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
@@ -109,6 +111,12 @@ export const ProductCard = ({
                         showDiscountPrice ? discountPrice :
                         price;
 
+  const handleContactClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.scrollTo(0, 0);
+    navigate(productUrl);
+  };
+
   return (
     <Card className="overflow-hidden transition-all duration-200 hover:shadow-lg h-full flex flex-col">
       <Link to={productUrl} className="flex-none">
@@ -187,12 +195,14 @@ export const ProductCard = ({
             </span>
           )}
         </div>
-        <Link to={productUrl} className="w-full">
-          <Button className="w-full gap-2" variant="default">
-            <MessageCircle className="h-4 w-4" />
-            Contact Now
-          </Button>
-        </Link>
+        <Button 
+          className="w-full gap-2" 
+          variant="default"
+          onClick={handleContactClick}
+        >
+          <MessageCircle className="h-4 w-4" />
+          Contact Now
+        </Button>
       </CardFooter>
     </Card>
   );
