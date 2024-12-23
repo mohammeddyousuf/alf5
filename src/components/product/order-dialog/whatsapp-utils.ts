@@ -40,12 +40,7 @@ export const createWhatsAppUrl = (message: string, customNumber?: string) => {
     return '';
   }
 
-  if (!customNumber) {
-    console.error('No WhatsApp number provided');
-    return '';
-  }
-  
-  const phoneNumber = customNumber.replace(/[^0-9]/g, '');
+  const phoneNumber = (customNumber || '919900981857').replace(/[^0-9]/g, '');
   
   try {
     // Use the official WhatsApp Click to Chat API format
