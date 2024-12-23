@@ -19,7 +19,7 @@ const Index = () => {
       console.log("Fetching latest products");
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, price, sale_price, discount_price, images, brand, custom_label")
+        .select("id, name, price, sale_price, discount_price, images, brand, custom_label, status")
         .eq("status", "published")
         .order("created_at", { ascending: false })
         .limit(8);
@@ -40,7 +40,7 @@ const Index = () => {
       console.log("Fetching featured products");
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, price, sale_price, discount_price, images, brand, custom_label")
+        .select("id, name, price, sale_price, discount_price, images, brand, custom_label, status")
         .eq("status", "published")
         .eq("featured", true)
         .limit(8);
@@ -62,7 +62,7 @@ const Index = () => {
       const { data, error } = await supabase
         .from("collections")
         .select("*")
-        .order("created_at", { ascending: true }); // Changed to ascending order
+        .order("created_at", { ascending: true });
       
       if (error) {
         console.error("Error fetching collections:", error);

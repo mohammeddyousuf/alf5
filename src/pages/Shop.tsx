@@ -123,10 +123,11 @@ const Shop = () => {
       let query = supabase
         .from("products")
         .select(
-          "id, name, price, sale_price, discount_price, images, brand, custom_label, description, category_id, subcategory_id, featured, created_at"
+          "id, name, price, sale_price, discount_price, images, brand, custom_label, description, category_id, subcategory_id, featured, created_at, status"
         )
         .eq("status", "published");
 
+      // Apply filters
       if (selectedCategory) {
         query = query.eq("category_id", selectedCategory);
       }
