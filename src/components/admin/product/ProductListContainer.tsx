@@ -42,6 +42,8 @@ export function ProductListContainer({
   const productsPerPage = 12;
 
   const filteredProducts = products?.filter((product: ProductRow) => {
+    console.log("Filtering product:", product.name, "Status:", product.status);
+    
     const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase()) ||
       (product.description?.toLowerCase().includes(search.toLowerCase())) ||
       (product.brand?.toLowerCase().includes(search.toLowerCase())) ||
@@ -54,13 +56,16 @@ export function ProductListContainer({
     const matchesFeatured = !showFeatured || product.featured;
     const matchesStatus = selectedStatus === 'all' || product.status === selectedStatus;
 
-    return matchesSearch && 
+    const matches = matchesSearch && 
            matchesBrand && 
            matchesCustomLabel && 
            matchesCategory && 
            matchesSubcategory && 
            matchesFeatured && 
            matchesStatus;
+
+    console.log("Product matches filters:", matches);
+    return matches;
   });
 
   const sortProducts = (products: ProductRow[]) => {
