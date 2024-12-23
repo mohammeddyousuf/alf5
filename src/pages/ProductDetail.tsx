@@ -8,6 +8,7 @@ import { ProductInfo } from "@/components/product/ProductInfo";
 import { Helmet } from "react-helmet";
 import { ProductHead } from "@/components/product/detail/ProductHead";
 import { ProductMeta } from "@/components/product/detail/ProductMeta";
+import { SimilarProducts } from "@/components/product/SimilarProducts";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -131,6 +132,12 @@ const ProductDetail = () => {
           />
         </div>
       </div>
+
+      <SimilarProducts 
+        currentProductId={product.id}
+        categoryId={product.category_id}
+        brand={product.brand}
+      />
     </>
   );
 };
