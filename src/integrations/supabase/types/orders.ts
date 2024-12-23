@@ -5,6 +5,8 @@ export interface Orders {
   product_name: string;
   product_brand: string | null;
   product_price: number;
+  category_name: string | null;
+  subcategory_name: string | null;
   customer_name: string;
   customer_email: string;
   customer_mobile: string;

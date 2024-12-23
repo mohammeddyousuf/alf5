@@ -58,6 +58,8 @@ export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
           <TableRow>
             <TableHead>Date</TableHead>
             <TableHead>Product</TableHead>
+            <TableHead>Category</TableHead>
+            <TableHead>Subcategory</TableHead>
             <TableHead>Customer</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Mobile</TableHead>
@@ -86,6 +88,12 @@ export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
                     </div>
                   )}
                 </div>
+              </TableCell>
+              <TableCell>
+                <div className="text-sm">{order.category_name || '-'}</div>
+              </TableCell>
+              <TableCell>
+                <div className="text-sm">{order.subcategory_name || '-'}</div>
               </TableCell>
               <TableCell>{order.customer_name}</TableCell>
               <TableCell>
