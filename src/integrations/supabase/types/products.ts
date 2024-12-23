@@ -17,6 +17,7 @@ export interface Products {
     updated_at: string
     video_urls: string[] | null
     custom_label: string | null
+    whatsapp_number: string | null
   }
   Insert: {
     added_date?: string | null
@@ -36,6 +37,7 @@ export interface Products {
     updated_at?: string
     video_urls?: string[] | null
     custom_label?: string | null
+    whatsapp_number?: string | null
   }
   Update: {
     added_date?: string | null
@@ -55,6 +57,7 @@ export interface Products {
     updated_at?: string
     video_urls?: string[] | null
     custom_label?: string | null
+    whatsapp_number?: string | null
   }
 }
 
