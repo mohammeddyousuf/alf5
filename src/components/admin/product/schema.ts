@@ -35,6 +35,7 @@ export const productFormSchema = z.object({
   featured: z.boolean().default(false),
   brand: z.string().nullable().optional(),
   custom_label: z.string().nullable().optional(),
+  whatsapp_number: z.string().nullable().optional(),
 });
 
 export type ProductFormData = z.infer<typeof productFormSchema>;

@@ -73,6 +73,23 @@ export function BasicFields({ form }: BasicFieldsProps) {
 
       <FormField
         control={form.control}
+        name="whatsapp_number"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>WhatsApp Number Override</FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="Enter WhatsApp number (optional)" />
+            </FormControl>
+            <FormMessage />
+            <p className="text-sm text-muted-foreground">
+              Leave empty to use default WhatsApp number
+            </p>
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="custom_label"
         render={({ field }) => (
           <FormItem>

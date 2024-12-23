@@ -13,6 +13,7 @@ interface ProductInfoProps {
   discountPrice: number | null;
   productId: string;
   onOrderSubmit: (formData: any) => void;
+  whatsappNumber?: string;
 }
 
 export function ProductInfo({ 
@@ -23,7 +24,8 @@ export function ProductInfo({
   salePrice,
   discountPrice,
   productId,
-  onOrderSubmit 
+  onOrderSubmit,
+  whatsappNumber
 }: ProductInfoProps) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
@@ -153,6 +155,7 @@ export function ProductInfo({
         productPrice={displayPrice}
         productId={productId}
         onSubmit={handleOrderSubmit}
+        whatsappNumber={whatsappNumber}
       />
     </div>
   );

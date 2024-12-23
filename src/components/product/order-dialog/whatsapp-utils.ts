@@ -34,11 +34,12 @@ export const constructWhatsAppMessage = (data: {
   return finalMessage;
 };
 
-export const createWhatsAppUrl = (message: string) => {
+export const createWhatsAppUrl = (message: string, customNumber?: string) => {
   const baseUrl = 'https://api.whatsapp.com/send/';
+  const defaultNumber = '+919900981857';
   
   const params = new URLSearchParams({
-    phone: '+919900981857',
+    phone: customNumber || defaultNumber,
     text: message,
     type: 'phone_number',
     app_absent: '0'
@@ -47,7 +48,7 @@ export const createWhatsAppUrl = (message: string) => {
   const url = `https://api.whatsapp.com/send/?${params.toString()}`;
   
   console.log('WhatsApp URL parameters:', {
-    phone: '+919900981857',
+    phone: customNumber || defaultNumber,
     text: message,
     rawMessage: message
   });

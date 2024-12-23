@@ -18,6 +18,7 @@ interface OrderDialogProps {
   productPrice: number;
   productId: string;
   onSubmit: (data: ExtendedOrderFormData) => void;
+  whatsappNumber?: string;
 }
 
 export function OrderDialog({
@@ -28,6 +29,7 @@ export function OrderDialog({
   productPrice,
   productId,
   onSubmit,
+  whatsappNumber,
 }: OrderDialogProps) {
   const form = useForm<OrderFormData>({
     resolver: zodResolver(formSchema),
@@ -47,6 +49,7 @@ export function OrderDialog({
     productBrand,
     productPrice,
     onSubmit,
+    whatsappNumber,
   });
 
   return (

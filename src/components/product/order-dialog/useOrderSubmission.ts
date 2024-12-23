@@ -10,6 +10,7 @@ interface UseOrderSubmissionProps {
   productBrand: string | null;
   productPrice: number;
   onSubmit: (data: ExtendedOrderFormData) => void;
+  whatsappNumber?: string;
 }
 
 export const useOrderSubmission = ({
@@ -18,6 +19,7 @@ export const useOrderSubmission = ({
   productBrand,
   productPrice,
   onSubmit,
+  whatsappNumber,
 }: UseOrderSubmissionProps) => {
   const { toast } = useToast();
   const [ipAddress, setIpAddress] = useState<string>("");
@@ -76,7 +78,7 @@ export const useOrderSubmission = ({
       const whatsappMessage = constructWhatsAppMessage(messageData);
       console.log("WhatsApp Message:", whatsappMessage);
       
-      const whatsappUrl = createWhatsAppUrl(whatsappMessage);
+      const whatsappUrl = createWhatsAppUrl(whatsappMessage, whatsappNumber);
       console.log("Generated WhatsApp URL:", whatsappUrl);
       
       const { error } = await supabase
