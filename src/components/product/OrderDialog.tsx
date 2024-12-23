@@ -48,7 +48,18 @@ export function OrderDialog({
     productName,
     productBrand,
     productPrice,
-    onSubmit,
+    onSubmit: async (data) => {
+      // Close dialog first
+      onOpenChange(false);
+      
+      // Add a small delay before opening WhatsApp
+      setTimeout(() => {
+        if (data.whatsappUrl) {
+          window.open(data.whatsappUrl, '_blank', 'noopener,noreferrer');
+        }
+        onSubmit(data);
+      }, 500); // 500ms delay
+    },
     whatsappNumber,
   });
 
