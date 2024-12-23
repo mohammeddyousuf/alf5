@@ -20,24 +20,29 @@ export function generateWhatsAppUrl(data: ExtendedOrderFormData, customNumber?: 
     return '';
   }
 
-  console.log("Generating WhatsApp URL with number:", customNumber);
+  console.log("Raw WhatsApp number received:", customNumber);
   
   if (!customNumber) {
     console.error('No WhatsApp number provided');
     return '';
   }
+
+  // First remove any spaces and special characters except +
+  let cleanNumber = customNumber.trim().replace(/[^\d+]/g, '');
   
-  // Clean the phone number by removing any non-digit characters and + symbol
-  const phoneNumber = customNumber.replace(/[^0-9]/g, '');
+  // Then remove the + if it exists at the start
+  cleanNumber = cleanNumber.replace(/^\+/, '');
   
-  if (!phoneNumber) {
+  console.log("Cleaned WhatsApp number:", cleanNumber);
+  
+  if (!cleanNumber) {
     console.error('Invalid WhatsApp number after cleaning');
     return '';
   }
   
   try {
     const message = generateWhatsAppMessage(data);
-    const url = `https://wa.me/${phoneNumber}?text=${message}`;
+    const url = `https://wa.me/${cleanNumber}?text=${message}`;
     console.log("Generated WhatsApp URL:", url);
     return url;
   } catch (error) {
