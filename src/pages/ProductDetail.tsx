@@ -20,17 +20,21 @@ const ProductDetail = () => {
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
+      console.log("Fetching settings in ProductDetail...");
       const { data, error } = await supabase
         .from("settings")
         .select("*")
-        .limit(1);
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
       
       if (error) {
         console.error("Error fetching settings:", error);
         return null;
       }
       
-      return data && data.length > 0 ? data[0] : null;
+      console.log("Settings fetched:", data);
+      return data;
     },
   });
 
@@ -128,7 +132,7 @@ const ProductDetail = () => {
             discountPrice={product.discount_price}
             productId={product.id}
             onOrderSubmit={handleOrderSubmit}
-            whatsappNumber={product.whatsapp_number}
+            whatsappNumber={settings?.whatsapp_number}
           />
         </div>
       </div>

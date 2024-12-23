@@ -49,6 +49,7 @@ export function OrderDialog({
     productBrand,
     productPrice,
     onSubmit: async (data) => {
+      console.log("WhatsApp number being used:", whatsappNumber);
       if (data.whatsappUrl) {
         // First submit the form data
         onSubmit(data);
