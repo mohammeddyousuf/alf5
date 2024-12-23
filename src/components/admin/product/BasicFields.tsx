@@ -37,6 +37,9 @@ export function BasicFields({ form }: BasicFieldsProps) {
     },
   });
 
+  console.log("Current WhatsApp number:", whatsappNumber);
+  console.log("Settings WhatsApp number:", settings?.whatsapp_number);
+
   return (
     <>
       <div className="flex justify-between items-center">
@@ -99,8 +102,8 @@ export function BasicFields({ form }: BasicFieldsProps) {
             </FormControl>
             <FormMessage />
             <p className="text-sm text-muted-foreground">
-              {whatsappNumber ? 
-                `Currently using: ${whatsappNumber}` : 
+              {field.value ? 
+                `Currently using: ${field.value}` : 
                 `Using default WhatsApp number: ${settings?.whatsapp_number || 'Loading...'}`
               }
             </p>

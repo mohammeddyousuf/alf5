@@ -8,6 +8,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Orders } from "@/integrations/supabase/types/orders";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface OrdersTableProps {
   orders: Orders[];
@@ -15,6 +17,40 @@ interface OrdersTableProps {
 }
 
 export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
+  // Fetch products to get WhatsApp numbers
+  const { data: products } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id, whatsapp_number");
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch default WhatsApp number from settings
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("settings")
+        .select("whatsapp_number")
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const getWhatsAppNumber = (order: Orders) => {
+    if (!products) return settings?.whatsapp_number || '+919900981857';
+    
+    const product = products.find(p => p.id === order.product_id);
+    return product?.whatsapp_number || settings?.whatsapp_number || '+919900981857';
+  };
+
   return (
     <div className="border rounded-lg">
       <Table>
@@ -71,7 +107,7 @@ export function OrdersTable({ orders, formatPrice }: OrdersTableProps) {
                 <div className="text-sm">{order.message || '-'}</div>
               </TableCell>
               <TableCell>
-                <div className="text-sm font-medium">{order.whatsapp_number || '+919900981857'}</div>
+                <div className="text-sm font-medium">{getWhatsAppNumber(order)}</div>
               </TableCell>
               <TableCell>
                 <div className="text-sm">{order.location || '-'}</div>
