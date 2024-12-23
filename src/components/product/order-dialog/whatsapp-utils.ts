@@ -35,23 +35,19 @@ export const constructWhatsAppMessage = (data: {
 };
 
 export const createWhatsAppUrl = (message: string, customNumber?: string) => {
-  // Ensure we have a message
   if (!message) {
     console.error('No message provided for WhatsApp URL creation');
     return '';
   }
 
-  const baseUrl = 'https://api.whatsapp.com/send';
-  const defaultNumber = '+919900981857';
-  const phoneNumber = (customNumber || defaultNumber).replace(/[^0-9+]/g, '');
+  const baseUrl = 'https://wa.me';
+  const defaultNumber = '919900981857'; // Remove + for wa.me format
+  const phoneNumber = (customNumber || defaultNumber).replace(/[^0-9]/g, '');
   
   try {
-    // Create URL with properly encoded parameters
-    const url = new URL(baseUrl);
-    url.searchParams.append('phone', phoneNumber);
+    // Create URL with properly encoded parameters for wa.me format
+    const url = new URL(`${baseUrl}/${phoneNumber}`);
     url.searchParams.append('text', message);
-    url.searchParams.append('type', 'phone_number');
-    url.searchParams.append('app_absent', '0');
     
     console.log('WhatsApp URL parameters:', {
       phone: phoneNumber,
@@ -62,7 +58,6 @@ export const createWhatsAppUrl = (message: string, customNumber?: string) => {
     const finalUrl = url.toString();
     console.log('Final WhatsApp URL:', finalUrl);
     
-    // Add a small delay before returning the URL
     return finalUrl;
   } catch (error) {
     console.error('Error creating WhatsApp URL:', error);

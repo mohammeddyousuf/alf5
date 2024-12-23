@@ -49,16 +49,19 @@ export function OrderDialog({
     productBrand,
     productPrice,
     onSubmit: async (data) => {
-      // Close dialog first
-      onOpenChange(false);
-      
-      // Add a small delay before opening WhatsApp
-      setTimeout(() => {
-        if (data.whatsappUrl) {
-          window.open(data.whatsappUrl, '_blank', 'noopener,noreferrer');
-        }
+      if (data.whatsappUrl) {
+        // First open WhatsApp with the message
+        window.open(data.whatsappUrl, '_blank', 'noopener,noreferrer');
+        
+        // Then close dialog and submit after a small delay
+        setTimeout(() => {
+          onOpenChange(false);
+          onSubmit(data);
+        }, 100);
+      } else {
+        onOpenChange(false);
         onSubmit(data);
-      }, 500); // 500ms delay
+      }
     },
     whatsappNumber,
   });
