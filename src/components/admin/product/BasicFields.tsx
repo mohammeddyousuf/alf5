@@ -107,12 +107,19 @@ export function BasicFields({ form }: BasicFieldsProps) {
               />
             </FormControl>
             <FormMessage />
-            <p className="text-sm text-muted-foreground">
-              {field.value ? 
-                `Currently using: ${field.value}` : 
-                `Using default WhatsApp number: ${settings?.whatsapp_number || 'Loading...'}`
-              }
-            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                {field.value ? 
+                  `Currently using override: ${field.value}` : 
+                  `Using default WhatsApp number: ${settings?.whatsapp_number || 'Loading...'}`
+                }
+              </p>
+              {field.value && (
+                <p className="text-sm text-yellow-600">
+                  This product is using a custom WhatsApp number different from the default
+                </p>
+              )}
+            </div>
           </FormItem>
         )}
       />
