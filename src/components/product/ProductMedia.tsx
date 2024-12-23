@@ -72,11 +72,12 @@ export const ProductMedia = ({
     return publicUrl;
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+  const handleImageClick = () => {
+    // Find and click the Contact Now button
+    const contactButton = document.querySelector('button:has(.contact-now-text)') as HTMLButtonElement;
+    if (contactButton) {
+      contactButton.click();
+    }
   };
 
   return (
@@ -92,7 +93,7 @@ export const ProductMedia = ({
                       src={getImageUrl(image)}
                       alt={`${productName} ${index + 1}`}
                       className="w-full h-full object-cover rounded-lg cursor-pointer"
-                      onClick={scrollToTop}
+                      onClick={handleImageClick}
                     />
                     {index === 0 && (showSalePrice || showDiscountPrice) && (
                       <div className="absolute top-2 left-2">
@@ -150,7 +151,7 @@ export const ProductMedia = ({
               src={getImageUrl(image)}
               alt={`${productName} ${index + 1}`}
               className="w-full aspect-square object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
-              onClick={scrollToTop}
+              onClick={handleImageClick}
             />
           ))}
         </div>
