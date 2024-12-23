@@ -103,6 +103,11 @@ export function BasicFields({ form }: BasicFieldsProps) {
               <Input 
                 {...field} 
                 value={field.value || ''} 
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Only update if there's a value, otherwise set to null
+                  field.onChange(value || null);
+                }}
                 placeholder={`Default: ${settings?.whatsapp_number || 'Loading...'}`}
               />
             </FormControl>
