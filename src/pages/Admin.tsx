@@ -7,6 +7,8 @@ import { AdminHeader } from "@/components/admin/AdminHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { queryClient } from "@/lib/react-query";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -19,6 +21,36 @@ const Admin = () => {
       return data;
     },
   });
+
+  const { data: enquiries, refetch: refetchEnquiries } = useQuery({
+    queryKey: ["enquiries"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("enquiries")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Effect to refetch data after auth state changes
+  useEffect(() => {
+    const handleAuthChange = (event: string) => {
+      if (event === 'SIGNED_IN') {
+        // Refetch all queries after successful sign in
+        queryClient.invalidateQueries();
+      }
+    };
+
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthChange);
+
+    // Cleanup subscription
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const { data: products, ...productsQuery } = useQuery({
     queryKey: ["products"],
@@ -93,18 +125,6 @@ const Admin = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("orders")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const { data: enquiries } = useQuery({
-    queryKey: ["enquiries"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("enquiries")
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
