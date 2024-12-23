@@ -3,17 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Link } from "react-router-dom";
 import { ProductMedia } from "@/components/product/ProductMedia";
 import { ProductInfo } from "@/components/product/ProductInfo";
 import { Helmet } from "react-helmet";
+import { ProductHead } from "@/components/product/detail/ProductHead";
+import { ProductMeta } from "@/components/product/detail/ProductMeta";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -65,28 +59,9 @@ const ProductDetail = () => {
   };
 
   const handleOrderSubmit = (formData: any) => {
-    const whatsappNumber = settings?.whatsapp_number || "+1234567890";
-    const websiteName = settings?.website_name || "Our Store";
+    if (!settings) return;
     
     if (!product) return;
-    
-    const message = `*${websiteName}*
-
-*Order Details:*
-Product: ${formData.productName}
-${formData.productBrand ? `Brand: ${formData.productBrand}\n` : ''}Price: ${formData.productPrice}
-
-*Customer Details:*
-Name: ${formData.name}
-Email: ${formData.email}
-Mobile: ${formData.mobile}
-Address: ${formData.address}
-Payment Mode: ${formData.paymentMode}`;
-
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-    
-    window.open(whatsappUrl, "_blank");
     
     toast({
       title: "Order Placed",
@@ -114,61 +89,23 @@ Payment Mode: ${formData.paymentMode}`;
   const productImage = product.images && product.images.length > 0 ? product.images[0] : null;
   const productPrice = product.sale_price || product.price;
   const currentUrl = window.location.href;
-  
-  // Convert relative image URLs to absolute URLs
-  const getAbsoluteUrl = (url: string) => {
-    if (!url) return '';
-    if (url.startsWith('http')) return url;
-    return `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
-  };
-
-  const absoluteProductImage = productImage ? getAbsoluteUrl(productImage) : null;
 
   return (
     <>
       <Helmet>
-        <title>{`${product.name} | ${websiteName}`}</title>
-        <meta name="description" content={product.description || `${product.name} - Available at ${websiteName}`} />
-        
-        {/* Facebook Open Graph */}
-        <meta property="og:type" content="product" />
-        <meta property="og:url" content={currentUrl} />
-        <meta property="og:title" content={`${product.name} | ${websiteName}`} />
-        <meta property="og:description" content={product.description || `${product.name} - Available at ${websiteName}`} />
-        {absoluteProductImage && <meta property="og:image" content={absoluteProductImage} />}
-        <meta property="product:price:amount" content={String(productPrice)} />
-        <meta property="product:price:currency" content="USD" />
-        {product.brand && <meta property="product:brand" content={product.brand} />}
-        
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${product.name} | ${websiteName}`} />
-        <meta name="twitter:description" content={product.description || `${product.name} - Available at ${websiteName}`} />
-        {absoluteProductImage && <meta name="twitter:image" content={absoluteProductImage} />}
+        <ProductMeta
+          websiteName={websiteName}
+          productName={product.name}
+          productDescription={product.description}
+          productImage={productImage}
+          currentUrl={currentUrl}
+          productPrice={productPrice}
+          productBrand={product.brand}
+        />
       </Helmet>
 
       <div className="container py-8">
-        <div className="mb-6">
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <Link to="/" className="transition-colors hover:text-foreground">
-                  Home
-                </Link>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <Link to="/shop" className="transition-colors hover:text-foreground">
-                  Shop
-                </Link>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{product.name}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
+        <ProductHead productName={product.name} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <ProductMedia
@@ -190,6 +127,7 @@ Payment Mode: ${formData.paymentMode}`;
             discountPrice={product.discount_price}
             productId={product.id}
             onOrderSubmit={handleOrderSubmit}
+            whatsappNumber={product.whatsapp_number}
           />
         </div>
       </div>
