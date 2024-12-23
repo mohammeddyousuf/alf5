@@ -50,14 +50,14 @@ export function OrderDialog({
     productPrice,
     onSubmit: async (data) => {
       if (data.whatsappUrl) {
-        // First open WhatsApp with the message
-        window.open(data.whatsappUrl, '_blank', 'noopener,noreferrer');
+        // First submit the form data
+        onSubmit(data);
         
-        // Then close dialog and submit after a small delay
-        setTimeout(() => {
-          onOpenChange(false);
-          onSubmit(data);
-        }, 100);
+        // Then close dialog
+        onOpenChange(false);
+        
+        // Finally open WhatsApp in a new window
+        window.open(data.whatsappUrl, '_blank');
       } else {
         onOpenChange(false);
         onSubmit(data);
