@@ -49,9 +49,9 @@ const Page = () => {
   return (
     <div className="container py-12">
       <h1 className="text-4xl font-bold mb-8">{page.title}</h1>
-      <div className="prose prose-sm md:prose-base lg:prose-lg">
+      <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none">
         {page.content.split("\n").map((paragraph, index) => (
-          <p key={index}>{paragraph}</p>
+          <p key={index} className="text-left">{paragraph}</p>
         ))}
       </div>
     </div>
