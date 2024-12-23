@@ -30,7 +30,9 @@ export function BasicFields({ form }: BasicFieldsProps) {
       const { data, error } = await supabase
         .from("settings")
         .select("whatsapp_number")
-        .single();
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
       
       if (error) throw error;
       return data;
