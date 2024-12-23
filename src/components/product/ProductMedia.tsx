@@ -72,7 +72,8 @@ export const ProductMedia = ({
     return publicUrl;
   };
 
-  const handleImageClick = () => {
+  const handleImageClick = (event: React.MouseEvent) => {
+    event.preventDefault();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -88,7 +89,7 @@ export const ProductMedia = ({
                     <img
                       src={getImageUrl(image)}
                       alt={`${productName} ${index + 1}`}
-                      className="w-full h-full object-cover rounded-lg"
+                      className="w-full h-full object-cover rounded-lg cursor-pointer"
                       onClick={handleImageClick}
                     />
                     {index === 0 && (showSalePrice || showDiscountPrice) && (
