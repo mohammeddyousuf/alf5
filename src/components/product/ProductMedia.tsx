@@ -73,10 +73,12 @@ export const ProductMedia = ({
   };
 
   const handleImageClick = () => {
-    // Find and click the Contact Now button
-    const contactButton = document.querySelector('button:has(.contact-now-text)') as HTMLButtonElement;
+    // Find the Contact Now button more specifically
+    const contactButton = document.querySelector('button span.contact-now-text')?.closest('button') as HTMLButtonElement;
     if (contactButton) {
       contactButton.click();
+    } else {
+      console.log("Contact button not found");
     }
   };
 
