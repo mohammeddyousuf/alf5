@@ -26,6 +26,7 @@ const defaultValues: ProductFormData = {
   featured: false,
   brand: null,
   custom_label: null,
+  whatsapp_number: null,
 };
 
 export function useProductForm({ product, onSuccess, onLimitExceeded }: UseProductFormProps) {
@@ -46,6 +47,7 @@ export function useProductForm({ product, onSuccess, onLimitExceeded }: UseProdu
       featured: product.featured ?? false,
       brand: product.brand ?? null,
       custom_label: product.custom_label ?? null,
+      whatsapp_number: product.whatsapp_number ?? null,
     } : defaultValues,
   });
 
@@ -64,6 +66,7 @@ export function useProductForm({ product, onSuccess, onLimitExceeded }: UseProdu
         featured: values.featured,
         brand: values.brand || null,
         custom_label: values.custom_label || null,
+        whatsapp_number: values.whatsapp_number || null,
       };
 
       if (product?.id) {
