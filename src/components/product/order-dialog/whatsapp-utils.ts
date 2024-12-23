@@ -12,6 +12,7 @@ export const constructWhatsAppMessage = (data: {
 }) => {
   console.log("Constructing WhatsApp message with data:", data);
   
+  // Using template literals to preserve line breaks
   const messageLines = [
     `Hi, ${data.websiteName}`,
     "",
@@ -40,14 +41,28 @@ export const createWhatsAppUrl = (message: string, customNumber?: string) => {
     return '';
   }
 
-  const baseUrl = 'https://wa.me';
-  const defaultNumber = '919900981857'; // Remove + for wa.me format
-  const phoneNumber = (customNumber || defaultNumber).replace(/[^0-9]/g, '');
+  const baseUrl = 'https://api.whatsapp.com/send';
+  const defaultNumber = '+919900981857';
+  const phoneNumber = (customNumber || defaultNumber).replace(/[^0-9+]/g, '');
   
   try {
-    // Create URL with properly encoded parameters for wa.me format
-    const url = new URL(`${baseUrl}/${phoneNumber}`);
-    url.searchParams.append('text', message);
+    // Create URL with properly encoded parameters
+    const url = new URL(baseUrl);
+    
+    // Remove the '+' before adding to URL params
+    url.searchParams.append('phone', phoneNumber.replace('+', ''));
+    
+    // Properly encode the message while preserving special characters
+    const encodedText = encodeURIComponent(message)
+      .replace(/\*/g, '%2A')  // Preserve asterisks for bold text
+      .replace(/\n/g, '%0A')  // Preserve line breaks
+      .replace(/\r/g, '%0D')  // Handle carriage returns
+      .replace(/'/g, '%27')   // Handle single quotes
+      .replace(/"/g, '%22');  // Handle double quotes
+    
+    url.searchParams.append('text', encodedText);
+    url.searchParams.append('type', 'phone_number');
+    url.searchParams.append('app_absent', '0');
     
     console.log('WhatsApp URL parameters:', {
       phone: phoneNumber,
