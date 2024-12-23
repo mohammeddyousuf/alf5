@@ -15,6 +15,7 @@ export interface Orders {
   ip_address: string | null;
   source: string | null;
   whatsapp_number: string | null;
+  sent_to_whatsapp: string | null;
 }
 
 export interface OrdersInsert extends Partial<Omit<Orders, 'created_at'>> {
