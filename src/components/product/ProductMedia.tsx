@@ -72,6 +72,10 @@ export const ProductMedia = ({
     return publicUrl;
   };
 
+  const handleImageClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="space-y-4">
       {images && images.length > 0 && (
@@ -85,6 +89,7 @@ export const ProductMedia = ({
                       src={getImageUrl(image)}
                       alt={`${productName} ${index + 1}`}
                       className="w-full h-full object-cover rounded-lg"
+                      onClick={handleImageClick}
                     />
                     {index === 0 && (showSalePrice || showDiscountPrice) && (
                       <div className="absolute top-2 left-2">
@@ -142,6 +147,7 @@ export const ProductMedia = ({
               src={getImageUrl(image)}
               alt={`${productName} ${index + 1}`}
               className="w-full aspect-square object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={handleImageClick}
             />
           ))}
         </div>
