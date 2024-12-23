@@ -22,6 +22,7 @@ export const WhatsAppSettings = () => {
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
+      console.log("Fetching settings...");
       const { data, error } = await supabase
         .from("settings")
         .select("*")
@@ -74,7 +75,11 @@ export const WhatsAppSettings = () => {
 
       if (error) throw error;
 
-      await queryClient.invalidateQueries({ queryKey: ["settings"] });
+      // Invalidate all queries that might use the WhatsApp number
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["settings"] }),
+        queryClient.invalidateQueries({ queryKey: ["products"] })
+      ]);
 
       toast({
         title: "Success",
