@@ -21,6 +21,7 @@ export function ProductMeta({
   const getAbsoluteUrl = (url: string) => {
     if (!url) return '';
     if (url.startsWith('http')) return url;
+    // Ensure we use the full domain for the image URL
     return `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
   };
 
