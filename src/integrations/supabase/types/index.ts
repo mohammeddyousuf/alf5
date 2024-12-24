@@ -8,6 +8,7 @@ import type { Categories } from './categories';
 import type { Subcategories } from './subcategories';
 import type { Orders } from './orders';
 import type { Sliders } from './sliders';
+import type { Faqs } from './faqs';
 
 export type Json =
   | string
@@ -30,6 +31,7 @@ export interface Database {
       subcategories: Subcategories;
       orders: Orders;
       sliders: Sliders;
+      faqs: Faqs;
     }
     Views: {
       [_ in never]: never

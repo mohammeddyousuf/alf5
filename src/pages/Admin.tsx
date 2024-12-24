@@ -90,6 +90,15 @@ const Admin = () => {
     },
   });
 
+  const { data: faqs } = useQuery({
+    queryKey: ["faqs"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("faqs").select("*");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <ProtectedRoute>
       <div className="container mx-auto p-6 space-y-6">
@@ -148,6 +157,12 @@ const Admin = () => {
             <h2 className="text-xl font-semibold mb-2">Pages</h2>
             <p className="text-3xl font-bold mb-4">{pages?.length || 0}</p>
             <Button onClick={() => navigate("/admin/pages")}>Manage Pages</Button>
+          </Card>
+
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-2">FAQs</h2>
+            <p className="text-3xl font-bold mb-4">{faqs?.length || 0}</p>
+            <Button onClick={() => navigate("/admin/faqs")}>Manage FAQs</Button>
           </Card>
         </div>
 
