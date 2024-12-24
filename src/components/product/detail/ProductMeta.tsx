@@ -31,14 +31,17 @@ export function ProductMeta({
       <title>{`${productName} | ${websiteName}`}</title>
       <meta name="description" content={productDescription || `${productName} - Available at ${websiteName}`} />
       
-      {/* Facebook Open Graph */}
+      {/* WhatsApp and Facebook Open Graph */}
       <meta property="og:type" content="product" />
       <meta property="og:url" content={currentUrl} />
       <meta property="og:title" content={`${productName} | ${websiteName}`} />
       <meta property="og:description" content={productDescription || `${productName} - Available at ${websiteName}`} />
       {absoluteProductImage && <meta property="og:image" content={absoluteProductImage} />}
+      {absoluteProductImage && <meta property="og:image:secure_url" content={absoluteProductImage} />}
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
       <meta property="product:price:amount" content={String(productPrice)} />
-      <meta property="product:price:currency" content="USD" />
+      <meta property="product:price:currency" content="INR" />
       {productBrand && <meta property="product:brand" content={productBrand} />}
       
       {/* Twitter Card */}
