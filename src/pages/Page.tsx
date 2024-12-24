@@ -51,7 +51,11 @@ const Page = () => {
       <h1 className="text-4xl font-bold mb-8">{page.title}</h1>
       <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none">
         {page.content.split("\n").map((paragraph, index) => (
-          <p key={index} className="text-left">{paragraph}</p>
+          paragraph.trim() ? (
+            <p key={index} className="text-left mb-6">{paragraph}</p>
+          ) : (
+            <div key={index} className="h-4" /> // Adds spacing for empty lines
+          )
         ))}
       </div>
     </div>
