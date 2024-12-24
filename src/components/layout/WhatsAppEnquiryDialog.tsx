@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea } from "@/components/ui/textarea";
-import { logEnquiry } from "@/utils/enquiryUtils";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface WhatsAppEnquiryDialogProps {
   isOpen: boolean;
@@ -13,12 +13,34 @@ interface WhatsAppEnquiryDialogProps {
   onSubmit: (name: string, mobile: string, email: string, comments?: string) => void;
 }
 
-export const WhatsAppEnquiryDialog = ({ isOpen, onClose, onSubmit }: WhatsAppEnquiryDialogProps) => {
+export const WhatsAppEnquiryDialog = ({ isOpen: propIsOpen, onClose, onSubmit }: WhatsAppEnquiryDialogProps) => {
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
   const [email, setEmail] = useState("");
   const [comments, setComments] = useState("");
   const { toast } = useToast();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Check if dialog should be opened from URL parameter
+  const searchParams = new URLSearchParams(location.search);
+  const showDialog = searchParams.get('connect') === 'whatsapp';
+  const [isOpen, setIsOpen] = useState(propIsOpen || showDialog);
+
+  useEffect(() => {
+    setIsOpen(propIsOpen || showDialog);
+  }, [propIsOpen, showDialog]);
+
+  const handleClose = () => {
+    // Remove the URL parameter when closing
+    if (showDialog) {
+      const newSearchParams = new URLSearchParams(location.search);
+      newSearchParams.delete('connect');
+      navigate({ search: newSearchParams.toString() }, { replace: true });
+    }
+    setIsOpen(false);
+    onClose();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,11 +55,11 @@ export const WhatsAppEnquiryDialog = ({ isOpen, onClose, onSubmit }: WhatsAppEnq
     }
 
     onSubmit(name, mobile, email, comments);
-    onClose();
+    handleClose();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Connect on WhatsApp</DialogTitle>
