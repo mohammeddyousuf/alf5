@@ -46,15 +46,32 @@ const Page = () => {
     );
   }
 
+  // Function to convert markdown-style links to HTML
+  const convertLinksToHtml = (text: string) => {
+    // Regular expression to match [text](url) pattern
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    return text.replace(linkRegex, (match, text, url) => {
+      // For WhatsApp connect links, use the special parameter
+      if (url === "whatsapp-connect") {
+        url = "/?connect=whatsapp";
+      }
+      return `<a href="${url}" class="text-primary hover:underline">${text}</a>`;
+    });
+  };
+
   return (
     <div className="container py-12">
       <h1 className="text-4xl font-bold mb-8">{page.title}</h1>
       <div className="prose prose-sm md:prose-base lg:prose-lg max-w-none">
         {page.content.split("\n").map((paragraph, index) => (
           paragraph.trim() ? (
-            <p key={index} className="text-left mb-6">{paragraph}</p>
+            <p 
+              key={index} 
+              className="text-left mb-6"
+              dangerouslySetInnerHTML={{ __html: convertLinksToHtml(paragraph) }}
+            />
           ) : (
-            <div key={index} className="h-4" /> // Adds spacing for empty lines
+            <div key={index} className="h-4" />
           )
         ))}
       </div>
