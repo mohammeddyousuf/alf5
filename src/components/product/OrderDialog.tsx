@@ -38,7 +38,8 @@ export function OrderDialog({
       email: "",
       mobile: "",
       address: "",
-      paymentMode: "bank_transfer",
+      paymentMode: "upi",
+      howDidYouKnow: "",
       comments: "",
     },
   });
