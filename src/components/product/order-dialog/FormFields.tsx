@@ -80,44 +80,58 @@ export function FormFields({ form }: FormFieldsProps) {
         )}
       />
 
-      <FormField
-        control={form.control}
-        name="paymentMode"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-foreground">
-              Preferred Payment Mode (Optional)
-            </FormLabel>
-            <Select onValueChange={field.onChange} value={field.value}>
-              <FormControl>
-                <SelectTrigger className="bg-background text-foreground">
-                  <SelectValue placeholder="Select payment mode" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                <SelectItem value="cash">Cash</SelectItem>
-                <SelectItem value="upi">UPI</SelectItem>
-                <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        <FormField
+          control={form.control}
+          name="paymentMode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-foreground">
+                Preferred Payment Mode (Optional)
+              </FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger className="bg-background text-foreground">
+                    <SelectValue placeholder="Select payment mode" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="upi">UPI</SelectItem>
+                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="cash">Cash</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <FormField
-        control={form.control}
-        name="comments"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel className="text-foreground">Comments (Optional)</FormLabel>
-            <FormControl>
-              <Textarea {...field} className="bg-background text-foreground" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+        <FormField
+          control={form.control}
+          name="howDidYouKnow"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-foreground">How did you know about us? (Optional)</FormLabel>
+              <FormControl>
+                <Input {...field} className="bg-background text-foreground" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="comments"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-foreground">Comments (Optional)</FormLabel>
+              <FormControl>
+                <Textarea {...field} className="bg-background text-foreground" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
     </>
   );
 }

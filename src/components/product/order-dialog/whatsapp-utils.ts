@@ -9,7 +9,7 @@ Name: ${data.name}
 Mobile: ${data.mobile}
 Email: ${data.email}
 Address: ${data.address}
-Payment Mode: ${data.paymentMode}${data.comments ? `\nComments: ${data.comments}` : ''}`;
+Payment Mode: ${data.paymentMode}${data.howDidYouKnow ? `\nHow did you know about us: ${data.howDidYouKnow}` : ''}${data.comments ? `\nComments: ${data.comments}` : ''}`;
 
   return encodeURIComponent(message);
 }
