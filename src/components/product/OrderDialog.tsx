@@ -60,8 +60,28 @@ export function OrderDialog({
         // Then close dialog
         onOpenChange(false);
         
-        // Finally open WhatsApp in a new window
-        window.open(data.whatsappUrl, '_blank');
+        // Try to open WhatsApp with error handling
+        try {
+          const newWindow = window.open(data.whatsappUrl, '_blank');
+          if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+            // Fallback: copy URL to clipboard and show message
+            navigator.clipboard.writeText(data.whatsappUrl).then(() => {
+              alert('WhatsApp could not be opened automatically. The WhatsApp link has been copied to your clipboard. Please paste it in your browser to continue with your order.');
+            }).catch(() => {
+              // If clipboard fails, show the URL
+              alert(`WhatsApp could not be opened automatically. Please copy this link and paste it in your browser: ${data.whatsappUrl}`);
+            });
+          }
+        } catch (error) {
+          console.error('Error opening WhatsApp:', error);
+          // Fallback: copy URL to clipboard and show message
+          navigator.clipboard.writeText(data.whatsappUrl).then(() => {
+            alert('WhatsApp could not be opened automatically. The WhatsApp link has been copied to your clipboard. Please paste it in your browser to continue with your order.');
+          }).catch(() => {
+            // If clipboard fails, show the URL
+            alert(`WhatsApp could not be opened automatically. Please copy this link and paste it in your browser: ${data.whatsappUrl}`);
+          });
+        }
       } else {
         onOpenChange(false);
         onSubmit(data);
