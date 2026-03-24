@@ -189,6 +189,27 @@ export const WhatsAppSettings = () => {
               Show order form before redirecting to WhatsApp
             </Label>
           </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="showWhatsappGroupPopup"
+              checked={showWhatsappGroupPopup}
+              onCheckedChange={(checked) => setShowWhatsappGroupPopup(checked === true)}
+            />
+            <Label htmlFor="showWhatsappGroupPopup">
+              Show WhatsApp group popup when website loads
+            </Label>
+          </div>
+          {showWhatsappGroupPopup && (
+            <div className="space-y-2 ml-6">
+              <Label htmlFor="popupMessage">Popup Message</Label>
+              <Input
+                id="popupMessage"
+                value={whatsappGroupPopupMessage}
+                onChange={(e) => setWhatsappGroupPopupMessage(e.target.value)}
+                placeholder="Join our WhatsApp group for the latest updates and offers!"
+              />
+            </div>
+          )}
           <Button onClick={handleUpdateWhatsApp} disabled={isUpdating}>
             {isUpdating ? (
               <>
