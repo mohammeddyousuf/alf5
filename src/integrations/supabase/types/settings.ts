@@ -26,6 +26,8 @@ export interface Settings {
   lock_check_interval: number | null;
   show_news_ticker: boolean | null;
   show_order_form: boolean | null;
+  show_whatsapp_group_popup: boolean | null;
+  whatsapp_group_popup_message: string | null;
 }
 
 export interface SettingsInsert extends Partial<Omit<Settings, 'whatsapp_number' | 'created_at' | 'updated_at'>> {
