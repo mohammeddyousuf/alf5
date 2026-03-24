@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ export const WhatsAppSettings = () => {
   const queryClient = useQueryClient();
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [whatsappGroupUrl, setWhatsappGroupUrl] = useState("");
+  const [showOrderForm, setShowOrderForm] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLink[]>([]);
   const [isSocialMediaUpdating, setIsSocialMediaUpdating] = useState(false);
@@ -39,6 +41,7 @@ export const WhatsAppSettings = () => {
     if (settings) {
       setWhatsappNumber(settings.whatsapp_number || "");
       setWhatsappGroupUrl(settings.whatsapp_group_url || "");
+      setShowOrderForm(settings.show_order_form !== false);
       
       // Initialize social media links from settings
       let links: SocialMediaLink[] = [];
@@ -69,7 +72,8 @@ export const WhatsAppSettings = () => {
         .from("settings")
         .update({ 
           whatsapp_number: whatsappNumber,
-          whatsapp_group_url: whatsappGroupUrl 
+          whatsapp_group_url: whatsappGroupUrl,
+          show_order_form: showOrderForm
         })
         .eq("id", settings?.id);
 
@@ -153,6 +157,16 @@ export const WhatsAppSettings = () => {
               onChange={(e) => setWhatsappGroupUrl(e.target.value)}
               placeholder="Enter WhatsApp group invite link"
             />
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="showOrderForm"
+              checked={showOrderForm}
+              onCheckedChange={(checked) => setShowOrderForm(checked === true)}
+            />
+            <Label htmlFor="showOrderForm">
+              Show order form before redirecting to WhatsApp
+            </Label>
           </div>
           <Button onClick={handleUpdateWhatsApp} disabled={isUpdating}>
             {isUpdating ? (
