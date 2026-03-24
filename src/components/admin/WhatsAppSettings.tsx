@@ -72,7 +72,8 @@ export const WhatsAppSettings = () => {
         .from("settings")
         .update({ 
           whatsapp_number: whatsappNumber,
-          whatsapp_group_url: whatsappGroupUrl 
+          whatsapp_group_url: whatsappGroupUrl,
+          show_order_form: showOrderForm
         })
         .eq("id", settings?.id);
 
