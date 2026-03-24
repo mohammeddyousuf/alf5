@@ -90,10 +90,34 @@ export function ProductInfo({
     discountPrice < price;
 
   const handleWhatsAppClick = () => {
-    // Log both numbers to debug
     console.log("Product WhatsApp Override:", whatsappNumber);
     console.log("Default WhatsApp Number:", settings?.whatsapp_number);
-    setOrderDialogOpen(true);
+    
+    const showForm = settings?.show_order_form !== false;
+    
+    if (showForm) {
+      setOrderDialogOpen(true);
+    } else {
+      // Skip form, go directly to WhatsApp with product info
+      const number = effectiveWhatsAppNumber;
+      if (!number) {
+        console.error("No WhatsApp number available");
+        return;
+      }
+      let cleanNumber = number.trim().replace(/[^\d+]/g, '').replace(/^\+/, '');
+      const message = encodeURIComponent(
+        `Hi,\n\nI'm interested in ${name}${brand ? ` by ${brand}` : ''}.\nPrice: ${formatPrice(displayPrice)}\n\nPlease share more details.`
+      );
+      const url = `https://wa.me/${cleanNumber}?text=${message}`;
+      try {
+        const newWindow = window.open(url, '_blank');
+        if (!newWindow || newWindow.closed) {
+          navigator.clipboard.writeText(url).catch(() => {});
+        }
+      } catch {
+        navigator.clipboard.writeText(url).catch(() => {});
+      }
+    }
   };
 
   const handleOrderSubmit = (data: any) => {
