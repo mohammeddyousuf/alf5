@@ -116,10 +116,46 @@ export const ProductCard = ({
                         showDiscountPrice ? discountPrice :
                         price;
 
+  const formatWhatsAppPrice = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.scrollTo(0, 0);
-    navigate(productUrl);
+    
+    const showForm = settings?.show_order_form !== false;
+    
+    if (showForm) {
+      setOrderDialogOpen(true);
+    } else {
+      const number = settings?.whatsapp_number;
+      if (!number) {
+        console.error("No WhatsApp number available");
+        return;
+      }
+      let cleanNumber = number.trim().replace(/[^\d+]/g, '').replace(/^\+/, '');
+      const message = encodeURIComponent(
+        `Hi,\n\nI'm interested in ${name}${brand ? ` by ${brand}` : ''}.\nPrice: ${formatWhatsAppPrice(effectivePrice)}\n\nPlease share more details.`
+      );
+      const url = `https://wa.me/${cleanNumber}?text=${message}`;
+      window.open(url, '_blank');
+    }
+  };
+
+  const handleOrderSubmit = (data: any) => {
+    const { whatsappUrl: generatedUrl, ...formData } = data;
+    if (generatedUrl) {
+      window.open(generatedUrl, '_blank', 'noopener,noreferrer');
+    }
+    toast({
+      title: "Order Placed",
+      description: "You will be redirected to WhatsApp to complete your order.",
+    });
+    setOrderDialogOpen(false);
   };
 
   return (
