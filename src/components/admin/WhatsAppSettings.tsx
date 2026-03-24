@@ -44,6 +44,8 @@ export const WhatsAppSettings = () => {
       setWhatsappNumber(settings.whatsapp_number || "");
       setWhatsappGroupUrl(settings.whatsapp_group_url || "");
       setShowOrderForm(settings.show_order_form !== false);
+      setShowWhatsappGroupPopup(settings.show_whatsapp_group_popup === true);
+      setWhatsappGroupPopupMessage(settings.whatsapp_group_popup_message || "");
       
       // Initialize social media links from settings
       let links: SocialMediaLink[] = [];
