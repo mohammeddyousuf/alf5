@@ -41,6 +41,7 @@ export const WhatsAppSettings = () => {
     if (settings) {
       setWhatsappNumber(settings.whatsapp_number || "");
       setWhatsappGroupUrl(settings.whatsapp_group_url || "");
+      setShowOrderForm(settings.show_order_form !== false);
       
       // Initialize social media links from settings
       let links: SocialMediaLink[] = [];
