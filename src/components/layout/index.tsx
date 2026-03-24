@@ -78,6 +78,11 @@ const Layout = ({ children }: LayoutProps) => {
       </main>
       <Footer />
       {showLockOverlay && <LockOverlay message={settings?.lock_message || "This website is currently locked. Please contact support."} />}
+      <WhatsAppGroupPopup
+        enabled={settings?.show_whatsapp_group_popup === true}
+        message={settings?.whatsapp_group_popup_message || ""}
+        groupUrl={settings?.whatsapp_group_url || ""}
+      />
     </div>
   );
 };
