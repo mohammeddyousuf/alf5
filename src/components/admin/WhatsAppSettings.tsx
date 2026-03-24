@@ -19,6 +19,8 @@ export const WhatsAppSettings = () => {
   const [showOrderForm, setShowOrderForm] = useState(true);
   const [showWhatsappGroupPopup, setShowWhatsappGroupPopup] = useState(false);
   const [whatsappGroupPopupMessage, setWhatsappGroupPopupMessage] = useState("");
+  const [showFloatingContact, setShowFloatingContact] = useState(false);
+  const [showFloatingGroup, setShowFloatingGroup] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLink[]>([]);
   const [isSocialMediaUpdating, setIsSocialMediaUpdating] = useState(false);
@@ -46,6 +48,8 @@ export const WhatsAppSettings = () => {
       setShowOrderForm(settings.show_order_form !== false);
       setShowWhatsappGroupPopup(settings.show_whatsapp_group_popup === true);
       setWhatsappGroupPopupMessage(settings.whatsapp_group_popup_message || "");
+      setShowFloatingContact(settings.show_floating_whatsapp_contact === true);
+      setShowFloatingGroup(settings.show_floating_whatsapp_group === true);
       
       // Initialize social media links from settings
       let links: SocialMediaLink[] = [];
@@ -78,6 +82,8 @@ export const WhatsAppSettings = () => {
         whatsapp_group_url: whatsappGroupUrl,
         show_whatsapp_group_popup: showWhatsappGroupPopup,
         whatsapp_group_popup_message: whatsappGroupPopupMessage,
+        show_floating_whatsapp_contact: showFloatingContact,
+        show_floating_whatsapp_group: showFloatingGroup,
       };
 
       // Try with show_order_form column
@@ -210,6 +216,26 @@ export const WhatsAppSettings = () => {
               />
             </div>
           )}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="showFloatingContact"
+              checked={showFloatingContact}
+              onCheckedChange={(checked) => setShowFloatingContact(checked === true)}
+            />
+            <Label htmlFor="showFloatingContact">
+              Show floating "Contact on WhatsApp" button on website
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="showFloatingGroup"
+              checked={showFloatingGroup}
+              onCheckedChange={(checked) => setShowFloatingGroup(checked === true)}
+            />
+            <Label htmlFor="showFloatingGroup">
+              Show floating "Join WhatsApp Group" button on website
+            </Label>
+          </div>
           <Button onClick={handleUpdateWhatsApp} disabled={isUpdating}>
             {isUpdating ? (
               <>

@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LockOverlay } from "../LockOverlay";
 import { WhatsAppGroupPopup } from "../home/WhatsAppGroupPopup";
+import { FloatingWhatsAppButtons } from "../home/FloatingWhatsAppButtons";
 import { useLocation } from "react-router-dom";
 
 interface LayoutProps {
@@ -81,6 +82,12 @@ const Layout = ({ children }: LayoutProps) => {
       <WhatsAppGroupPopup
         enabled={settings?.show_whatsapp_group_popup === true}
         message={settings?.whatsapp_group_popup_message || ""}
+        groupUrl={settings?.whatsapp_group_url || ""}
+      />
+      <FloatingWhatsAppButtons
+        showContact={settings?.show_floating_whatsapp_contact === true}
+        showGroup={settings?.show_floating_whatsapp_group === true}
+        whatsappNumber={settings?.whatsapp_number || ""}
         groupUrl={settings?.whatsapp_group_url || ""}
       />
     </div>
