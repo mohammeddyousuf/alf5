@@ -82,6 +82,8 @@ export const WhatsAppSettings = () => {
         whatsapp_group_url: whatsappGroupUrl,
         show_whatsapp_group_popup: showWhatsappGroupPopup,
         whatsapp_group_popup_message: whatsappGroupPopupMessage,
+        show_floating_whatsapp_contact: showFloatingContact,
+        show_floating_whatsapp_group: showFloatingGroup,
       };
 
       // Try with show_order_form column
