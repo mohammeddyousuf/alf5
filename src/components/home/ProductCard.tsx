@@ -242,9 +242,20 @@ export const ProductCard = ({
           onClick={handleContactClick}
         >
           <MessageCircle className="h-4 w-4" />
-          Contact Now
+          Contact on WhatsApp
         </Button>
       </CardFooter>
+
+      <OrderDialog
+        open={orderDialogOpen}
+        onOpenChange={setOrderDialogOpen}
+        productName={name}
+        productBrand={brand || null}
+        productPrice={effectivePrice}
+        productId={id}
+        onSubmit={handleOrderSubmit}
+        whatsappNumber={settings?.whatsapp_number}
+      />
     </Card>
   );
 };
