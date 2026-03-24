@@ -6,6 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { SaleCountdown } from "@/components/product/SaleCountdown";
 import { MessageCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { OrderDialog } from "@/components/product/OrderDialog";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
   id: string;
