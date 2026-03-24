@@ -68,16 +68,31 @@ export const WhatsAppSettings = () => {
   const handleUpdateWhatsApp = async () => {
     setIsUpdating(true);
     try {
-      const { error } = await supabase
+      // Try updating with show_order_form first
+      const updateData: Record<string, any> = { 
+        whatsapp_number: whatsappNumber,
+        whatsapp_group_url: whatsappGroupUrl,
+      };
+
+      // Try with show_order_form column
+      const { error: fullError } = await supabase
         .from("settings")
-        .update({ 
-          whatsapp_number: whatsappNumber,
-          whatsapp_group_url: whatsappGroupUrl,
-          show_order_form: showOrderForm
-        })
+        .update({ ...updateData, show_order_form: showOrderForm })
         .eq("id", settings?.id);
 
-      if (error) throw error;
+      if (fullError) {
+        // If show_order_form column doesn't exist, update without it
+        if (fullError.message?.includes('show_order_form')) {
+          console.warn("show_order_form column not found, updating without it");
+          const { error } = await supabase
+            .from("settings")
+            .update(updateData)
+            .eq("id", settings?.id);
+          if (error) throw error;
+        } else {
+          throw fullError;
+        }
+      }
 
       // Invalidate all queries that might use the WhatsApp number
       await Promise.all([
