@@ -216,6 +216,26 @@ export const WhatsAppSettings = () => {
               />
             </div>
           )}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="showFloatingContact"
+              checked={showFloatingContact}
+              onCheckedChange={(checked) => setShowFloatingContact(checked === true)}
+            />
+            <Label htmlFor="showFloatingContact">
+              Show floating "Contact on WhatsApp" button on website
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="showFloatingGroup"
+              checked={showFloatingGroup}
+              onCheckedChange={(checked) => setShowFloatingGroup(checked === true)}
+            />
+            <Label htmlFor="showFloatingGroup">
+              Show floating "Join WhatsApp Group" button on website
+            </Label>
+          </div>
           <Button onClick={handleUpdateWhatsApp} disabled={isUpdating}>
             {isUpdating ? (
               <>
