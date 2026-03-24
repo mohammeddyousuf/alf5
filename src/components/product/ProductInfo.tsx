@@ -148,7 +148,7 @@ export function ProductInfo({
       <div className="space-y-2 text-center">
         <div className="flex items-center justify-center gap-4">
           <p className={`text-2xl font-bold ${(showSalePrice || showDiscountPrice) ? 'text-destructive' : 'text-foreground'}`}>
-            {formatPrice(displayPrice)}
+            {formatPrice(displayPrice)}*
           </p>
         </div>
         {(showSalePrice || showDiscountPrice) && (
@@ -161,6 +161,9 @@ export function ProductInfo({
             </p>
           </div>
         )}
+        <p className="text-xs text-muted-foreground">
+          *Price fluctuates per batch. Please contact for latest price.
+        </p>
       </div>
 
       {description && (

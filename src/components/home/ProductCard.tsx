@@ -227,14 +227,17 @@ export const ProductCard = ({
                 </span>
               </div>
               <span className="text-lg font-bold text-destructive">
-                {formatPrice(effectivePrice)}
+                {formatPrice(effectivePrice)}*
               </span>
             </>
           ) : (
             <span className="text-lg font-semibold">
-              {formatPrice(price)}
+              {formatPrice(price)}*
             </span>
           )}
+          <p className="text-[10px] text-muted-foreground leading-tight">
+            *Price fluctuates per batch. Please contact for latest price.
+          </p>
         </div>
         <Button 
           className="w-full gap-2" 
