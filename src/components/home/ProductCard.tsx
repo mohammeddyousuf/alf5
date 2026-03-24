@@ -32,6 +32,8 @@ export const ProductCard = ({
   customLabel 
 }: ProductCardProps) => {
   const navigate = useNavigate();
+  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
