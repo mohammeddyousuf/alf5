@@ -15,6 +15,7 @@ export const WhatsAppSettings = () => {
   const queryClient = useQueryClient();
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [whatsappGroupUrl, setWhatsappGroupUrl] = useState("");
+  const [showOrderForm, setShowOrderForm] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLink[]>([]);
   const [isSocialMediaUpdating, setIsSocialMediaUpdating] = useState(false);
