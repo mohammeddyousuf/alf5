@@ -17,6 +17,8 @@ export const WhatsAppSettings = () => {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [whatsappGroupUrl, setWhatsappGroupUrl] = useState("");
   const [showOrderForm, setShowOrderForm] = useState(true);
+  const [showWhatsappGroupPopup, setShowWhatsappGroupPopup] = useState(false);
+  const [whatsappGroupPopupMessage, setWhatsappGroupPopupMessage] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLink[]>([]);
   const [isSocialMediaUpdating, setIsSocialMediaUpdating] = useState(false);
@@ -42,6 +44,8 @@ export const WhatsAppSettings = () => {
       setWhatsappNumber(settings.whatsapp_number || "");
       setWhatsappGroupUrl(settings.whatsapp_group_url || "");
       setShowOrderForm(settings.show_order_form !== false);
+      setShowWhatsappGroupPopup(settings.show_whatsapp_group_popup === true);
+      setWhatsappGroupPopupMessage(settings.whatsapp_group_popup_message || "");
       
       // Initialize social media links from settings
       let links: SocialMediaLink[] = [];
@@ -72,6 +76,8 @@ export const WhatsAppSettings = () => {
       const updateData: Record<string, any> = { 
         whatsapp_number: whatsappNumber,
         whatsapp_group_url: whatsappGroupUrl,
+        show_whatsapp_group_popup: showWhatsappGroupPopup,
+        whatsapp_group_popup_message: whatsappGroupPopupMessage,
       };
 
       // Try with show_order_form column
@@ -183,6 +189,27 @@ export const WhatsAppSettings = () => {
               Show order form before redirecting to WhatsApp
             </Label>
           </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="showWhatsappGroupPopup"
+              checked={showWhatsappGroupPopup}
+              onCheckedChange={(checked) => setShowWhatsappGroupPopup(checked === true)}
+            />
+            <Label htmlFor="showWhatsappGroupPopup">
+              Show WhatsApp group popup when website loads
+            </Label>
+          </div>
+          {showWhatsappGroupPopup && (
+            <div className="space-y-2 ml-6">
+              <Label htmlFor="popupMessage">Popup Message</Label>
+              <Input
+                id="popupMessage"
+                value={whatsappGroupPopupMessage}
+                onChange={(e) => setWhatsappGroupPopupMessage(e.target.value)}
+                placeholder="Join our WhatsApp group for the latest updates and offers!"
+              />
+            </div>
+          )}
           <Button onClick={handleUpdateWhatsApp} disabled={isUpdating}>
             {isUpdating ? (
               <>

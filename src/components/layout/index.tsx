@@ -4,6 +4,7 @@ import { Footer } from "./Footer";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { LockOverlay } from "../LockOverlay";
+import { WhatsAppGroupPopup } from "../home/WhatsAppGroupPopup";
 import { useLocation } from "react-router-dom";
 
 interface LayoutProps {
@@ -77,6 +78,11 @@ const Layout = ({ children }: LayoutProps) => {
       </main>
       <Footer />
       {showLockOverlay && <LockOverlay message={settings?.lock_message || "This website is currently locked. Please contact support."} />}
+      <WhatsAppGroupPopup
+        enabled={settings?.show_whatsapp_group_popup === true}
+        message={settings?.whatsapp_group_popup_message || ""}
+        groupUrl={settings?.whatsapp_group_url || ""}
+      />
     </div>
   );
 };
