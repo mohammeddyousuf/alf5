@@ -158,6 +158,16 @@ export const WhatsAppSettings = () => {
               placeholder="Enter WhatsApp group invite link"
             />
           </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="showOrderForm"
+              checked={showOrderForm}
+              onCheckedChange={(checked) => setShowOrderForm(checked === true)}
+            />
+            <Label htmlFor="showOrderForm">
+              Show order form before redirecting to WhatsApp
+            </Label>
+          </div>
           <Button onClick={handleUpdateWhatsApp} disabled={isUpdating}>
             {isUpdating ? (
               <>
