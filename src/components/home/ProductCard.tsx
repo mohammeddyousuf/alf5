@@ -6,6 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { SaleCountdown } from "@/components/product/SaleCountdown";
 import { MessageCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { OrderDialog } from "@/components/product/OrderDialog";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
   id: string;
@@ -29,6 +32,8 @@ export const ProductCard = ({
   customLabel 
 }: ProductCardProps) => {
   const navigate = useNavigate();
+  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -111,10 +116,46 @@ export const ProductCard = ({
                         showDiscountPrice ? discountPrice :
                         price;
 
+  const formatWhatsAppPrice = (amount: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  };
+
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.scrollTo(0, 0);
-    navigate(productUrl);
+    
+    const showForm = settings?.show_order_form !== false;
+    
+    if (showForm) {
+      setOrderDialogOpen(true);
+    } else {
+      const number = settings?.whatsapp_number;
+      if (!number) {
+        console.error("No WhatsApp number available");
+        return;
+      }
+      let cleanNumber = number.trim().replace(/[^\d+]/g, '').replace(/^\+/, '');
+      const message = encodeURIComponent(
+        `Hi,\n\nI'm interested in ${name}${brand ? ` by ${brand}` : ''}.\nPrice: ${formatWhatsAppPrice(effectivePrice)}\n\nPlease share more details.`
+      );
+      const url = `https://wa.me/${cleanNumber}?text=${message}`;
+      window.open(url, '_blank');
+    }
+  };
+
+  const handleOrderSubmit = (data: any) => {
+    const { whatsappUrl: generatedUrl, ...formData } = data;
+    if (generatedUrl) {
+      window.open(generatedUrl, '_blank', 'noopener,noreferrer');
+    }
+    toast({
+      title: "Order Placed",
+      description: "You will be redirected to WhatsApp to complete your order.",
+    });
+    setOrderDialogOpen(false);
   };
 
   return (
@@ -201,9 +242,20 @@ export const ProductCard = ({
           onClick={handleContactClick}
         >
           <MessageCircle className="h-4 w-4" />
-          Contact Now
+          Contact on WhatsApp
         </Button>
       </CardFooter>
+
+      <OrderDialog
+        open={orderDialogOpen}
+        onOpenChange={setOrderDialogOpen}
+        productName={name}
+        productBrand={brand || null}
+        productPrice={effectivePrice}
+        productId={id}
+        onSubmit={handleOrderSubmit}
+        whatsappNumber={settings?.whatsapp_number}
+      />
     </Card>
   );
 };
