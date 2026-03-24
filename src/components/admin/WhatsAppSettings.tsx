@@ -76,6 +76,8 @@ export const WhatsAppSettings = () => {
       const updateData: Record<string, any> = { 
         whatsapp_number: whatsappNumber,
         whatsapp_group_url: whatsappGroupUrl,
+        show_whatsapp_group_popup: showWhatsappGroupPopup,
+        whatsapp_group_popup_message: whatsappGroupPopupMessage,
       };
 
       // Try with show_order_form column
