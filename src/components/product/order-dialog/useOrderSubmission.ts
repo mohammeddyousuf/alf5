@@ -10,7 +10,7 @@ interface UseOrderSubmissionProps {
   productBrand: string | null;
   productPrice: number;
   onSubmit: (data: ExtendedOrderFormData) => void;
-  whatsappNumber?: string;
+  whatsappNumber?: string | null;
 }
 
 export const useOrderSubmission = ({
