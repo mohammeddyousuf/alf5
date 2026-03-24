@@ -17,6 +17,8 @@ export const WhatsAppSettings = () => {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [whatsappGroupUrl, setWhatsappGroupUrl] = useState("");
   const [showOrderForm, setShowOrderForm] = useState(true);
+  const [showWhatsappGroupPopup, setShowWhatsappGroupPopup] = useState(false);
+  const [whatsappGroupPopupMessage, setWhatsappGroupPopupMessage] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLink[]>([]);
   const [isSocialMediaUpdating, setIsSocialMediaUpdating] = useState(false);
