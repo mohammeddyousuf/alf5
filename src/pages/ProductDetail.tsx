@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ProductMedia } from "@/components/product/ProductMedia";

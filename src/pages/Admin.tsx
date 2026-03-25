@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { WhatsAppSettings } from "@/components/admin/WhatsAppSettings";
 import { WebsiteSettings } from "@/components/admin/WebsiteSettings";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";

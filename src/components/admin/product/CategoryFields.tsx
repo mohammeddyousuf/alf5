@@ -3,7 +3,7 @@ import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { productFormSchema } from "./schema";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import {
   Select,
   SelectContent,

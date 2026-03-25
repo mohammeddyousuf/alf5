@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { BackToDashboard } from "@/components/admin/BackToDashboard";
 import { Button } from "@/components/ui/button";

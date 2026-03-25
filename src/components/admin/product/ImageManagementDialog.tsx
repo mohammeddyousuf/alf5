@@ -5,7 +5,7 @@ import { Loader2, Upload, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageDeleteDialog } from "@/components/admin/shared/ImageDeleteDialog";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { SearchAndSort } from "./image-management/SearchAndSort";
 import { ImageTable } from "./image-management/ImageTable";
 import { useQuery } from "@tanstack/react-query";

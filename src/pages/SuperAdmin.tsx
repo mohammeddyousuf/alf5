@@ -6,7 +6,7 @@ import { SystemLimits } from "@/components/admin/settings/SystemLimits";
 import { SubscriptionLockSection } from "@/components/admin/settings/SubscriptionLockSection";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 
 const SuperAdmin = () => {
   const navigate = useNavigate();

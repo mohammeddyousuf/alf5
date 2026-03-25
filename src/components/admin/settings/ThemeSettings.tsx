@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { updateThemeColor, initializeThemeColors } from "@/utils/themeUtils";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { ColorInput } from "./theme/ColorInput";
 import { defaultColors } from "./theme/defaultColors";
 import { Button } from "@/components/ui/button";

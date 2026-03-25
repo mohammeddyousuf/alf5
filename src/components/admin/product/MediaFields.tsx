@@ -6,7 +6,7 @@ import { productFormSchema } from "./schema";
 import { Button } from "@/components/ui/button";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { useState } from "react";
 import { ImageDeleteDialog } from "./ImageDeleteDialog";
 import { useQueryClient } from "@tanstack/react-query";

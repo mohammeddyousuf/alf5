@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 import { Product } from "@/types/product";
 import { Loader2 } from "lucide-react";

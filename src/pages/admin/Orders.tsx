@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 import { OrdersHeader } from "@/components/admin/orders/OrdersHeader";

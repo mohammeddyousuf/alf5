@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Filter } from "lucide-react";
 import { useLocation } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { useToast } from "@/components/ui/use-toast";
 import { ShopFilters } from "@/components/shop/ShopFilters";
 import { ProductGrid } from "@/components/shop/ProductGrid";

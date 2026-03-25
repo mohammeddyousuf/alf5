@@ -1,6 +1,6 @@
 import { useParams, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { Loader2 } from "lucide-react";
 
 const Page = () => {

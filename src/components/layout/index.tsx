@@ -2,7 +2,7 @@ import { ReactNode, useEffect } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { LockOverlay } from "../LockOverlay";
 import { WhatsAppGroupPopup } from "../home/WhatsAppGroupPopup";
 import { FloatingWhatsAppButtons } from "../home/FloatingWhatsAppButtons";

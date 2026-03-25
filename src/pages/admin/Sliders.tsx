@@ -13,7 +13,7 @@ import {
 import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { SliderForm } from "@/components/admin/slider/SliderForm";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { useToast } from "@/hooks/use-toast";
 import { ImageDeleteDialog } from "@/components/admin/shared/ImageDeleteDialog";
 

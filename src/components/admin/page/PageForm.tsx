@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
