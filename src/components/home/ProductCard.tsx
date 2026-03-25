@@ -237,9 +237,9 @@ export const ProductCard = ({
               {formatPrice(price)}*
             </span>
           )}
-          {priceNote && (
+          {(priceNote || settings?.default_price_note) && (
             <p className="text-[10px] text-muted-foreground leading-tight">
-              *{priceNote}
+              *{priceNote || settings?.default_price_note}
             </p>
           )}
         </div>
