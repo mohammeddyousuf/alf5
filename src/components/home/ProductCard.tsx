@@ -19,6 +19,7 @@ interface ProductCardProps {
   imageUrl?: string;
   brand?: string | null;
   customLabel?: string | null;
+  priceNote?: string | null;
 }
 
 export const ProductCard = ({ 
