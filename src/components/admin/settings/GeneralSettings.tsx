@@ -2,6 +2,7 @@ import { useState } from "react";
 import { WebsiteNameSection } from "./WebsiteNameSection";
 import { TrackingCodesSection } from "./TrackingCodesSection";
 import { ImageSection } from "./ImageSection";
+import { DefaultPriceNoteSection } from "./DefaultPriceNoteSection";
 
 interface GeneralSettingsProps {
   settings: any;
@@ -28,6 +29,11 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
 
       <TrackingCodesSection
         initialCodes={settings?.tracking_codes || ""}
+        refetch={refetch}
+      />
+
+      <DefaultPriceNoteSection
+        initialNote={settings?.default_price_note || "Price fluctuates. Please contact for latest price."}
         refetch={refetch}
       />
     </div>
