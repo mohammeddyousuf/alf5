@@ -145,6 +145,43 @@ function getAbsoluteImageUrl($img, $supabaseUrl) {
 // Main logic
 $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+// Image proxy: serve product images from our domain without the upstream X-Robots-Tag header
+if (isset($_GET['img_proxy'])) {
+    $imgFile = urldecode((string) $_GET['img_proxy']);
+    $imgUrl = $SUPABASE_URL . "/storage/v1/object/public/product-images/" . rawurlencode($imgFile);
+
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $imgUrl,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_TIMEOUT => 15,
+        CURLOPT_HTTPHEADER => [
+            "apikey: $SUPABASE_KEY",
+            "Authorization: Bearer $SUPABASE_KEY",
+        ],
+    ]);
+
+    $imageData = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE) ?: 'image/jpeg';
+    curl_close($ch);
+
+    if ($httpCode === 200 && $imageData !== false) {
+        header('Content-Type: ' . $contentType);
+        header('Content-Length: ' . strlen($imageData));
+        header('Cache-Control: public, max-age=86400');
+        header('Access-Control-Allow-Origin: *');
+        echo $imageData;
+        exit;
+    }
+
+    http_response_code(404);
+    header('Content-Type: text/plain; charset=UTF-8');
+    echo 'Image not found';
+    exit;
+}
+
 // If not a crawler, serve the normal SPA
 if (!isCrawler()) {
     // Serve the static index.html
