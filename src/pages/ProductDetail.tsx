@@ -7,7 +7,6 @@ import { ProductMedia } from "@/components/product/ProductMedia";
 import { ProductInfo } from "@/components/product/ProductInfo";
 import { Helmet } from "react-helmet";
 import { ProductHead } from "@/components/product/detail/ProductHead";
-import { ProductMeta } from "@/components/product/detail/ProductMeta";
 import { SimilarProducts } from "@/components/product/SimilarProducts";
 
 const ProductDetail = () => {
@@ -97,13 +96,16 @@ const ProductDetail = () => {
   const stockStatus = (product as any).stock_status || 'in_stock';
   const availability = stockStatus === 'in_stock' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
 
+  const ogDescription = product.description || `${product.name} - Available at ${websiteName}`;
+  const ogTitle = `${product.name} | ${websiteName}`;
+
   const jsonLd: Record<string, any> = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    description: product.description || `${product.name} - Available at ${websiteName}`,
+    description: ogDescription,
     url: currentUrl,
-    ...(absoluteImage && { image: absoluteImage }),
+    ...(absoluteImage && { image: [absoluteImage] }),
     ...(product.brand && { brand: { "@type": "Brand", name: product.brand } }),
     offers: {
       "@type": "Offer",
@@ -111,6 +113,7 @@ const ProductDetail = () => {
       priceCurrency: "INR",
       availability,
       url: currentUrl,
+      itemCondition: "https://schema.org/NewCondition",
     },
     additionalProperty: [
       ...((product as any).top_notes ? [{ "@type": "PropertyValue", name: "Top Notes", value: (product as any).top_notes }] : []),
@@ -123,8 +126,8 @@ const ProductDetail = () => {
 
   const handleShare = async () => {
     const shareData = {
-      title: `${product.name} | ${websiteName}`,
-      text: product.description || `${product.name} - Available at ${websiteName}`,
+      title: ogTitle,
+      text: ogDescription,
       url: currentUrl,
     };
     try {
@@ -142,15 +145,35 @@ const ProductDetail = () => {
   return (
     <>
       <Helmet>
-        <ProductMeta
-          websiteName={websiteName}
-          productName={product.name}
-          productDescription={product.description}
-          productImage={absoluteImage}
-          currentUrl={currentUrl}
-          productPrice={productPrice}
-          productBrand={product.brand}
-        />
+        <title>{ogTitle}</title>
+        <meta name="description" content={ogDescription} />
+        <link rel="canonical" href={currentUrl} />
+
+        {/* Open Graph / Facebook / Pinterest */}
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content={currentUrl} />
+        <meta property="og:title" content={ogTitle} />
+        <meta property="og:description" content={ogDescription} />
+        <meta property="og:site_name" content={websiteName} />
+        {absoluteImage && <meta property="og:image" content={absoluteImage} />}
+        {absoluteImage && <meta property="og:image:secure_url" content={absoluteImage} />}
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="product:price:amount" content={String(productPrice)} />
+        <meta property="product:price:currency" content="INR" />
+        {product.brand && <meta property="product:brand" content={product.brand} />}
+        <meta property="product:availability" content={stockStatus === 'in_stock' ? 'in stock' : 'out of stock'} />
+
+        {/* Pinterest Rich Pin verification */}
+        <meta property="og:price:amount" content={String(productPrice)} />
+        <meta property="og:price:currency" content="INR" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={ogTitle} />
+        <meta name="twitter:description" content={ogDescription} />
+        {absoluteImage && <meta name="twitter:image" content={absoluteImage} />}
+
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
 
