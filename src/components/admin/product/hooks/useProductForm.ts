@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { productFormSchema, type ProductFormData } from "../schema";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
+import type { Database } from "@/integrations/supabase/types/database";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ProductList } from "./ProductList";
 import { ProductPagination } from "@/components/shop/ProductPagination";
-import { Database } from "@/integrations/supabase/types";
+import { Database } from "@/integrations/supabase/types/database";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 

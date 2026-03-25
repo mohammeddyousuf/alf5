@@ -1,6 +1,6 @@
 import { ProductCard } from "./ProductCard";
 import { Loader2 } from "lucide-react";
-import { Database } from "@/integrations/supabase/types";
+import { Database } from "@/integrations/supabase/types/database";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 

@@ -13,9 +13,10 @@ interface WhatsAppGroupPopupProps {
   enabled: boolean;
   message: string;
   groupUrl: string;
+  title?: string;
 }
 
-export const WhatsAppGroupPopup = ({ enabled, message, groupUrl }: WhatsAppGroupPopupProps) => {
+export const WhatsAppGroupPopup = ({ enabled, message, groupUrl, title = "Join Our WhatsApp Group" }: WhatsAppGroupPopupProps) => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export const WhatsAppGroupPopup = ({ enabled, message, groupUrl }: WhatsAppGroup
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MessageCircle className="h-5 w-5 text-green-500" />
-            Join Our WhatsApp Group
+            {title}
           </DialogTitle>
           <DialogDescription className="pt-2 text-base">
             {message || "Join our WhatsApp group for the latest updates and offers!"}

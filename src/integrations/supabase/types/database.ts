@@ -1,9 +1,9 @@
 import { Settings, SettingsInsert, SettingsUpdate } from './settings';
-import { Products, ProductsInsert, ProductsUpdate } from './products';
+import { Products } from './products';
 import { Categories, CategoriesInsert, CategoriesUpdate } from './categories';
-import { Collections, CollectionsInsert, CollectionsUpdate } from './collections';
+import { Collections } from './collections';
 import { NewsTicker, NewsTickerInsert, NewsTickerUpdate } from './newsTicker';
-import { Pages, PagesInsert, PagesUpdate } from './pages';
+import { Pages } from './pages';
 import { Sliders, SlidersInsert, SlidersUpdate } from './sliders';
 import { Subcategories, SubcategoriesInsert, SubcategoriesUpdate } from './subcategories';
 import { Orders, OrdersInsert, OrdersUpdate } from './orders';
@@ -25,45 +25,15 @@ export interface Database {
         Update: CategoriesUpdate;
         Relationships: [];
       };
-      collections: {
-        Row: Collections;
-        Insert: CollectionsInsert;
-        Update: CollectionsUpdate;
-        Relationships: [];
-      };
+      collections: Collections;
       news_ticker: {
         Row: NewsTicker;
         Insert: NewsTickerInsert;
         Update: NewsTickerUpdate;
         Relationships: [];
       };
-      pages: {
-        Row: Pages;
-        Insert: PagesInsert;
-        Update: PagesUpdate;
-        Relationships: [];
-      };
-      products: {
-        Row: Products;
-        Insert: ProductsInsert;
-        Update: ProductsUpdate;
-        Relationships: [
-          {
-            foreignKeyName: "products_category_id_fkey";
-            columns: ["category_id"];
-            isOneToOne: false;
-            referencedRelation: "categories";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "products_subcategory_id_fkey";
-            columns: ["subcategory_id"];
-            isOneToOne: false;
-            referencedRelation: "subcategories";
-            referencedColumns: ["id"];
-          }
-        ];
-      };
+      pages: Pages;
+      products: Products;
       sliders: {
         Row: Sliders;
         Insert: SlidersInsert;

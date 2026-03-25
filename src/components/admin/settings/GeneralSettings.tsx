@@ -3,6 +3,7 @@ import { WebsiteNameSection } from "./WebsiteNameSection";
 import { TrackingCodesSection } from "./TrackingCodesSection";
 import { ImageSection } from "./ImageSection";
 import { DefaultPriceNoteSection } from "./DefaultPriceNoteSection";
+import { WhatsAppTextsSection } from "./WhatsAppTextsSection";
 
 interface GeneralSettingsProps {
   settings: any;
@@ -34,6 +35,13 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
 
       <DefaultPriceNoteSection
         initialNote={settings?.default_price_note || "Price fluctuates. Please contact for latest price."}
+        refetch={refetch}
+      />
+
+      <WhatsAppTextsSection
+        floatingContactText={settings?.floating_contact_text || "Contact on WhatsApp"}
+        floatingGroupText={settings?.floating_group_text || "Join WhatsApp Group"}
+        popupTitle={settings?.whatsapp_popup_title || "Join Our WhatsApp Group"}
         refetch={refetch}
       />
     </div>
