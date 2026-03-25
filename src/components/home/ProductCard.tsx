@@ -146,7 +146,21 @@ export const ProductCard = ({
         toast({ title: "Link copied", description: "Product link copied to clipboard." });
       }
     } catch {
-      // User cancelled share
+      try {
+        await navigator.clipboard.writeText(fullUrl);
+        toast({ title: "Link copied", description: "Product link copied to clipboard." });
+      } catch {
+        // Final fallback: use a temporary textarea
+        const textarea = document.createElement('textarea');
+        textarea.value = fullUrl;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        toast({ title: "Link copied", description: "Product link copied to clipboard." });
+      }
     }
   };
 
