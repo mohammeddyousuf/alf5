@@ -281,6 +281,12 @@ const Shop = () => {
                   setSelectedBrand={setSelectedBrand}
                   selectedLabel={selectedLabel}
                   setSelectedLabel={setSelectedLabel}
+                  selectedTopNote={selectedTopNote}
+                  setSelectedTopNote={setSelectedTopNote}
+                  selectedHeartNote={selectedHeartNote}
+                  setSelectedHeartNote={setSelectedHeartNote}
+                  selectedBaseNote={selectedBaseNote}
+                  setSelectedBaseNote={setSelectedBaseNote}
                 />
               </div>
             </SheetContent>
@@ -310,6 +316,12 @@ const Shop = () => {
             setSelectedBrand={setSelectedBrand}
             selectedLabel={selectedLabel}
             setSelectedLabel={setSelectedLabel}
+            selectedTopNote={selectedTopNote}
+            setSelectedTopNote={setSelectedTopNote}
+            selectedHeartNote={selectedHeartNote}
+            setSelectedHeartNote={setSelectedHeartNote}
+            selectedBaseNote={selectedBaseNote}
+            setSelectedBaseNote={setSelectedBaseNote}
           />
         </div>
 
