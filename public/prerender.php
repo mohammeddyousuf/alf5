@@ -104,9 +104,9 @@ function fetchProduct($shortId, $supabaseUrl, $supabaseKey) {
     return null;
 }
 
-// Fetch site settings
+// Fetch site settings (including tracking_codes)
 function fetchSettings($supabaseUrl, $supabaseKey) {
-    $url = $supabaseUrl . "/rest/v1/settings?select=website_name,favicon_url&order=created_at.desc&limit=1";
+    $url = $supabaseUrl . "/rest/v1/settings?select=website_name,favicon_url,tracking_codes&order=created_at.desc&limit=1";
     
     $ch = curl_init();
     curl_setopt_array($ch, [
