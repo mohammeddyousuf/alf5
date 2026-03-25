@@ -178,12 +178,12 @@ export function ProductInfo({
               <span className="text-xs text-foreground">
                 {stockStatus === 'in_stock' ? 'In Stock' : 'Out of Stock'}
               </span>
-              {priceNote && <span className="text-xs text-muted-foreground">·</span>}
+              {(priceNote || settings?.default_price_note) && <span className="text-xs text-muted-foreground">·</span>}
             </>
           )}
-          {priceNote && (
+          {(priceNote || settings?.default_price_note) && (
             <span className="text-xs text-muted-foreground">
-              *{priceNote}
+              *{priceNote || settings?.default_price_note}
             </span>
           )}
         </div>
