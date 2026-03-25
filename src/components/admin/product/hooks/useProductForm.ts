@@ -22,6 +22,7 @@ const defaultValues: ProductFormData = {
   images: [],
   status: "draft",
   stock_status: "in_stock",
+  price_note: null,
   category_id: null,
   subcategory_id: null,
   featured: false,
