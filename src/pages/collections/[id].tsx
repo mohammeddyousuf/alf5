@@ -73,6 +73,7 @@ const CollectionDetail = () => {
             salePrice={product.sale_price}
             imageUrl={product.images?.[0]}
             priceNote={(product as any).price_note}
+            stockStatus={(product as any).stock_status}
           />
         ))}
       </div>
