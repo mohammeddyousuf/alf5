@@ -48,6 +48,7 @@ export function useProductForm({ product, onSuccess, onLimitExceeded }: UseProdu
       images: product.images ?? [],
       status: product.status ?? "draft",
       stock_status: (product as any).stock_status ?? "in_stock",
+      price_note: (product as any).price_note ?? null,
       category_id: product.category_id,
       subcategory_id: product.subcategory_id,
       featured: product.featured ?? false,
