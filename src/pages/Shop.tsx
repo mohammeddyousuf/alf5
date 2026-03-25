@@ -224,6 +224,9 @@ const Shop = () => {
     selectedSubcategory,
     selectedBrand,
     selectedLabel,
+    selectedTopNote,
+    selectedHeartNote,
+    selectedBaseNote,
   ]);
 
   if (error) {
