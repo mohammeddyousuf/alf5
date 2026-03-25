@@ -169,19 +169,20 @@ export function ProductInfo({
             </p>
           </div>
         )}
-        <p className="text-xs text-muted-foreground">
-          *Price fluctuates per batch. Please contact for latest price.
-        </p>
-      </div>
-
-      {stockStatus && (
-        <div className="flex items-center gap-2">
-          <span className={`inline-block h-2 w-2 rounded-full ${stockStatus === 'in_stock' ? 'bg-green-500' : 'bg-red-500'}`} />
-          <span className="text-sm text-foreground">
-            {stockStatus === 'in_stock' ? 'In Stock' : 'Out of Stock'}
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          {stockStatus && (
+            <>
+              <span className={`inline-block h-2 w-2 rounded-full ${stockStatus === 'in_stock' ? 'bg-green-500' : 'bg-red-500'}`} />
+              <span className="text-xs text-foreground">
+                {stockStatus === 'in_stock' ? 'In Stock' : 'Out of Stock'}
+              </span>
+              <span className="text-xs text-muted-foreground">·</span>
+            </>
+          )}
+          <span className="text-xs text-muted-foreground">
+            *Price fluctuates. Please contact for latest price.
           </span>
         </div>
-      )}
 
       {(topNotes || heartNotes || baseNotes) && (
         <div className="space-y-2 border-t border-b border-border py-4">
