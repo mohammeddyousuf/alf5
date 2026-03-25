@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/db";
 import { SaleCountdown } from "@/components/product/SaleCountdown";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { OrderDialog } from "@/components/product/OrderDialog";
 import { useState } from "react";
@@ -128,6 +128,28 @@ export const ProductCard = ({
     }).format(amount);
   };
 
+  const handleShare = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const fullUrl = `${window.location.origin}${productUrl}`;
+    const websiteName = settings?.website_name || "Our Store";
+    const shareData = {
+      title: `${name} | ${websiteName}`,
+      text: `${name}${brand ? ` by ${brand}` : ''} - Available at ${websiteName}`,
+      url: fullUrl,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(fullUrl);
+        toast({ title: "Link copied", description: "Product link copied to clipboard." });
+      }
+    } catch {
+      // User cancelled share
+    }
+  };
+
   const handleContactClick = (e: React.MouseEvent) => {
     e.preventDefault();
     
@@ -192,6 +214,13 @@ export const ProductCard = ({
                   <SaleCountdown endDate={settings.clearance_sale_end_date} />
                 </div>
               )}
+              <button
+                onClick={handleShare}
+                className="absolute bottom-2 left-2 bg-background/80 backdrop-blur-sm rounded-full p-1.5 hover:bg-background transition-colors"
+                aria-label="Share product"
+              >
+                <Share2 className="h-3.5 w-3.5 text-foreground" />
+              </button>
               {customLabel && (
                 <div className="absolute bottom-2 right-2">
                   <Badge 
