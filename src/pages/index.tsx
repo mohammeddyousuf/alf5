@@ -141,6 +141,7 @@ const Index = () => {
                     brand={product.brand}
                     customLabel={product.custom_label}
                     priceNote={(product as any).price_note}
+                    stockStatus={(product as any).stock_status}
                   />
                 </CarouselItem>
               ))}
