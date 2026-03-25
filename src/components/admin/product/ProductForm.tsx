@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Database } from "@/integrations/supabase/types";
+
 import { PriceFields } from "./PriceFields";
 import { MediaFields } from "./MediaFields";
 import { CategoryFields } from "./CategoryFields";
@@ -13,7 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/db";
 import { useProducts } from "@/hooks/useProducts";
 
-type ProductRow = Database["public"]["Tables"]["products"]["Row"];
+type ProductRow = any;
 
 interface ProductFormProps {
   product?: ProductRow;
