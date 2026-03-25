@@ -91,7 +91,12 @@ function fetchProduct($shortId, $supabaseUrl, $supabaseKey) {
 
     foreach ($data as $product) {
         $productId = $product['id'] ?? '';
-        if ($productId && str_ends_with($productId, $shortId)) {
+        if (!$productId) {
+            continue;
+        }
+
+        // App URLs use the FIRST 8 chars of the UUID (see frontend startsWith lookup).
+        if (str_starts_with($productId, $shortId) || str_ends_with($productId, $shortId)) {
             return $product;
         }
     }
