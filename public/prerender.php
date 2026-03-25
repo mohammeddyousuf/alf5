@@ -60,7 +60,7 @@ function getProductShortId($uri) {
 
 // Fetch product data from Supabase
 function fetchProduct($shortId, $supabaseUrl, $supabaseKey) {
-    $url = $supabaseUrl . "/rest/v1/products?select=*&id=like." . urlencode($shortId . '%');
+    $url = $supabaseUrl . "/rest/v1/products?select=*&id=like." . $shortId . "*";
     
     $ch = curl_init();
     curl_setopt_array($ch, [
