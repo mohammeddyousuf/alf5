@@ -136,7 +136,7 @@ export function BasicFields({ form }: BasicFieldsProps) {
           <FormItem>
             <FormLabel>Custom Label</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="Enter custom label (optional)" onChange={(e) => field.onChange(e.target.value.toUpperCase())} />
+              <Input {...field} placeholder="Enter custom label (optional)" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -164,7 +164,7 @@ export function BasicFields({ form }: BasicFieldsProps) {
           <FormItem>
             <FormLabel>Brand</FormLabel>
             <FormControl>
-              <Input {...field} onChange={(e) => field.onChange(e.target.value.toUpperCase())} />
+              <Input {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -217,7 +217,7 @@ export function BasicFields({ form }: BasicFieldsProps) {
           <FormItem>
             <FormLabel>Top Notes</FormLabel>
             <FormControl>
-              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value.toUpperCase() || null)} placeholder="e.g. BERGAMOT, LEMON, PINK PEPPER" />
+              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Bergamot, Lemon, Pink Pepper" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -231,7 +231,7 @@ export function BasicFields({ form }: BasicFieldsProps) {
           <FormItem>
             <FormLabel>Heart Notes</FormLabel>
             <FormControl>
-              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value.toUpperCase() || null)} placeholder="e.g. ROSE, JASMINE, IRIS" />
+              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Rose, Jasmine, Iris" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -245,7 +245,7 @@ export function BasicFields({ form }: BasicFieldsProps) {
           <FormItem>
             <FormLabel>Base Notes</FormLabel>
             <FormControl>
-              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value.toUpperCase() || null)} placeholder="e.g. MUSK, AMBER, SANDALWOOD" />
+              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Musk, Amber, Sandalwood" />
             </FormControl>
             <FormMessage />
           </FormItem>
