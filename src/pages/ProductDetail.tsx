@@ -14,13 +14,11 @@ const ProductDetail = () => {
   const { slug } = useParams();
   const { toast } = useToast();
 
-  // Extract the short ID from the slug (last part after the last dash)
   const shortId = slug?.split('-').pop()?.substring(0, 8);
 
   const { data: settings } = useQuery({
     queryKey: ["settings"],
     queryFn: async () => {
-      console.log("Fetching settings in ProductDetail...");
       const { data, error } = await supabase
         .from("settings")
         .select("*")
@@ -28,12 +26,7 @@ const ProductDetail = () => {
         .limit(1)
         .maybeSingle();
       
-      if (error) {
-        console.error("Error fetching settings:", error);
-        return null;
-      }
-      
-      console.log("Settings fetched:", data);
+      if (error) return null;
       return data;
     },
   });
@@ -64,10 +57,7 @@ const ProductDetail = () => {
   };
 
   const handleOrderSubmit = (formData: any) => {
-    if (!settings) return;
-    
-    if (!product) return;
-    
+    if (!settings || !product) return;
     toast({
       title: "Order Placed",
       description: "You will be redirected to WhatsApp to complete your order.",
@@ -95,6 +85,60 @@ const ProductDetail = () => {
   const productPrice = product.sale_price || product.price;
   const currentUrl = window.location.href;
 
+  const getAbsoluteImageUrl = (img: string) => {
+    if (!img) return '';
+    if (img.startsWith('http')) return img;
+    const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(img);
+    return publicUrl;
+  };
+
+  const absoluteImage = productImage ? getAbsoluteImageUrl(productImage) : null;
+
+  const stockStatus = (product as any).stock_status || 'in_stock';
+  const availability = stockStatus === 'in_stock' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
+
+  const jsonLd: Record<string, any> = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description || `${product.name} - Available at ${websiteName}`,
+    url: currentUrl,
+    ...(absoluteImage && { image: absoluteImage }),
+    ...(product.brand && { brand: { "@type": "Brand", name: product.brand } }),
+    offers: {
+      "@type": "Offer",
+      price: productPrice,
+      priceCurrency: "INR",
+      availability,
+      url: currentUrl,
+    },
+    additionalProperty: [
+      ...((product as any).top_notes ? [{ "@type": "PropertyValue", name: "Top Notes", value: (product as any).top_notes }] : []),
+      ...((product as any).heart_notes ? [{ "@type": "PropertyValue", name: "Heart Notes", value: (product as any).heart_notes }] : []),
+      ...((product as any).base_notes ? [{ "@type": "PropertyValue", name: "Base Notes", value: (product as any).base_notes }] : []),
+    ],
+  };
+
+  if (jsonLd.additionalProperty.length === 0) delete jsonLd.additionalProperty;
+
+  const handleShare = async () => {
+    const shareData = {
+      title: `${product.name} | ${websiteName}`,
+      text: product.description || `${product.name} - Available at ${websiteName}`,
+      url: currentUrl,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(currentUrl);
+        toast({ title: "Link copied", description: "Product link copied to clipboard." });
+      }
+    } catch (err) {
+      // User cancelled share
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -102,11 +146,12 @@ const ProductDetail = () => {
           websiteName={websiteName}
           productName={product.name}
           productDescription={product.description}
-          productImage={productImage}
+          productImage={absoluteImage}
           currentUrl={currentUrl}
           productPrice={productPrice}
           productBrand={product.brand}
         />
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
 
       <div className="container py-8">
@@ -122,6 +167,7 @@ const ProductDetail = () => {
             discountPrice={product.discount_price}
             price={product.price}
             customLabel={product.custom_label}
+            onShare={handleShare}
           />
           <ProductInfo
             name={product.name}
@@ -133,6 +179,9 @@ const ProductDetail = () => {
             productId={product.id}
             onOrderSubmit={handleOrderSubmit}
             whatsappNumber={settings?.whatsapp_number}
+            topNotes={(product as any).top_notes}
+            heartNotes={(product as any).heart_notes}
+            baseNotes={(product as any).base_notes}
           />
         </div>
       </div>

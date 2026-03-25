@@ -173,6 +173,73 @@ export function BasicFields({ form }: BasicFieldsProps) {
 
       <FormField
         control={form.control}
+        name="stock_status"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Stock Status</FormLabel>
+            <Select
+              onValueChange={field.onChange}
+              value={field.value}
+            >
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select stock status" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="in_stock">In Stock</SelectItem>
+                <SelectItem value="out_of_stock">Out of Stock</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="top_notes"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Top Notes</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Bergamot, Lemon, Pink Pepper" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="heart_notes"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Heart Notes</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Rose, Jasmine, Iris" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="base_notes"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Base Notes</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Musk, Amber, Sandalwood" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="description"
         render={({ field }) => (
           <FormItem>

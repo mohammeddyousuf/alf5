@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Share2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -18,6 +19,7 @@ interface ProductMediaProps {
   discountPrice: number | null;
   price: number;
   customLabel?: string | null;
+  onShare?: () => void;
 }
 
 export const ProductMedia = ({
@@ -28,7 +30,8 @@ export const ProductMedia = ({
   salePrice,
   discountPrice,
   price,
-  customLabel
+  customLabel,
+  onShare,
 }: ProductMediaProps) => {
   const { data: settings } = useQuery({
     queryKey: ["settings"],
@@ -103,6 +106,15 @@ export const ProductMedia = ({
                           {showSalePrice ? 'SALE' : 'DISCOUNT'}
                         </Badge>
                       </div>
+                    )}
+                    {index === 0 && onShare && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onShare(); }}
+                        className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full p-2 hover:bg-background transition-colors"
+                        aria-label="Share product"
+                      >
+                        <Share2 className="h-4 w-4 text-foreground" />
+                      </button>
                     )}
                     {index === 0 && customLabel && (
                       <div className="absolute bottom-2 right-2">

@@ -13,7 +13,11 @@ export interface Products {
     sale_price: number | null
     discount_price: number | null
     status: "draft" | "published" | "archived" | null
+    stock_status: string | null
     subcategory_id: string | null
+    top_notes: string | null
+    heart_notes: string | null
+    base_notes: string | null
     updated_at: string
     video_urls: string[] | null
     custom_label: string | null
@@ -33,7 +37,11 @@ export interface Products {
     sale_price?: number | null
     discount_price?: number | null
     status?: "draft" | "published" | "archived" | null
+    stock_status?: string | null
     subcategory_id?: string | null
+    top_notes?: string | null
+    heart_notes?: string | null
+    base_notes?: string | null
     updated_at?: string
     video_urls?: string[] | null
     custom_label?: string | null
@@ -53,7 +61,11 @@ export interface Products {
     sale_price?: number | null
     discount_price?: number | null
     status?: "draft" | "published" | "archived" | null
+    stock_status?: string | null
     subcategory_id?: string | null
+    top_notes?: string | null
+    heart_notes?: string | null
+    base_notes?: string | null
     updated_at?: string
     video_urls?: string[] | null
     custom_label?: string | null
