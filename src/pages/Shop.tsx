@@ -189,6 +189,9 @@ const Shop = () => {
     showDiscountOnly,
     selectedBrand,
     selectedLabel,
+    selectedTopNote,
+    selectedHeartNote,
+    selectedBaseNote,
     settings,
   });
 
