@@ -13,9 +13,10 @@ interface WhatsAppGroupPopupProps {
   enabled: boolean;
   message: string;
   groupUrl: string;
+  title?: string;
 }
 
-export const WhatsAppGroupPopup = ({ enabled, message, groupUrl }: WhatsAppGroupPopupProps) => {
+export const WhatsAppGroupPopup = ({ enabled, message, groupUrl, title = "Join Our WhatsApp Group" }: WhatsAppGroupPopupProps) => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
