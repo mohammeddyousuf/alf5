@@ -210,6 +210,9 @@ export function BasicFields({ form }: BasicFieldsProps) {
         )}
       />
 
+      <FormField
+        control={form.control}
+        name="top_notes"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Top Notes</FormLabel>
