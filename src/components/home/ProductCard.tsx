@@ -236,7 +236,7 @@ export const ProductCard = ({
             </span>
           )}
           <p className="text-[10px] text-muted-foreground leading-tight">
-            *Price fluctuates per batch. Please contact for latest price.
+            *Price fluctuates. Please contact for latest price.
           </p>
         </div>
         <Button 
