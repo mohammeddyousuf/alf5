@@ -277,6 +277,7 @@ if ($shortId) {
     
     <link rel="canonical" href="' . htmlspecialchars($url) . '" />
     <script type="application/ld+json">' . json_encode($jsonLd, JSON_UNESCAPED_SLASHES) . '</script>
+    ' . ($settings['tracking_codes'] ?? '') . '
 </head>
 <body>
     <h1>' . $title . '</h1>
@@ -291,8 +292,9 @@ if ($shortId) {
 }
 
 // For non-product pages or if product not found, serve default meta tags
-$settings = fetchSettings($SUPABASE_URL, $SUPABASE_KEY);
+$settings = $settings ?? fetchSettings($SUPABASE_URL, $SUPABASE_KEY);
 $siteName = htmlspecialchars($settings['website_name'] ?? $SITE_NAME);
+$trackingCodes = $settings['tracking_codes'] ?? '';
 
 header('Content-Type: text/html; charset=UTF-8');
 echo '<!DOCTYPE html>
