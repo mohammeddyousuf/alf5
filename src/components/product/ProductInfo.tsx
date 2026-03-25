@@ -17,6 +17,7 @@ interface ProductInfoProps {
   topNotes?: string | null;
   heartNotes?: string | null;
   baseNotes?: string | null;
+  stockStatus?: string | null;
 }
 
 export function ProductInfo({ 
@@ -32,6 +33,7 @@ export function ProductInfo({
   topNotes,
   heartNotes,
   baseNotes,
+  stockStatus,
 }: ProductInfoProps) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
@@ -172,12 +174,21 @@ export function ProductInfo({
         </p>
       </div>
 
+      {stockStatus && (
+        <div className="flex items-center gap-2">
+          <span className={`inline-block h-2 w-2 rounded-full ${stockStatus === 'in_stock' ? 'bg-green-500' : 'bg-red-500'}`} />
+          <span className="text-sm text-foreground">
+            {stockStatus === 'in_stock' ? 'In Stock' : 'Out of Stock'}
+          </span>
+        </div>
+      )}
+
       {(topNotes || heartNotes || baseNotes) && (
         <div className="space-y-2 border-t border-b border-border py-4">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Scent Profile</p>
           {topNotes && (
             <div className="flex gap-2">
-              <span className="text-sm text-muted-foreground min-w-[70px]">Opening</span>
+              <span className="text-sm text-muted-foreground min-w-[70px]">Top</span>
               <span className="text-sm text-foreground">{topNotes}</span>
             </div>
           )}
