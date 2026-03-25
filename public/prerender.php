@@ -312,6 +312,7 @@ echo '<!DOCTYPE html>
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="' . $siteName . ' - Premium Fragrances" />
     <meta name="twitter:description" content="Premium fragrances and perfumes. Discover your signature scent at ' . $siteName . '." />
+    ' . $trackingCodes . '
 </head>
 <body>
     <h1>' . $siteName . '</h1>
