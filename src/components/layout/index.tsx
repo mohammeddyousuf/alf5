@@ -83,12 +83,15 @@ const Layout = ({ children }: LayoutProps) => {
         enabled={settings?.show_whatsapp_group_popup === true}
         message={settings?.whatsapp_group_popup_message || ""}
         groupUrl={settings?.whatsapp_group_url || ""}
+        title={(settings as any)?.whatsapp_popup_title || "Join Our WhatsApp Group"}
       />
       <FloatingWhatsAppButtons
         showContact={settings?.show_floating_whatsapp_contact === true}
         showGroup={settings?.show_floating_whatsapp_group === true}
         whatsappNumber={settings?.whatsapp_number || ""}
         groupUrl={settings?.whatsapp_group_url || ""}
+        contactText={(settings as any)?.floating_contact_text || "Contact on WhatsApp"}
+        groupText={(settings as any)?.floating_group_text || "Join WhatsApp Group"}
       />
     </div>
   );
