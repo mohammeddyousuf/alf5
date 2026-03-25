@@ -104,9 +104,9 @@ function fetchProduct($shortId, $supabaseUrl, $supabaseKey) {
     return null;
 }
 
-// Fetch site settings
+// Fetch site settings (including tracking_codes)
 function fetchSettings($supabaseUrl, $supabaseKey) {
-    $url = $supabaseUrl . "/rest/v1/settings?select=website_name,favicon_url&order=created_at.desc&limit=1";
+    $url = $supabaseUrl . "/rest/v1/settings?select=website_name,favicon_url,tracking_codes&order=created_at.desc&limit=1";
     
     $ch = curl_init();
     curl_setopt_array($ch, [
@@ -182,12 +182,18 @@ if (isset($_GET['img_proxy'])) {
     exit;
 }
 
-// If not a crawler, serve the normal SPA
+// If not a crawler, serve the normal SPA with tracking codes injected
 if (!isCrawler()) {
-    // Serve the static index.html
     $indexFile = __DIR__ . '/index.html';
     if (file_exists($indexFile)) {
-        readfile($indexFile);
+        $html = file_get_contents($indexFile);
+        // Inject tracking codes from settings into <head>
+        $settings = fetchSettings($SUPABASE_URL, $SUPABASE_KEY);
+        $trackingCodes = $settings['tracking_codes'] ?? '';
+        if ($trackingCodes) {
+            $html = str_replace('</head>', $trackingCodes . "\n</head>", $html);
+        }
+        echo $html;
     }
     exit;
 }
@@ -271,6 +277,7 @@ if ($shortId) {
     
     <link rel="canonical" href="' . htmlspecialchars($url) . '" />
     <script type="application/ld+json">' . json_encode($jsonLd, JSON_UNESCAPED_SLASHES) . '</script>
+    ' . ($settings['tracking_codes'] ?? '') . '
 </head>
 <body>
     <h1>' . $title . '</h1>
@@ -285,8 +292,9 @@ if ($shortId) {
 }
 
 // For non-product pages or if product not found, serve default meta tags
-$settings = fetchSettings($SUPABASE_URL, $SUPABASE_KEY);
+$settings = $settings ?? fetchSettings($SUPABASE_URL, $SUPABASE_KEY);
 $siteName = htmlspecialchars($settings['website_name'] ?? $SITE_NAME);
+$trackingCodes = $settings['tracking_codes'] ?? '';
 
 header('Content-Type: text/html; charset=UTF-8');
 echo '<!DOCTYPE html>
@@ -304,6 +312,7 @@ echo '<!DOCTYPE html>
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="' . $siteName . ' - Premium Fragrances" />
     <meta name="twitter:description" content="Premium fragrances and perfumes. Discover your signature scent at ' . $siteName . '." />
+    ' . $trackingCodes . '
 </head>
 <body>
     <h1>' . $siteName . '</h1>
