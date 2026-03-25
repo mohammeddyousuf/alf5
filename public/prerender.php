@@ -60,7 +60,9 @@ function getProductShortId($uri) {
 
 // Fetch product data from Supabase
 function fetchProduct($shortId, $supabaseUrl, $supabaseKey) {
-    $url = $supabaseUrl . "/rest/v1/products?select=*&id=like." . $shortId . "*";
+    // Product IDs are UUIDs, so PostgREST LIKE filters do not work directly on the id column.
+    // Fetch a bounded list and resolve the short ID suffix in PHP instead.
+    $url = $supabaseUrl . "/rest/v1/products?select=*&limit=1000";
     
     $ch = curl_init();
     curl_setopt_array($ch, [
@@ -71,7 +73,7 @@ function fetchProduct($shortId, $supabaseUrl, $supabaseKey) {
             "Authorization: Bearer $supabaseKey",
             "Content-Type: application/json",
         ],
-        CURLOPT_TIMEOUT => 5,
+        CURLOPT_TIMEOUT => 8,
     ]);
     
     $response = curl_exec($ch);
@@ -83,11 +85,18 @@ function fetchProduct($shortId, $supabaseUrl, $supabaseKey) {
     }
     
     $data = json_decode($response, true);
-    if (empty($data)) {
+    if (empty($data) || !is_array($data)) {
         return null;
     }
+
+    foreach ($data as $product) {
+        $productId = $product['id'] ?? '';
+        if ($productId && str_ends_with($productId, $shortId)) {
+            return $product;
+        }
+    }
     
-    return $data[0];
+    return null;
 }
 
 // Fetch site settings
