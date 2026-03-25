@@ -72,6 +72,7 @@ export function useProductForm({ product, onSuccess, onLimitExceeded }: UseProdu
         images: values.images,
         status: values.status,
         stock_status: values.stock_status,
+        price_note: values.price_note || null,
         category_id: values.category_id || null,
         subcategory_id: values.subcategory_id || null,
         featured: values.featured,
