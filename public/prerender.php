@@ -182,12 +182,18 @@ if (isset($_GET['img_proxy'])) {
     exit;
 }
 
-// If not a crawler, serve the normal SPA
+// If not a crawler, serve the normal SPA with tracking codes injected
 if (!isCrawler()) {
-    // Serve the static index.html
     $indexFile = __DIR__ . '/index.html';
     if (file_exists($indexFile)) {
-        readfile($indexFile);
+        $html = file_get_contents($indexFile);
+        // Inject tracking codes from settings into <head>
+        $settings = fetchSettings($SUPABASE_URL, $SUPABASE_KEY);
+        $trackingCodes = $settings['tracking_codes'] ?? '';
+        if ($trackingCodes) {
+            $html = str_replace('</head>', $trackingCodes . "\n</head>", $html);
+        }
+        echo $html;
     }
     exit;
 }
