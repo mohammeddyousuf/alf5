@@ -1,9 +1,9 @@
 import { Settings, SettingsInsert, SettingsUpdate } from './settings';
-import { Products } from './products';
+import { Products, ProductsInsert, ProductsUpdate } from './products';
 import { Categories, CategoriesInsert, CategoriesUpdate } from './categories';
-import { Collections } from './collections';
+import { Collections, CollectionsInsert, CollectionsUpdate } from './collections';
 import { NewsTicker, NewsTickerInsert, NewsTickerUpdate } from './newsTicker';
-import { Pages } from './pages';
+import { Pages, PagesInsert, PagesUpdate } from './pages';
 import { Sliders, SlidersInsert, SlidersUpdate } from './sliders';
 import { Subcategories, SubcategoriesInsert, SubcategoriesUpdate } from './subcategories';
 import { Orders, OrdersInsert, OrdersUpdate } from './orders';
@@ -11,9 +11,6 @@ import { SystemLimits, SystemLimitsInsert, SystemLimitsUpdate } from './systemLi
 import { Enquiries, EnquiriesInsert, EnquiriesUpdate } from './enquiries';
 
 export interface Database {
-  __InternalSupabase: {
-    PostgrestVersion: "14.4"
-  }
   public: {
     Tables: {
       settings: {
@@ -28,15 +25,45 @@ export interface Database {
         Update: CategoriesUpdate;
         Relationships: [];
       };
-      collections: Collections;
+      collections: {
+        Row: Collections;
+        Insert: CollectionsInsert;
+        Update: CollectionsUpdate;
+        Relationships: [];
+      };
       news_ticker: {
         Row: NewsTicker;
         Insert: NewsTickerInsert;
         Update: NewsTickerUpdate;
         Relationships: [];
       };
-      pages: Pages;
-      products: Products;
+      pages: {
+        Row: Pages;
+        Insert: PagesInsert;
+        Update: PagesUpdate;
+        Relationships: [];
+      };
+      products: {
+        Row: Products;
+        Insert: ProductsInsert;
+        Update: ProductsUpdate;
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey";
+            columns: ["category_id"];
+            isOneToOne: false;
+            referencedRelation: "categories";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "products_subcategory_id_fkey";
+            columns: ["subcategory_id"];
+            isOneToOne: false;
+            referencedRelation: "subcategories";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       sliders: {
         Row: Sliders;
         Insert: SlidersInsert;

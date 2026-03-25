@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { Database } from "@/integrations/supabase/types/database";
+import { Database } from "@/integrations/supabase/types";
 import { PriceFields } from "./PriceFields";
 import { MediaFields } from "./MediaFields";
 import { CategoryFields } from "./CategoryFields";

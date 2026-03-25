@@ -1,15 +1,30 @@
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const SUPABASE_URL = "https://hoytbffldsdeywkyuuza.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhveXRiZmZsZHNkZXl3a3l1dXphIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM3MTAyNDksImV4cCI6MjA0OTI4NjI0OX0.gJwvzpKqdhIWhsIGF1a4BPUXysKXNtB-lg_aNG_VFz4";
 
-// The auto-generated types.ts has empty tables since the external Supabase
-// schema is not mirrored in Lovable Cloud. We use 'any' to allow all table
-// operations. The actual schema is defined in types/database.ts for reference.
-export const supabase = createClient<any>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
+    detectSessionInUrl: false,
+    storage: window.localStorage,
+  },
+});
+
+// Add detailed debug logging
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log('Auth state changed:', event);
+  console.log('Session details:', session);
+  
+  if (event === 'SIGNED_IN') {
+    console.log('Sign in successful');
+  } else if (event === 'SIGNED_OUT') {
+    console.log('Sign out successful');
+  } else if (event === 'USER_UPDATED') {
+    console.log('User updated');
+  } else if (event === 'PASSWORD_RECOVERY') {
+    console.log('Password recovery initiated');
   }
 });
