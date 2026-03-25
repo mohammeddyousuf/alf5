@@ -21,6 +21,8 @@ export const WhatsAppSettings = () => {
   const [whatsappGroupPopupMessage, setWhatsappGroupPopupMessage] = useState("");
   const [showFloatingContact, setShowFloatingContact] = useState(false);
   const [showFloatingGroup, setShowFloatingGroup] = useState(false);
+  const [floatingContactText, setFloatingContactText] = useState("Contact on WhatsApp");
+  const [floatingGroupText, setFloatingGroupText] = useState("Join WhatsApp Group");
   const [isUpdating, setIsUpdating] = useState(false);
   const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLink[]>([]);
   const [isSocialMediaUpdating, setIsSocialMediaUpdating] = useState(false);
@@ -50,6 +52,8 @@ export const WhatsAppSettings = () => {
       setWhatsappGroupPopupMessage(settings.whatsapp_group_popup_message || "");
       setShowFloatingContact(settings.show_floating_whatsapp_contact === true);
       setShowFloatingGroup(settings.show_floating_whatsapp_group === true);
+      setFloatingContactText(settings.floating_contact_text || "Contact on WhatsApp");
+      setFloatingGroupText(settings.floating_group_text || "Join WhatsApp Group");
       
       // Initialize social media links from settings
       let links: SocialMediaLink[] = [];
@@ -84,6 +88,8 @@ export const WhatsAppSettings = () => {
         whatsapp_group_popup_message: whatsappGroupPopupMessage,
         show_floating_whatsapp_contact: showFloatingContact,
         show_floating_whatsapp_group: showFloatingGroup,
+        floating_contact_text: floatingContactText,
+        floating_group_text: floatingGroupText,
       };
 
       // Try with show_order_form column
@@ -226,6 +232,17 @@ export const WhatsAppSettings = () => {
               Show floating "Contact on WhatsApp" button on website
             </Label>
           </div>
+          {showFloatingContact && (
+            <div className="space-y-2 ml-6">
+              <Label htmlFor="floatingContactText">Button Tooltip Text</Label>
+              <Input
+                id="floatingContactText"
+                value={floatingContactText}
+                onChange={(e) => setFloatingContactText(e.target.value)}
+                placeholder="Contact on WhatsApp"
+              />
+            </div>
+          )}
           <div className="flex items-center space-x-2">
             <Checkbox
               id="showFloatingGroup"
@@ -236,6 +253,17 @@ export const WhatsAppSettings = () => {
               Show floating "Join WhatsApp Group" button on website
             </Label>
           </div>
+          {showFloatingGroup && (
+            <div className="space-y-2 ml-6">
+              <Label htmlFor="floatingGroupText">Button Tooltip Text</Label>
+              <Input
+                id="floatingGroupText"
+                value={floatingGroupText}
+                onChange={(e) => setFloatingGroupText(e.target.value)}
+                placeholder="Join WhatsApp Group"
+              />
+            </div>
+          )}
           <Button onClick={handleUpdateWhatsApp} disabled={isUpdating}>
             {isUpdating ? (
               <>
