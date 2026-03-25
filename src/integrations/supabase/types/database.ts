@@ -10,7 +10,7 @@ import { Orders, OrdersInsert, OrdersUpdate } from './orders';
 import { SystemLimits, SystemLimitsInsert, SystemLimitsUpdate } from './systemLimits';
 import { Enquiries, EnquiriesInsert, EnquiriesUpdate } from './enquiries';
 
-export interface Database {
+export interface AppDatabase {
   __InternalSupabase: {
     PostgrestVersion: "14.4"
   }
