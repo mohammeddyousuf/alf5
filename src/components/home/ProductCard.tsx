@@ -20,6 +20,7 @@ interface ProductCardProps {
   brand?: string | null;
   customLabel?: string | null;
   priceNote?: string | null;
+  stockStatus?: string | null;
 }
 
 export const ProductCard = ({ 
@@ -32,6 +33,7 @@ export const ProductCard = ({
   brand,
   customLabel,
   priceNote,
+  stockStatus,
 }: ProductCardProps) => {
   const navigate = useNavigate();
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
@@ -237,11 +239,22 @@ export const ProductCard = ({
               {formatPrice(price)}*
             </span>
           )}
-          {(priceNote || settings?.default_price_note) && (
-            <p className="text-[10px] text-muted-foreground leading-tight">
-              *{priceNote || settings?.default_price_note}
-            </p>
-          )}
+          <div className="flex items-center justify-center gap-1 flex-wrap">
+            {stockStatus && (
+              <>
+                <span className={`inline-block h-1.5 w-1.5 rounded-full ${stockStatus === 'in_stock' ? 'bg-green-500' : 'bg-red-500'}`} />
+                <span className="text-[10px] text-foreground">
+                  {stockStatus === 'in_stock' ? 'In Stock' : 'Out of Stock'}
+                </span>
+                {(priceNote || settings?.default_price_note) && <span className="text-[10px] text-muted-foreground">·</span>}
+              </>
+            )}
+            {(priceNote || settings?.default_price_note) && (
+              <span className="text-[10px] text-muted-foreground">
+                *{priceNote || settings?.default_price_note}
+              </span>
+            )}
+          </div>
         </div>
         <Button 
           className="w-full gap-2" 
