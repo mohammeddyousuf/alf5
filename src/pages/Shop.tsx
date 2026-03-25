@@ -48,6 +48,15 @@ const Shop = () => {
   const [selectedLabel, setSelectedLabel] = useState<string | null>(
     getUrlParam("label")
   );
+  const [selectedTopNote, setSelectedTopNote] = useState<string | null>(
+    getUrlParam("topNote")
+  );
+  const [selectedHeartNote, setSelectedHeartNote] = useState<string | null>(
+    getUrlParam("heartNote")
+  );
+  const [selectedBaseNote, setSelectedBaseNote] = useState<string | null>(
+    getUrlParam("baseNote")
+  );
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Update URL when page changes
@@ -66,6 +75,9 @@ const Shop = () => {
       subcategory: selectedSubcategory,
       brand: selectedBrand,
       label: selectedLabel,
+      topNote: selectedTopNote,
+      heartNote: selectedHeartNote,
+      baseNote: selectedBaseNote,
     });
   }, [
     currentPage,
@@ -80,6 +92,9 @@ const Shop = () => {
     selectedSubcategory,
     selectedBrand,
     selectedLabel,
+    selectedTopNote,
+    selectedHeartNote,
+    selectedBaseNote,
   ]);
 
   const { data: settings } = useQuery({
