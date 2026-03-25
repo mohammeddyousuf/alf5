@@ -36,12 +36,12 @@ interface ShopFiltersProps {
   setShowDiscountOnly: (show: boolean) => void;
   selectedLabel: string | null;
   setSelectedLabel: (label: string | null) => void;
-  selectedTopNote: string | null;
-  setSelectedTopNote: (note: string | null) => void;
-  selectedHeartNote: string | null;
-  setSelectedHeartNote: (note: string | null) => void;
-  selectedBaseNote: string | null;
-  setSelectedBaseNote: (note: string | null) => void;
+  selectedTopNotes: string[];
+  setSelectedTopNotes: (notes: string[]) => void;
+  selectedHeartNotes: string[];
+  setSelectedHeartNotes: (notes: string[]) => void;
+  selectedBaseNotes: string[];
+  setSelectedBaseNotes: (notes: string[]) => void;
 }
 
 export function ShopFilters({
@@ -65,12 +65,12 @@ export function ShopFilters({
   setShowDiscountOnly,
   selectedLabel,
   setSelectedLabel,
-  selectedTopNote,
-  setSelectedTopNote,
-  selectedHeartNote,
-  setSelectedHeartNote,
-  selectedBaseNote,
-  setSelectedBaseNote,
+  selectedTopNotes,
+  setSelectedTopNotes,
+  selectedHeartNotes,
+  setSelectedHeartNotes,
+  selectedBaseNotes,
+  setSelectedBaseNotes,
 }: ShopFiltersProps) {
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -238,22 +238,22 @@ export function ShopFilters({
 
         <NoteFilter
           label="Top Notes"
-          selectedNote={selectedTopNote}
-          setSelectedNote={setSelectedTopNote}
+          selectedNotes={selectedTopNotes}
+          setSelectedNotes={setSelectedTopNotes}
           notes={noteOptions?.topNotes}
         />
 
         <NoteFilter
           label="Heart Notes"
-          selectedNote={selectedHeartNote}
-          setSelectedNote={setSelectedHeartNote}
+          selectedNotes={selectedHeartNotes}
+          setSelectedNotes={setSelectedHeartNotes}
           notes={noteOptions?.heartNotes}
         />
 
         <NoteFilter
           label="Base Notes"
-          selectedNote={selectedBaseNote}
-          setSelectedNote={setSelectedBaseNote}
+          selectedNotes={selectedBaseNotes}
+          setSelectedNotes={setSelectedBaseNotes}
           notes={noteOptions?.baseNotes}
         />
 

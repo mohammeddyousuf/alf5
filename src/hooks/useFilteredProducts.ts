@@ -8,9 +8,9 @@ interface FilterParams {
   showDiscountOnly: boolean;
   selectedBrand: string | null;
   selectedLabel: string | null;
-  selectedTopNote: string | null;
-  selectedHeartNote: string | null;
-  selectedBaseNote: string | null;
+  selectedTopNotes: string[];
+  selectedHeartNotes: string[];
+  selectedBaseNotes: string[];
   settings: any;
 }
 
@@ -22,9 +22,9 @@ export const useFilteredProducts = ({
   showDiscountOnly,
   selectedBrand,
   selectedLabel,
-  selectedTopNote,
-  selectedHeartNote,
-  selectedBaseNote,
+  selectedTopNotes,
+  selectedHeartNotes,
+  selectedBaseNotes,
   settings,
 }: FilterParams) => {
   const isSaleValid = () => {
@@ -48,9 +48,10 @@ export const useFilteredProducts = ({
     return product.discount_price && product.discount_price < product.price;
   };
 
-  const noteContains = (field: string | null | undefined, search: string) => {
-    if (!field) return false;
-    return field.toLowerCase().split(',').some(n => n.trim().toLowerCase().includes(search.toLowerCase()));
+  const noteContainsAny = (field: string | null | undefined, searches: string[]) => {
+    if (!field || searches.length === 0) return true;
+    const fieldNotes = field.toLowerCase().split(',').map(n => n.trim());
+    return searches.some(s => fieldNotes.some(fn => fn.includes(s.toLowerCase())));
   };
 
   const filteredProducts = products?.filter((product) => {
@@ -76,9 +77,9 @@ export const useFilteredProducts = ({
     const meetsDiscount = showDiscountOnly ? hasDiscount(product) : true;
     const meetsBrand = selectedBrand ? product.brand === selectedBrand : true;
     const meetsLabel = selectedLabel ? product.custom_label === selectedLabel : true;
-    const meetsTopNote = selectedTopNote ? noteContains(product.top_notes, selectedTopNote) : true;
-    const meetsHeartNote = selectedHeartNote ? noteContains(product.heart_notes, selectedHeartNote) : true;
-    const meetsBaseNote = selectedBaseNote ? noteContains(product.base_notes, selectedBaseNote) : true;
+    const meetsTopNote = noteContainsAny(product.top_notes, selectedTopNotes);
+    const meetsHeartNote = noteContainsAny(product.heart_notes, selectedHeartNotes);
+    const meetsBaseNote = noteContainsAny(product.base_notes, selectedBaseNotes);
 
     return matchesSearch && meetsPrice && meetsSale && meetsDiscount && meetsBrand && meetsLabel && meetsTopNote && meetsHeartNote && meetsBaseNote;
   });
