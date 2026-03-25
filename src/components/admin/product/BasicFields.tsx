@@ -130,18 +130,18 @@ export function BasicFields({ form }: BasicFieldsProps) {
       />
 
       <FormField
-        control={form.control}
-        name="custom_label"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Custom Label</FormLabel>
-            <FormControl>
-              <Input {...field} placeholder="Enter custom label (optional)" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+          control={form.control}
+          name="custom_label"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Custom Label</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter custom label (optional)" className="uppercase" onChange={(e) => field.onChange(e.target.value.toUpperCase())} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
       <FormField
         control={form.control}
@@ -217,7 +217,7 @@ export function BasicFields({ form }: BasicFieldsProps) {
           <FormItem>
             <FormLabel>Top Notes</FormLabel>
             <FormControl>
-              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Bergamot, Lemon, Pink Pepper" />
+              <Input {...field} value={field.value || ''} className="uppercase" onChange={(e) => field.onChange(e.target.value.toUpperCase() || null)} placeholder="e.g. BERGAMOT, LEMON, PINK PEPPER" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -231,7 +231,7 @@ export function BasicFields({ form }: BasicFieldsProps) {
           <FormItem>
             <FormLabel>Heart Notes</FormLabel>
             <FormControl>
-              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Rose, Jasmine, Iris" />
+              <Input {...field} value={field.value || ''} className="uppercase" onChange={(e) => field.onChange(e.target.value.toUpperCase() || null)} placeholder="e.g. ROSE, JASMINE, IRIS" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -245,7 +245,7 @@ export function BasicFields({ form }: BasicFieldsProps) {
           <FormItem>
             <FormLabel>Base Notes</FormLabel>
             <FormControl>
-              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Musk, Amber, Sandalwood" />
+              <Input {...field} value={field.value || ''} className="uppercase" onChange={(e) => field.onChange(e.target.value.toUpperCase() || null)} placeholder="e.g. MUSK, AMBER, SANDALWOOD" />
             </FormControl>
             <FormMessage />
           </FormItem>

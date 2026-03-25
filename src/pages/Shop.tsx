@@ -48,14 +48,14 @@ const Shop = () => {
   const [selectedLabel, setSelectedLabel] = useState<string | null>(
     getUrlParam("label")
   );
-  const [selectedTopNote, setSelectedTopNote] = useState<string | null>(
-    getUrlParam("topNote")
+  const [selectedTopNotes, setSelectedTopNotes] = useState<string[]>(
+    getUrlParam("topNote")?.split(",").filter(Boolean) || []
   );
-  const [selectedHeartNote, setSelectedHeartNote] = useState<string | null>(
-    getUrlParam("heartNote")
+  const [selectedHeartNotes, setSelectedHeartNotes] = useState<string[]>(
+    getUrlParam("heartNote")?.split(",").filter(Boolean) || []
   );
-  const [selectedBaseNote, setSelectedBaseNote] = useState<string | null>(
-    getUrlParam("baseNote")
+  const [selectedBaseNotes, setSelectedBaseNotes] = useState<string[]>(
+    getUrlParam("baseNote")?.split(",").filter(Boolean) || []
   );
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
@@ -75,9 +75,9 @@ const Shop = () => {
       subcategory: selectedSubcategory,
       brand: selectedBrand,
       label: selectedLabel,
-      topNote: selectedTopNote,
-      heartNote: selectedHeartNote,
-      baseNote: selectedBaseNote,
+      topNote: selectedTopNotes.length > 0 ? selectedTopNotes.join(",") : null,
+      heartNote: selectedHeartNotes.length > 0 ? selectedHeartNotes.join(",") : null,
+      baseNote: selectedBaseNotes.length > 0 ? selectedBaseNotes.join(",") : null,
     });
   }, [
     currentPage,
@@ -92,9 +92,9 @@ const Shop = () => {
     selectedSubcategory,
     selectedBrand,
     selectedLabel,
-    selectedTopNote,
-    selectedHeartNote,
-    selectedBaseNote,
+    selectedTopNotes,
+    selectedHeartNotes,
+    selectedBaseNotes,
   ]);
 
   const { data: settings } = useQuery({
@@ -189,9 +189,9 @@ const Shop = () => {
     showDiscountOnly,
     selectedBrand,
     selectedLabel,
-    selectedTopNote,
-    selectedHeartNote,
-    selectedBaseNote,
+    selectedTopNotes,
+    selectedHeartNotes,
+    selectedBaseNotes,
     settings,
   });
 
@@ -224,9 +224,9 @@ const Shop = () => {
     selectedSubcategory,
     selectedBrand,
     selectedLabel,
-    selectedTopNote,
-    selectedHeartNote,
-    selectedBaseNote,
+    selectedTopNotes,
+    selectedHeartNotes,
+    selectedBaseNotes,
   ]);
 
   if (error) {
@@ -284,12 +284,12 @@ const Shop = () => {
                   setSelectedBrand={setSelectedBrand}
                   selectedLabel={selectedLabel}
                   setSelectedLabel={setSelectedLabel}
-                  selectedTopNote={selectedTopNote}
-                  setSelectedTopNote={setSelectedTopNote}
-                  selectedHeartNote={selectedHeartNote}
-                  setSelectedHeartNote={setSelectedHeartNote}
-                  selectedBaseNote={selectedBaseNote}
-                  setSelectedBaseNote={setSelectedBaseNote}
+                  selectedTopNotes={selectedTopNotes}
+                  setSelectedTopNotes={setSelectedTopNotes}
+                  selectedHeartNotes={selectedHeartNotes}
+                  setSelectedHeartNotes={setSelectedHeartNotes}
+                  selectedBaseNotes={selectedBaseNotes}
+                  setSelectedBaseNotes={setSelectedBaseNotes}
                 />
               </div>
             </SheetContent>
@@ -319,12 +319,12 @@ const Shop = () => {
             setSelectedBrand={setSelectedBrand}
             selectedLabel={selectedLabel}
             setSelectedLabel={setSelectedLabel}
-            selectedTopNote={selectedTopNote}
-            setSelectedTopNote={setSelectedTopNote}
-            selectedHeartNote={selectedHeartNote}
-            setSelectedHeartNote={setSelectedHeartNote}
-            selectedBaseNote={selectedBaseNote}
-            setSelectedBaseNote={setSelectedBaseNote}
+            selectedTopNotes={selectedTopNotes}
+            setSelectedTopNotes={setSelectedTopNotes}
+            selectedHeartNotes={selectedHeartNotes}
+            setSelectedHeartNotes={setSelectedHeartNotes}
+            selectedBaseNotes={selectedBaseNotes}
+            setSelectedBaseNotes={setSelectedBaseNotes}
           />
         </div>
 
