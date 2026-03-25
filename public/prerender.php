@@ -131,7 +131,7 @@ function fetchSettings($supabaseUrl, $supabaseKey) {
 function getAbsoluteImageUrl($img, $supabaseUrl) {
     if (!$img) return '';
     if (strpos($img, 'http') === 0) return $img;
-    return $supabaseUrl . "/storage/v1/object/public/product-images/" . $img;
+    return $supabaseUrl . "/storage/v1/object/public/product-images/" . rawurlencode($img);
 }
 
 // Main logic
