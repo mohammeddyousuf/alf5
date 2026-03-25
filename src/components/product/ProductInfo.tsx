@@ -18,6 +18,7 @@ interface ProductInfoProps {
   heartNotes?: string | null;
   baseNotes?: string | null;
   stockStatus?: string | null;
+  priceNote?: string | null;
 }
 
 export function ProductInfo({ 
@@ -34,6 +35,7 @@ export function ProductInfo({
   heartNotes,
   baseNotes,
   stockStatus,
+  priceNote,
 }: ProductInfoProps) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
