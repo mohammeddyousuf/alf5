@@ -27,6 +27,7 @@ export function ProductGrid({ products }: ProductGridProps) {
           imageUrl={product.images?.[0]}
           brand={product.brand}
           customLabel={product.custom_label}
+          priceNote={(product as any).price_note}
         />
       ))}
     </div>
