@@ -13,6 +13,7 @@ import {
 import { PriceRangeFilter } from "./filters/PriceRangeFilter";
 import { BrandFilter } from "./filters/BrandFilter";
 import { CustomLabelFilter } from "./filters/CustomLabelFilter";
+import { NoteFilter } from "./filters/NoteFilter";
 
 interface ShopFiltersProps {
   priceRange: [number, number];
@@ -35,6 +36,12 @@ interface ShopFiltersProps {
   setShowDiscountOnly: (show: boolean) => void;
   selectedLabel: string | null;
   setSelectedLabel: (label: string | null) => void;
+  selectedTopNote: string | null;
+  setSelectedTopNote: (note: string | null) => void;
+  selectedHeartNote: string | null;
+  setSelectedHeartNote: (note: string | null) => void;
+  selectedBaseNote: string | null;
+  setSelectedBaseNote: (note: string | null) => void;
 }
 
 export function ShopFilters({
@@ -58,6 +65,12 @@ export function ShopFilters({
   setShowDiscountOnly,
   selectedLabel,
   setSelectedLabel,
+  selectedTopNote,
+  setSelectedTopNote,
+  selectedHeartNote,
+  setSelectedHeartNote,
+  selectedBaseNote,
+  setSelectedBaseNote,
 }: ShopFiltersProps) {
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -117,6 +130,38 @@ export function ShopFilters({
       
       const uniqueLabels = Array.from(new Set(data.map(p => p.custom_label))).filter(Boolean);
       return uniqueLabels;
+    },
+  });
+
+  const { data: noteOptions } = useQuery({
+    queryKey: ["note-options"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("top_notes, heart_notes, base_notes")
+        .eq("status", "published");
+      
+      if (error) throw error;
+
+      const extractUnique = (field: 'top_notes' | 'heart_notes' | 'base_notes') => {
+        const allNotes = new Set<string>();
+        data?.forEach(p => {
+          const val = (p as any)[field];
+          if (val) {
+            val.split(',').forEach((n: string) => {
+              const trimmed = n.trim();
+              if (trimmed) allNotes.add(trimmed);
+            });
+          }
+        });
+        return Array.from(allNotes).sort();
+      };
+
+      return {
+        topNotes: extractUnique('top_notes'),
+        heartNotes: extractUnique('heart_notes'),
+        baseNotes: extractUnique('base_notes'),
+      };
     },
   });
 
@@ -187,6 +232,29 @@ export function ShopFilters({
           selectedLabel={selectedLabel}
           setSelectedLabel={setSelectedLabel}
           labels={labels}
+        />
+
+        <Separator />
+
+        <NoteFilter
+          label="Top Notes"
+          selectedNote={selectedTopNote}
+          setSelectedNote={setSelectedTopNote}
+          notes={noteOptions?.topNotes}
+        />
+
+        <NoteFilter
+          label="Heart Notes"
+          selectedNote={selectedHeartNote}
+          setSelectedNote={setSelectedHeartNote}
+          notes={noteOptions?.heartNotes}
+        />
+
+        <NoteFilter
+          label="Base Notes"
+          selectedNote={selectedBaseNote}
+          setSelectedNote={setSelectedBaseNote}
+          notes={noteOptions?.baseNotes}
         />
 
         <Separator />
