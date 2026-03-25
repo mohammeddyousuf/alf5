@@ -43,11 +43,16 @@ export const useFilteredProducts = ({
   };
 
   const filteredProducts = products?.filter((product) => {
+    const normalizedQuery = searchQuery.toLowerCase();
+
     const matchesSearch =
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (product.description?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (product.brand?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (product.custom_label?.toLowerCase().includes(searchQuery.toLowerCase()));
+      product.name.toLowerCase().includes(normalizedQuery) ||
+      (product.description?.toLowerCase().includes(normalizedQuery)) ||
+      (product.brand?.toLowerCase().includes(normalizedQuery)) ||
+      (product.custom_label?.toLowerCase().includes(normalizedQuery)) ||
+      (product.top_notes?.toLowerCase().includes(normalizedQuery)) ||
+      (product.heart_notes?.toLowerCase().includes(normalizedQuery)) ||
+      (product.base_notes?.toLowerCase().includes(normalizedQuery));
 
     const price = isProductOnSale(product) ? product.sale_price! : product.price;
     const meetsPrice =

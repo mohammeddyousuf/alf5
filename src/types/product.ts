@@ -11,5 +11,10 @@ export interface Product {
   category_id: string | null;
   subcategory_id: string | null;
   featured: boolean | null;
+  stock_status?: string | null;
+  price_note?: string | null;
+  top_notes?: string | null;
+  heart_notes?: string | null;
+  base_notes?: string | null;
   created_at: string;
 }
