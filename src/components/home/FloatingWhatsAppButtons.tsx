@@ -20,6 +20,8 @@ export const FloatingWhatsAppButtons = ({
   showGroup,
   whatsappNumber,
   groupUrl,
+  contactText = "Contact on WhatsApp",
+  groupText = "Join WhatsApp Group",
 }: FloatingWhatsAppButtonsProps) => {
   if (!showContact && !showGroup) return null;
 
@@ -45,13 +47,13 @@ export const FloatingWhatsAppButtons = ({
               <button
                 onClick={handleGroup}
                 className="h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg flex items-center justify-center transition-all hover:scale-110"
-                aria-label="Join WhatsApp Group"
+                aria-label={groupText}
               >
                 <Users className="h-6 w-6" />
               </button>
             </TooltipTrigger>
             <TooltipContent side="left">
-              <p>Join WhatsApp Group</p>
+              <p>{groupText}</p>
             </TooltipContent>
           </Tooltip>
         )}
@@ -61,13 +63,13 @@ export const FloatingWhatsAppButtons = ({
               <button
                 onClick={handleContact}
                 className="h-14 w-14 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg flex items-center justify-center transition-all hover:scale-110"
-                aria-label="Contact on WhatsApp"
+                aria-label={contactText}
               >
                 <MessageCircle className="h-6 w-6" />
               </button>
             </TooltipTrigger>
             <TooltipContent side="left">
-              <p>Contact on WhatsApp</p>
+              <p>{contactText}</p>
             </TooltipContent>
           </Tooltip>
         )}
