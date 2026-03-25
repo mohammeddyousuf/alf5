@@ -129,9 +129,17 @@ function fetchSettings($supabaseUrl, $supabaseKey) {
 
 // Get absolute image URL
 function getAbsoluteImageUrl($img, $supabaseUrl) {
+    global $SITE_URL;
     if (!$img) return '';
-    if (strpos($img, 'http') === 0) return $img;
-    return $supabaseUrl . "/storage/v1/object/public/product-images/" . rawurlencode($img);
+    if (strpos($img, 'http') === 0) {
+        $prefix = $supabaseUrl . "/storage/v1/object/public/product-images/";
+        if (strpos($img, $prefix) === 0) {
+            $filename = substr($img, strlen($prefix));
+            return $SITE_URL . '/img-proxy/' . rawurlencode(urldecode($filename));
+        }
+        return $img;
+    }
+    return $SITE_URL . '/img-proxy/' . rawurlencode($img);
 }
 
 // Main logic
