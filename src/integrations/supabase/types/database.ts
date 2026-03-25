@@ -91,5 +91,8 @@ export interface AppDatabase {
   };
 }
 
+// Export as Database alias for backward compatibility
+export type Database = AppDatabase;
+
 export type { Json } from './json';
 export * from './tables';
