@@ -12,6 +12,7 @@ export interface Products {
     price: number
     sale_price: number | null
     discount_price: number | null
+    price_note: string | null
     status: "draft" | "published" | "archived" | null
     stock_status: string | null
     subcategory_id: string | null
@@ -36,6 +37,7 @@ export interface Products {
     price: number
     sale_price?: number | null
     discount_price?: number | null
+    price_note?: string | null
     status?: "draft" | "published" | "archived" | null
     stock_status?: string | null
     subcategory_id?: string | null
@@ -60,6 +62,7 @@ export interface Products {
     price?: number
     sale_price?: number | null
     discount_price?: number | null
+    price_note?: string | null
     status?: "draft" | "published" | "archived" | null
     stock_status?: string | null
     subcategory_id?: string | null

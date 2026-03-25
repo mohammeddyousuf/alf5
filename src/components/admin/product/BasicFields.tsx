@@ -198,6 +198,20 @@ export function BasicFields({ form }: BasicFieldsProps) {
 
       <FormField
         control={form.control}
+        name="price_note"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Price Note</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Price fluctuates. Please contact for latest price." />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
         name="top_notes"
         render={({ field }) => (
           <FormItem>

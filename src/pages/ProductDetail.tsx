@@ -183,6 +183,7 @@ const ProductDetail = () => {
             heartNotes={(product as any).heart_notes}
             baseNotes={(product as any).base_notes}
             stockStatus={(product as any).stock_status}
+            priceNote={(product as any).price_note}
           />
         </div>
       </div>

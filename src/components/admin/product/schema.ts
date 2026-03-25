@@ -31,6 +31,7 @@ export const productFormSchema = z.object({
   images: z.array(z.string()).default([]),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
   stock_status: z.enum(["in_stock", "out_of_stock"]).default("in_stock"),
+  price_note: z.string().nullable().optional(),
   category_id: z.string().nullable().optional(),
   subcategory_id: z.string().nullable().optional(),
   featured: z.boolean().default(false),
