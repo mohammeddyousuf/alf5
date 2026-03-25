@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { useToast } from "@/components/ui/use-toast";
 import { OrderFormData, ExtendedOrderFormData } from "./types";
 import { generateWhatsAppMessage, generateWhatsAppUrl } from "./whatsapp-utils";

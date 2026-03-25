@@ -22,7 +22,7 @@ import Orders from "@/pages/admin/Orders";
 import Enquiries from "@/pages/admin/Enquiries";
 import Auth from "@/pages/Auth";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { initializeThemeColors } from "@/utils/themeUtils";
 import "./App.css";
 

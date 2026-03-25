@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Orders } from "@/integrations/supabase/types/orders";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 
 interface OrdersTableProps {
   orders: Orders[];

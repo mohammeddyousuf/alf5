@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { ProductCard } from "@/components/home/ProductCard";
 import { CollectionCard } from "@/components/home/CollectionCard";
 import { HeroSlider } from "@/components/home/HeroSlider";

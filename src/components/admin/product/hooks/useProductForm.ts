@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { productFormSchema, type ProductFormData } from "../schema";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import type { Database } from "@/integrations/supabase/types";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];

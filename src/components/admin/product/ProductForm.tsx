@@ -10,7 +10,7 @@ import { useProductForm } from "./hooks/useProductForm";
 import { useState } from "react";
 import { LimitExceededDialog } from "./LimitExceededDialog";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { useProducts } from "@/hooks/useProducts";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];

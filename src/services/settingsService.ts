@@ -1,4 +1,4 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 
 export const getLatestSettings = async () => {
   const { data, error } = await supabase

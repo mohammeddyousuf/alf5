@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { SocialMediaLinksSection } from "./settings/SocialMediaLinksSection";
 import type { SocialMediaLink } from "@/integrations/supabase/types/social";
 

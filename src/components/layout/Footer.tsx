@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { queryClient } from "@/lib/react-query";
 import { logEnquiry } from "@/utils/enquiryUtils";
 import { WhatsAppEnquiryDialog } from "./WhatsAppEnquiryDialog";

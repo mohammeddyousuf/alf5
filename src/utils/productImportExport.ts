@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 import { ProductsRow, ProductsInsert } from "@/integrations/supabase/types/products";
 
 interface CSVProduct {

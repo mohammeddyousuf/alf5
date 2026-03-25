@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/integrations/supabase/db";
 
 export const useImageDeletion = (onImageUpload: () => void, loadImages?: () => Promise<void>) => {
   const { toast } = useToast();
