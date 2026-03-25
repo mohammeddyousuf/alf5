@@ -30,6 +30,8 @@ export interface Settings {
   whatsapp_group_popup_message: string | null;
   show_floating_whatsapp_contact: boolean | null;
   show_floating_whatsapp_group: boolean | null;
+  floating_contact_text: string | null;
+  floating_group_text: string | null;
 }
 
 export interface SettingsInsert extends Partial<Omit<Settings, 'whatsapp_number' | 'created_at' | 'updated_at'>> {

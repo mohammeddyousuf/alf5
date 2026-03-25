@@ -11,6 +11,8 @@ interface FloatingWhatsAppButtonsProps {
   showGroup: boolean;
   whatsappNumber: string;
   groupUrl: string;
+  contactText?: string;
+  groupText?: string;
 }
 
 export const FloatingWhatsAppButtons = ({
