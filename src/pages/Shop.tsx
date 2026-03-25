@@ -224,9 +224,9 @@ const Shop = () => {
     selectedSubcategory,
     selectedBrand,
     selectedLabel,
-    selectedTopNote,
-    selectedHeartNote,
-    selectedBaseNote,
+    selectedTopNotes,
+    selectedHeartNotes,
+    selectedBaseNotes,
   ]);
 
   if (error) {
@@ -284,12 +284,12 @@ const Shop = () => {
                   setSelectedBrand={setSelectedBrand}
                   selectedLabel={selectedLabel}
                   setSelectedLabel={setSelectedLabel}
-                  selectedTopNote={selectedTopNote}
-                  setSelectedTopNote={setSelectedTopNote}
-                  selectedHeartNote={selectedHeartNote}
-                  setSelectedHeartNote={setSelectedHeartNote}
-                  selectedBaseNote={selectedBaseNote}
-                  setSelectedBaseNote={setSelectedBaseNote}
+                  selectedTopNotes={selectedTopNotes}
+                  setSelectedTopNotes={setSelectedTopNotes}
+                  selectedHeartNotes={selectedHeartNotes}
+                  setSelectedHeartNotes={setSelectedHeartNotes}
+                  selectedBaseNotes={selectedBaseNotes}
+                  setSelectedBaseNotes={setSelectedBaseNotes}
                 />
               </div>
             </SheetContent>
@@ -319,12 +319,12 @@ const Shop = () => {
             setSelectedBrand={setSelectedBrand}
             selectedLabel={selectedLabel}
             setSelectedLabel={setSelectedLabel}
-            selectedTopNote={selectedTopNote}
-            setSelectedTopNote={setSelectedTopNote}
-            selectedHeartNote={selectedHeartNote}
-            setSelectedHeartNote={setSelectedHeartNote}
-            selectedBaseNote={selectedBaseNote}
-            setSelectedBaseNote={setSelectedBaseNote}
+            selectedTopNotes={selectedTopNotes}
+            setSelectedTopNotes={setSelectedTopNotes}
+            selectedHeartNotes={selectedHeartNotes}
+            setSelectedHeartNotes={setSelectedHeartNotes}
+            selectedBaseNotes={selectedBaseNotes}
+            setSelectedBaseNotes={setSelectedBaseNotes}
           />
         </div>
 
