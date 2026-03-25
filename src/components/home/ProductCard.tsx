@@ -30,7 +30,8 @@ export const ProductCard = ({
   discountPrice, 
   imageUrl, 
   brand,
-  customLabel 
+  customLabel,
+  priceNote,
 }: ProductCardProps) => {
   const navigate = useNavigate();
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
@@ -236,9 +237,11 @@ export const ProductCard = ({
               {formatPrice(price)}*
             </span>
           )}
-          <p className="text-[10px] text-muted-foreground leading-tight">
-            *Price fluctuates. Please contact for latest price.
-          </p>
+          {priceNote && (
+            <p className="text-[10px] text-muted-foreground leading-tight">
+              *{priceNote}
+            </p>
+          )}
         </div>
         <Button 
           className="w-full gap-2" 
