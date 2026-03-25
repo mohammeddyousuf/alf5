@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,10 @@ interface WebsiteNameSectionProps {
 export const WebsiteNameSection = ({ initialName, refetch }: WebsiteNameSectionProps) => {
   const { toast } = useToast();
   const [websiteName, setWebsiteName] = useState(initialName);
+
+  useEffect(() => {
+    setWebsiteName(initialName);
+  }, [initialName]);
 
   const handleWebsiteNameUpdate = async () => {
     try {

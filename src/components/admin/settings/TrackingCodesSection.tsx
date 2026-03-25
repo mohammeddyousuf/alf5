@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,10 @@ interface TrackingCodesSectionProps {
 export const TrackingCodesSection = ({ initialCodes, refetch }: TrackingCodesSectionProps) => {
   const { toast } = useToast();
   const [trackingCodes, setTrackingCodes] = useState(initialCodes);
+
+  useEffect(() => {
+    setTrackingCodes(initialCodes);
+  }, [initialCodes]);
 
   const handleTrackingCodesUpdate = async () => {
     try {
