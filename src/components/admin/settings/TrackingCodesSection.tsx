@@ -14,6 +14,10 @@ export const TrackingCodesSection = ({ initialCodes, refetch }: TrackingCodesSec
   const { toast } = useToast();
   const [trackingCodes, setTrackingCodes] = useState(initialCodes);
 
+  useEffect(() => {
+    setTrackingCodes(initialCodes);
+  }, [initialCodes]);
+
   const handleTrackingCodesUpdate = async () => {
     try {
       await updateSettings({ tracking_codes: trackingCodes });

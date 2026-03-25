@@ -14,6 +14,10 @@ export const WebsiteNameSection = ({ initialName, refetch }: WebsiteNameSectionP
   const { toast } = useToast();
   const [websiteName, setWebsiteName] = useState(initialName);
 
+  useEffect(() => {
+    setWebsiteName(initialName);
+  }, [initialName]);
+
   const handleWebsiteNameUpdate = async () => {
     try {
       await updateSettings({ website_name: websiteName });
