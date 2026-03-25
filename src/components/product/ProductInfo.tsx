@@ -183,6 +183,7 @@ export function ProductInfo({
             *Price fluctuates. Please contact for latest price.
           </span>
         </div>
+      </div>
 
       {(topNotes || heartNotes || baseNotes) && (
         <div className="space-y-2 border-t border-b border-border py-4">
