@@ -21,12 +21,16 @@ const defaultValues: ProductFormData = {
   discount_price: null,
   images: [],
   status: "draft",
+  stock_status: "in_stock",
   category_id: null,
   subcategory_id: null,
   featured: false,
   brand: null,
   custom_label: null,
   whatsapp_number: null,
+  top_notes: null,
+  heart_notes: null,
+  base_notes: null,
 };
 
 export function useProductForm({ product, onSuccess, onLimitExceeded }: UseProductFormProps) {
@@ -42,12 +46,16 @@ export function useProductForm({ product, onSuccess, onLimitExceeded }: UseProdu
       discount_price: product.discount_price ?? null,
       images: product.images ?? [],
       status: product.status ?? "draft",
+      stock_status: (product as any).stock_status ?? "in_stock",
       category_id: product.category_id,
       subcategory_id: product.subcategory_id,
       featured: product.featured ?? false,
       brand: product.brand ?? null,
       custom_label: product.custom_label ?? null,
       whatsapp_number: product.whatsapp_number ?? null,
+      top_notes: (product as any).top_notes ?? null,
+      heart_notes: (product as any).heart_notes ?? null,
+      base_notes: (product as any).base_notes ?? null,
     } : defaultValues,
   });
 
@@ -61,12 +69,16 @@ export function useProductForm({ product, onSuccess, onLimitExceeded }: UseProdu
         discount_price: values.discount_price,
         images: values.images,
         status: values.status,
+        stock_status: values.stock_status,
         category_id: values.category_id || null,
         subcategory_id: values.subcategory_id || null,
         featured: values.featured,
         brand: values.brand || null,
         custom_label: values.custom_label || null,
         whatsapp_number: values.whatsapp_number || null,
+        top_notes: values.top_notes || null,
+        heart_notes: values.heart_notes || null,
+        base_notes: values.base_notes || null,
       };
 
       if (product?.id) {

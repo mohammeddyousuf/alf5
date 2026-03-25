@@ -30,12 +30,16 @@ export const productFormSchema = z.object({
     .optional(),
   images: z.array(z.string()).default([]),
   status: z.enum(["draft", "published", "archived"]).default("draft"),
+  stock_status: z.enum(["in_stock", "out_of_stock"]).default("in_stock"),
   category_id: z.string().nullable().optional(),
   subcategory_id: z.string().nullable().optional(),
   featured: z.boolean().default(false),
   brand: z.string().nullable().optional(),
   custom_label: z.string().nullable().optional(),
   whatsapp_number: z.string().nullable().optional(),
+  top_notes: z.string().nullable().optional(),
+  heart_notes: z.string().nullable().optional(),
+  base_notes: z.string().nullable().optional(),
 });
 
 export type ProductFormData = z.infer<typeof productFormSchema>;

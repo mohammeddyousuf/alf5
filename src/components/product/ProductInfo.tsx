@@ -14,6 +14,9 @@ interface ProductInfoProps {
   productId: string;
   onOrderSubmit: (formData: any) => void;
   whatsappNumber?: string | null;
+  topNotes?: string | null;
+  heartNotes?: string | null;
+  baseNotes?: string | null;
 }
 
 export function ProductInfo({ 
@@ -25,7 +28,10 @@ export function ProductInfo({
   discountPrice,
   productId,
   onOrderSubmit,
-  whatsappNumber
+  whatsappNumber,
+  topNotes,
+  heartNotes,
+  baseNotes,
 }: ProductInfoProps) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
@@ -165,6 +171,30 @@ export function ProductInfo({
           *Price fluctuates per batch. Please contact for latest price.
         </p>
       </div>
+
+      {(topNotes || heartNotes || baseNotes) && (
+        <div className="space-y-2 border-t border-b border-border py-4">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Scent Profile</p>
+          {topNotes && (
+            <div className="flex gap-2">
+              <span className="text-sm text-muted-foreground min-w-[70px]">Opening</span>
+              <span className="text-sm text-foreground">{topNotes}</span>
+            </div>
+          )}
+          {heartNotes && (
+            <div className="flex gap-2">
+              <span className="text-sm text-muted-foreground min-w-[70px]">Heart</span>
+              <span className="text-sm text-foreground">{heartNotes}</span>
+            </div>
+          )}
+          {baseNotes && (
+            <div className="flex gap-2">
+              <span className="text-sm text-muted-foreground min-w-[70px]">Base</span>
+              <span className="text-sm text-foreground">{baseNotes}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {description && (
         <p className="text-muted-foreground text-left">{description}</p>
