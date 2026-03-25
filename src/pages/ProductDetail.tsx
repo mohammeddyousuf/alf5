@@ -182,6 +182,7 @@ const ProductDetail = () => {
             topNotes={(product as any).top_notes}
             heartNotes={(product as any).heart_notes}
             baseNotes={(product as any).base_notes}
+            stockStatus={(product as any).stock_status}
           />
         </div>
       </div>
