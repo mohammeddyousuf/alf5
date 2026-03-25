@@ -123,7 +123,7 @@ const Shop = () => {
       let query = supabase
         .from("products")
         .select(
-          "id, name, price, sale_price, discount_price, images, brand, custom_label, description, category_id, subcategory_id, featured, created_at, status"
+          "id, name, price, sale_price, discount_price, images, brand, custom_label, description, category_id, subcategory_id, featured, created_at, status, stock_status, price_note, top_notes, heart_notes, base_notes"
         )
         .eq("status", "published");
 
