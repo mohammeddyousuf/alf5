@@ -11,6 +11,9 @@ import { SystemLimits, SystemLimitsInsert, SystemLimitsUpdate } from './systemLi
 import { Enquiries, EnquiriesInsert, EnquiriesUpdate } from './enquiries';
 
 export interface Database {
+  __InternalSupabase: {
+    PostgrestVersion: "14.4"
+  }
   public: {
     Tables: {
       settings: {
