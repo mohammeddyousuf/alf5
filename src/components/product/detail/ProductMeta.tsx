@@ -1,3 +1,5 @@
+import { useCurrency } from "@/hooks/useCurrency";
+
 interface ProductMetaProps {
   websiteName: string;
   productName: string;
@@ -17,6 +19,7 @@ export function ProductMeta({
   productPrice,
   productBrand,
 }: ProductMetaProps) {
+  const { currencyCode } = useCurrency();
   // Convert relative image URLs to absolute URLs
   const getAbsoluteUrl = (url: string) => {
     if (!url) return '';
@@ -42,7 +45,7 @@ export function ProductMeta({
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="product:price:amount" content={String(productPrice)} />
-      <meta property="product:price:currency" content="INR" />
+      <meta property="product:price:currency" content={currencyCode} />
       {productBrand && <meta property="product:brand" content={productBrand} />}
       
       {/* Twitter Card */}
