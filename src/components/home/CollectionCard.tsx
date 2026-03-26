@@ -20,7 +20,7 @@ export const CollectionCard = ({
 }: CollectionCardProps) => {
   return (
     <div className="group relative overflow-hidden rounded-lg">
-      <Link to={linkUrl || `/collections/${id}`} className="block">
+      <Link to={`/collections/${id}`} className="block">
         <div className="aspect-square w-full overflow-hidden">
           {imageUrl ? (
             <img

@@ -55,7 +55,8 @@ export const useFilteredProducts = ({
   };
 
   const noteContainsAny = (field: string | null | undefined, searches: string[]) => {
-    if (!field || searches.length === 0) return true;
+    if (searches.length === 0) return true;
+    if (!field) return false;
     const fieldNotes = field.toLowerCase().split(',').map(n => n.trim());
     return searches.some(s => fieldNotes.some(fn => fn.includes(s.toLowerCase())));
   };
