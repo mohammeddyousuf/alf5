@@ -55,6 +55,17 @@ const CollectionDetail = () => {
     queryFn: async () => {
       if (!collection) return [];
 
+      // If manual product selection exists, use that exclusively
+      if (collection.selected_product_ids?.length > 0) {
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .eq("status", "published")
+          .in("id", collection.selected_product_ids);
+        if (error) throw error;
+        return data;
+      }
+
       let query = supabase
         .from("products")
         .select("*")
@@ -69,6 +80,8 @@ const CollectionDetail = () => {
       if (collection.filter_scent_family) query = query.eq("scent_family", collection.filter_scent_family);
       if (collection.filter_featured) query = query.eq("featured", true);
       if (collection.filter_sale_only) query = query.not("sale_price", "is", null);
+      if (collection.filter_price_min != null) query = query.gte("price", collection.filter_price_min);
+      if (collection.filter_price_max != null) query = query.lte("price", collection.filter_price_max);
 
       const { data, error } = await query;
       if (error) throw error;
