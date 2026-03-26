@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/db";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { ImageUploadField } from "./shared/ImageUploadField";
+import { ProductSelector } from "./collection/ProductSelector";
 import { useQuery } from "@tanstack/react-query";
 import {
   Select,
@@ -42,6 +43,9 @@ const formSchema = z.object({
   filter_scent_family: z.string().nullable().optional(),
   filter_featured: z.boolean().default(false),
   filter_sale_only: z.boolean().default(false),
+  filter_price_min: z.coerce.number().nullable().optional(),
+  filter_price_max: z.coerce.number().nullable().optional(),
+  selected_product_ids: z.array(z.string()).default([]),
 });
 
 type CollectionRow = any;
@@ -73,6 +77,9 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
       filter_scent_family: collection?.filter_scent_family ?? null,
       filter_featured: collection?.filter_featured ?? false,
       filter_sale_only: collection?.filter_sale_only ?? false,
+      filter_price_min: collection?.filter_price_min ?? null,
+      filter_price_max: collection?.filter_price_max ?? null,
+      selected_product_ids: collection?.selected_product_ids ?? [],
     },
   });
 
@@ -151,6 +158,9 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
         filter_scent_family: values.filter_scent_family || null,
         filter_featured: values.filter_featured,
         filter_sale_only: values.filter_sale_only,
+        filter_price_min: values.filter_price_min || null,
+        filter_price_max: values.filter_price_max || null,
+        selected_product_ids: values.selected_product_ids.length > 0 ? values.selected_product_ids : null,
       };
 
       if (collection) {
@@ -411,6 +421,49 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
               )}
             />
           </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="filter_price_min"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Min Price (AED)</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="0" {...field} value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="filter_price_max"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Max Price (AED)</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="No limit" {...field} value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <div className="border rounded-lg p-4 space-y-4">
+          <h3 className="font-semibold text-sm">Manual Product Selection</h3>
+          <p className="text-xs text-muted-foreground">Optionally pick specific products to include. If selected, only these products will show (filters above are ignored).</p>
+          <FormField
+            control={form.control}
+            name="selected_product_ids"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <ProductSelector selectedIds={field.value} onChange={field.onChange} />
+                </FormControl>
+              </FormItem>
+            )}
+          />
         </div>
 
         <Button type="submit">
