@@ -88,6 +88,7 @@ const Index = () => {
                 key={collection.id}
                 id={collection.id}
                 name={collection.name}
+                slug={(collection as any).slug}
                 imageUrl={collection.image_url}
                 description={collection.description}
                 linkUrl={collection.link_url}
