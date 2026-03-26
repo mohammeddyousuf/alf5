@@ -60,7 +60,6 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
             <Select
               onValueChange={(value) => {
                 field.onChange(value);
-                // Reset subcategory when category changes
                 form.setValue("subcategory_id", null);
               }}
               value={field.value || undefined}
@@ -88,7 +87,7 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
         name="subcategory_id"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Subcategory</FormLabel>
+            <FormLabel>Gender Profile</FormLabel>
             <Select
               onValueChange={field.onChange}
               value={field.value || undefined}
@@ -96,7 +95,7 @@ export function CategoryFields({ form }: CategoryFieldsProps) {
             >
               <FormControl>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select subcategory" />
+                  <SelectValue placeholder="Select gender profile" />
                 </SelectTrigger>
               </FormControl>
               <SelectContent>

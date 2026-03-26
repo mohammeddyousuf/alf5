@@ -19,6 +19,9 @@ interface ProductInfoProps {
   baseNotes?: string | null;
   stockStatus?: string | null;
   priceNote?: string | null;
+  genderProfile?: string | null;
+  occasion?: string | null;
+  scentFamily?: string | null;
 }
 
 export function ProductInfo({ 
@@ -36,6 +39,9 @@ export function ProductInfo({
   baseNotes,
   stockStatus,
   priceNote,
+  genderProfile,
+  occasion,
+  scentFamily,
 }: ProductInfoProps) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
@@ -100,20 +106,13 @@ export function ProductInfo({
     discountPrice < price;
 
   const handleWhatsAppClick = () => {
-    console.log("Product WhatsApp Override:", whatsappNumber);
-    console.log("Default WhatsApp Number:", settings?.whatsapp_number);
-    
     const showForm = settings?.show_order_form !== false;
     
     if (showForm) {
       setOrderDialogOpen(true);
     } else {
-      // Skip form, go directly to WhatsApp with product info
       const number = effectiveWhatsAppNumber;
-      if (!number) {
-        console.error("No WhatsApp number available");
-        return;
-      }
+      if (!number) return;
       let cleanNumber = number.trim().replace(/[^\d+]/g, '').replace(/^\+/, '');
       const message = encodeURIComponent(
         `Hi,\n\nI'm interested in ${name}${brand ? ` by ${brand}` : ''}.\nPrice: ${formatPrice(displayPrice)}\n\nPlease share more details.`
@@ -143,9 +142,10 @@ export function ProductInfo({
                       showDiscountPrice ? discountPrice! : 
                       price;
 
-  // Prioritize product override number
   const effectiveWhatsAppNumber = whatsappNumber || settings?.whatsapp_number;
-  console.log("Effective WhatsApp number being used:", effectiveWhatsAppNumber);
+
+  const hasProfileInfo = genderProfile || occasion || scentFamily;
+  const hasScentProfile = topNotes || heartNotes || baseNotes;
 
   return (
     <div className="space-y-6 text-left">
@@ -189,7 +189,32 @@ export function ProductInfo({
         </div>
       </div>
 
-      {(topNotes || heartNotes || baseNotes) && (
+      {/* Gender Profile, Occasion, Scent Family */}
+      {hasProfileInfo && (
+        <div className="space-y-2 border-t border-b border-border py-4">
+          {genderProfile && (
+            <div className="flex gap-2">
+              <span className="text-sm text-muted-foreground min-w-[100px]">Gender Profile</span>
+              <span className="text-sm text-foreground">{genderProfile}</span>
+            </div>
+          )}
+          {occasion && (
+            <div className="flex gap-2">
+              <span className="text-sm text-muted-foreground min-w-[100px]">Occasion</span>
+              <span className="text-sm text-foreground">{occasion}</span>
+            </div>
+          )}
+          {scentFamily && (
+            <div className="flex gap-2">
+              <span className="text-sm text-muted-foreground min-w-[100px]">Scent Family</span>
+              <span className="text-sm text-foreground">{scentFamily}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Scent Profile */}
+      {hasScentProfile && (
         <div className="space-y-2 border-t border-b border-border py-4">
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Scent Profile</p>
           {topNotes && (
