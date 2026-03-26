@@ -1,5 +1,6 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface PriceRangeFilterProps {
   priceRange: [number, number];
@@ -21,12 +22,14 @@ export function PriceRangeFilter({ priceRange, setPriceRange }: PriceRangeFilter
     setPriceRange(prev => [prev[0], newMax]);
   };
 
+  const { currencySymbol } = useCurrency();
+
   return (
     <div className="space-y-2">
       <Label>Price Range</Label>
       <div className="flex items-center gap-2">
         <div className="flex-1">
-          <Label className="text-xs text-muted-foreground">Min Price (₹)</Label>
+          <Label className="text-xs text-muted-foreground">Min Price ({currencySymbol})</Label>
           <Input
             type="number"
             min={0}
@@ -37,7 +40,7 @@ export function PriceRangeFilter({ priceRange, setPriceRange }: PriceRangeFilter
           />
         </div>
         <div className="flex-1">
-          <Label className="text-xs text-muted-foreground">Max Price (₹)</Label>
+          <Label className="text-xs text-muted-foreground">Max Price ({currencySymbol})</Label>
           <Input
             type="number"
             min={0}

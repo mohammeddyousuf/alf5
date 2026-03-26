@@ -76,13 +76,7 @@ export function ProductInfo({
     }
   }, [settings?.clearance_sale_end_date, settings?.clearance_sale_active, refetch]);
 
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const { formatPrice } = useCurrency();
 
   const calculateDiscount = (originalPrice: number, discountedPrice: number) => {
     return Math.round(((originalPrice - discountedPrice) / originalPrice) * 100);

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { OrderDialog } from "@/components/product/OrderDialog";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface ProductCardProps {
   id: string;
@@ -54,13 +55,7 @@ export const ProductCard = ({
     },
   });
 
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const { formatPrice } = useCurrency();
 
   const calculateDiscount = (originalPrice: number, discountedPrice: number) => {
     return Math.round(((originalPrice - discountedPrice) / originalPrice) * 100);
@@ -120,13 +115,7 @@ export const ProductCard = ({
                         showDiscountPrice ? discountPrice :
                         price;
 
-  const formatWhatsAppPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const formatWhatsAppPrice = formatPrice;
 
   const handleShare = async (e: React.MouseEvent) => {
     e.preventDefault();
