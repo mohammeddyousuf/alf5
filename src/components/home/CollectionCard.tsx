@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 interface CollectionCardProps {
   id: string;
   name: string;
+  slug: string | null;
   imageUrl: string | null;
   description: string | null;
   linkUrl: string | null;

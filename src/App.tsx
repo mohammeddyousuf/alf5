@@ -101,7 +101,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/products/:slug" element={<ProductDetail />} />
-            <Route path="/collections/:id" element={<CollectionDetail />} />
+            <Route path="/collections/:slug" element={<CollectionDetail />} />
             <Route path="/page/:slug" element={<Page />} />
             <Route path="/about" element={<Page />} />
             <Route path="/faq" element={<Page />} />
