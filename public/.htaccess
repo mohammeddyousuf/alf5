@@ -2,6 +2,9 @@
   RewriteEngine On
   RewriteBase /
 
+  # Sitemap
+  RewriteRule ^sitemap\.xml$ /sitemap.php [L]
+
   # Proxy product images for social crawlers (strips X-Robots-Tag)
   RewriteRule ^img-proxy/(.+)$ /prerender.php?img_proxy=$1 [L,QSA]
 
