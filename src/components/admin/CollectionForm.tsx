@@ -283,7 +283,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
               name="filter_subcategory"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gender Profile</FormLabel>
+                  <FormLabel>Subcategory</FormLabel>
                   <Select onValueChange={(v) => field.onChange(v === "none" ? null : v)} value={field.value || "none"} disabled={!form.watch("filter_category")}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger></FormControl>
                     <SelectContent>
