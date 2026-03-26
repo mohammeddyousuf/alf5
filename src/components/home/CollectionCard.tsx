@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 interface CollectionCardProps {
   id: string;
   name: string;
+  slug: string | null;
   imageUrl: string | null;
   description: string | null;
   linkUrl: string | null;
@@ -13,14 +14,16 @@ interface CollectionCardProps {
 export const CollectionCard = ({ 
   id, 
   name, 
+  slug,
   imageUrl, 
   description, 
   linkUrl,
   buttonText = "View Collection"
 }: CollectionCardProps) => {
+  const collectionUrl = linkUrl || `/collections/${slug || id}`;
   return (
     <div className="group relative overflow-hidden rounded-lg">
-      <Link to={`/collections/${id}`} className="block">
+      <Link to={collectionUrl} className="block">
         <div className="aspect-square w-full overflow-hidden">
           {imageUrl ? (
             <img

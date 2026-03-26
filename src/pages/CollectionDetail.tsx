@@ -2,19 +2,24 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/db";
 import { ProductCard } from "@/components/home/ProductCard";
+import { ProductPagination } from "@/components/shop/ProductPagination";
 import { Loader2 } from "lucide-react";
 import { Helmet } from "react-helmet";
+import { useState } from "react";
+
+const PRODUCTS_PER_PAGE = 12;
 
 const CollectionDetail = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data: collection, isLoading: isLoadingCollection } = useQuery({
-    queryKey: ["collection", id],
+    queryKey: ["collection", slug],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("collections")
         .select("*")
-        .eq("id", id)
+        .eq("slug", slug)
         .single();
       
       if (error) throw error;
@@ -37,7 +42,7 @@ const CollectionDetail = () => {
   });
 
   const { data: products, isLoading: isLoadingProducts } = useQuery({
-    queryKey: ["collection-products", id, collection],
+    queryKey: ["collection-products", slug, collection],
     queryFn: async () => {
       if (!collection) return [];
 
@@ -79,6 +84,12 @@ const CollectionDetail = () => {
     );
   }
 
+  const totalPages = Math.ceil((products?.length || 0) / PRODUCTS_PER_PAGE);
+  const paginatedProducts = products?.slice(
+    (currentPage - 1) * PRODUCTS_PER_PAGE,
+    currentPage * PRODUCTS_PER_PAGE
+  );
+
   const siteName = settings?.website_name || "Our Store";
   const seoTitle = collection.seo_title || collection.name;
   const pageTitle = `${seoTitle} | ${siteName}`;
@@ -112,7 +123,7 @@ const CollectionDetail = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products?.map((product) => (
+          {paginatedProducts?.map((product) => (
             <ProductCard
               key={product.id}
               id={product.id}
@@ -129,10 +140,18 @@ const CollectionDetail = () => {
           ))}
         </div>
 
-        {products?.length === 0 && (
+        {paginatedProducts?.length === 0 && (
           <p className="text-center text-muted-foreground">
             No products found in this collection.
           </p>
+        )}
+
+        {totalPages > 1 && (
+          <ProductPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
         )}
       </div>
     </>
