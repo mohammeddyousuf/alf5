@@ -18,6 +18,7 @@ import NewPage from "@/pages/admin/pages/New";
 import EditPage from "@/pages/admin/pages/[id]";
 import Categories from "@/pages/admin/Categories";
 import ProductDetail from "@/pages/ProductDetail";
+import CollectionDetail from "@/pages/CollectionDetail";
 import Orders from "@/pages/admin/Orders";
 import Enquiries from "@/pages/admin/Enquiries";
 import Auth from "@/pages/Auth";
