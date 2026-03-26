@@ -23,6 +23,7 @@ export const useOrderSubmission = ({
   whatsappNumber,
 }: UseOrderSubmissionProps) => {
   const { toast } = useToast();
+  const { formatPrice: fp, currencyCode } = useCurrency();
   const [ipAddress, setIpAddress] = useState<string>("");
   const [location, setLocation] = useState<string>("");
   const [websiteName, setWebsiteName] = useState("ALFragrance");
@@ -49,13 +50,7 @@ export const useOrderSubmission = ({
     fetchLocationAndIP();
   }, []);
 
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: currencyCode,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const formatPrice = fp;
 
   const handleSubmit = async (data: OrderFormData) => {
     try {
