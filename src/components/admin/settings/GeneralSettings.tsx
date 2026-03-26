@@ -3,6 +3,7 @@ import { WebsiteNameSection } from "./WebsiteNameSection";
 import { TrackingCodesSection } from "./TrackingCodesSection";
 import { ImageSection } from "./ImageSection";
 import { DefaultPriceNoteSection } from "./DefaultPriceNoteSection";
+import { CurrencySection } from "./CurrencySection";
 
 interface GeneralSettingsProps {
   settings: any;
@@ -25,6 +26,12 @@ export const GeneralSettings = ({ settings, refetch }: GeneralSettingsProps) => 
         refetch={refetch}
         isUploading={isUploading}
         setIsUploading={setIsUploading}
+      />
+
+      <CurrencySection
+        initialCode={settings?.currency_code || "INR"}
+        initialLocale={settings?.currency_locale || "en-IN"}
+        refetch={refetch}
       />
 
       <TrackingCodesSection
