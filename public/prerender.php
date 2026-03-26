@@ -31,8 +31,8 @@ function getProductShortId($uri) {
     return null;
 }
 
-function getCollectionId($uri) {
-    if (preg_match('#^/collections/([a-f0-9-]+)$#', $uri, $matches)) {
+function getCollectionSlug($uri) {
+    if (preg_match('#^/collections/([^/]+)$#', $uri, $matches)) {
         return $matches[1];
     }
     return null;
