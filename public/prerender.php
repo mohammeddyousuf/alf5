@@ -248,8 +248,8 @@ if ($shortId) {
 </html>';
         exit;
     }
-} elseif ($collectionId) {
-    $collection = fetchCollection($collectionId, $SUPABASE_URL, $SUPABASE_KEY);
+} elseif ($collectionSlug) {
+    $collection = fetchCollection($collectionSlug, $SUPABASE_URL, $SUPABASE_KEY);
     $settings = fetchSettings($SUPABASE_URL, $SUPABASE_KEY);
     $siteName = $settings['website_name'] ?? $SITE_NAME;
 
