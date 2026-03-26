@@ -71,19 +71,22 @@ export function ProductSelector({ selectedIds, onChange }: ProductSelectorProps)
                 checked={selectedIds.includes(product.id)}
                 onCheckedChange={() => toggle(product.id)}
               />
-              {product.images?.[0] && (
-                <img
-                  src={product.images[0]}
-                  alt=""
-                  className="w-8 h-8 object-cover rounded"
-                />
-              )}
+              {(() => {
+                const imgs = Array.isArray(product.images) ? product.images : [];
+                return imgs[0] ? (
+                  <img
+                    src={imgs[0]}
+                    alt=""
+                    className="w-8 h-8 object-cover rounded"
+                  />
+                ) : null;
+              })()}
               <div className="flex-1 min-w-0">
                 <p className="text-sm truncate">{product.name}</p>
                 <p className="text-xs text-muted-foreground">{product.brand || "No brand"}</p>
               </div>
               <span className="text-xs text-muted-foreground whitespace-nowrap">
-                AED {product.price}
+                {product.price}
               </span>
             </label>
           ))}
