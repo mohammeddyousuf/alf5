@@ -31,8 +31,8 @@ function getProductShortId($uri) {
     return null;
 }
 
-function getCollectionId($uri) {
-    if (preg_match('#^/collections/([a-f0-9-]+)$#', $uri, $matches)) {
+function getCollectionSlug($uri) {
+    if (preg_match('#^/collections/([^/]+)$#', $uri, $matches)) {
         return $matches[1];
     }
     return null;
@@ -60,8 +60,22 @@ function fetchProduct($shortId, $supabaseUrl, $supabaseKey) {
     return null;
 }
 
-function fetchCollection($id, $supabaseUrl, $supabaseKey) {
-    $url = $supabaseUrl . "/rest/v1/collections?id=eq." . urlencode($id) . "&limit=1";
+function fetchCollection($slug, $supabaseUrl, $supabaseKey) {
+    // Try slug first
+    $url = $supabaseUrl . "/rest/v1/collections?slug=eq." . urlencode($slug) . "&limit=1";
+    $ch = curl_init();
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $url, CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => ["apikey: $supabaseKey", "Authorization: Bearer $supabaseKey", "Content-Type: application/json"],
+        CURLOPT_TIMEOUT => 5,
+    ]);
+    $response = curl_exec($ch);
+    curl_close($ch);
+    $data = json_decode($response, true);
+    if (!empty($data)) return $data[0];
+
+    // Fallback to ID
+    $url = $supabaseUrl . "/rest/v1/collections?id=eq." . urlencode($slug) . "&limit=1";
     $ch = curl_init();
     curl_setopt_array($ch, [
         CURLOPT_URL => $url, CURLOPT_RETURNTRANSFER => true,
@@ -148,7 +162,7 @@ if (!isCrawler()) {
 
 // Crawler handling
 $shortId = getProductShortId($requestUri);
-$collectionId = getCollectionId($requestUri);
+$collectionSlug = getCollectionSlug($requestUri);
 
 if ($shortId) {
     $product = fetchProduct($shortId, $SUPABASE_URL, $SUPABASE_KEY);
@@ -234,8 +248,8 @@ if ($shortId) {
 </html>';
         exit;
     }
-} elseif ($collectionId) {
-    $collection = fetchCollection($collectionId, $SUPABASE_URL, $SUPABASE_KEY);
+} elseif ($collectionSlug) {
+    $collection = fetchCollection($collectionSlug, $SUPABASE_URL, $SUPABASE_KEY);
     $settings = fetchSettings($SUPABASE_URL, $SUPABASE_KEY);
     $siteName = $settings['website_name'] ?? $SITE_NAME;
 
