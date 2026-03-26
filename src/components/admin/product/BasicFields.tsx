@@ -130,9 +130,9 @@ export function BasicFields({ form }: BasicFieldsProps) {
           name="custom_label"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Custom Label</FormLabel>
+              <FormLabel>Retail / Tester</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter custom label (optional)" className="uppercase" onChange={(e) => field.onChange(e.target.value.toUpperCase())} />
+                <Input {...field} placeholder="e.g. RETAIL, TESTER" className="uppercase" onChange={(e) => field.onChange(e.target.value.toUpperCase())} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -319,7 +319,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
               name="filter_custom_label"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Custom Label</FormLabel>
+                  <FormLabel>Retail / Tester</FormLabel>
                   <Select onValueChange={(v) => field.onChange(v === "none" ? null : v)} value={field.value || "none"}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger></FormControl>
                     <SelectContent>

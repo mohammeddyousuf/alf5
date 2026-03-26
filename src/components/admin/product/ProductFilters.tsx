@@ -155,10 +155,10 @@ export function ProductFilters({
         <div className="flex items-center space-x-2">
           <Select value={selectedCustomLabel} onValueChange={setSelectedCustomLabel}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Filter by label" />
+              <SelectValue placeholder="Filter by Retail / Tester" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Labels</SelectItem>
+              <SelectItem value="all">All Retail / Tester</SelectItem>
               {customLabels?.map((label) => (
                 <SelectItem key={label} value={label}>
                   {label}

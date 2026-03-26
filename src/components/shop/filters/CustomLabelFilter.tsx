@@ -25,7 +25,7 @@ export function CustomLabelFilter({ selectedLabel, setSelectedLabel, labels }: C
 
   return (
     <div className="space-y-2">
-      <Label>Label</Label>
+      <Label>Retail / Tester</Label>
       <Select
         value={selectedLabel || "all"}
         onValueChange={handleLabelChange}
@@ -34,7 +34,7 @@ export function CustomLabelFilter({ selectedLabel, setSelectedLabel, labels }: C
           <SelectValue placeholder="Select label" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Labels</SelectItem>
+          <SelectItem value="all">All</SelectItem>
           {labels?.map((label) => (
             <SelectItem key={label} value={label}>
               {label}
