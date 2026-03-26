@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 import { OrdersHeader } from "@/components/admin/orders/OrdersHeader";
 import { OrdersTable } from "@/components/admin/orders/OrdersTable";
+import { useCurrency } from "@/hooks/useCurrency";
 
 export default function Orders() {
   const { toast } = useToast();

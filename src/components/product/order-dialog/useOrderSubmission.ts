@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/db";
 import { useToast } from "@/components/ui/use-toast";
 import { OrderFormData, ExtendedOrderFormData } from "./types";
 import { generateWhatsAppMessage, generateWhatsAppUrl } from "./whatsapp-utils";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface UseOrderSubmissionProps {
   productId: string;
