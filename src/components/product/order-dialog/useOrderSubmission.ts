@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/db";
 import { useToast } from "@/components/ui/use-toast";
 import { OrderFormData, ExtendedOrderFormData } from "./types";
 import { generateWhatsAppMessage, generateWhatsAppUrl } from "./whatsapp-utils";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface UseOrderSubmissionProps {
   productId: string;
@@ -22,6 +23,7 @@ export const useOrderSubmission = ({
   whatsappNumber,
 }: UseOrderSubmissionProps) => {
   const { toast } = useToast();
+  const { formatPrice: fp, currencyCode } = useCurrency();
   const [ipAddress, setIpAddress] = useState<string>("");
   const [location, setLocation] = useState<string>("");
   const [websiteName, setWebsiteName] = useState("ALFragrance");
@@ -48,13 +50,7 @@ export const useOrderSubmission = ({
     fetchLocationAndIP();
   }, []);
 
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const formatPrice = fp;
 
   const handleSubmit = async (data: OrderFormData) => {
     try {

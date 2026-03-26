@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 import { OrdersHeader } from "@/components/admin/orders/OrdersHeader";
 import { OrdersTable } from "@/components/admin/orders/OrdersTable";
+import { useCurrency } from "@/hooks/useCurrency";
 
 export default function Orders() {
   const { toast } = useToast();
@@ -42,13 +43,7 @@ export default function Orders() {
     },
   });
 
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const { formatPrice } = useCurrency();
 
   const downloadCSV = () => {
     if (!orders || orders.length === 0) {

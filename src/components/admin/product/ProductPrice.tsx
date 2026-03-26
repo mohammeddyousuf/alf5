@@ -1,3 +1,5 @@
+import { useCurrency } from "@/hooks/useCurrency";
+
 interface ProductPriceProps {
   price: number;
   discountPrice: number | null;
@@ -5,13 +7,7 @@ interface ProductPriceProps {
 }
 
 export function ProductPrice({ price, discountPrice, salePrice }: ProductPriceProps) {
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const { formatPrice } = useCurrency();
 
   const calculateDiscount = (originalPrice: number, discountedPrice: number) => {
     return Math.round(((originalPrice - discountedPrice) / originalPrice) * 100);

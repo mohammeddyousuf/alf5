@@ -5,14 +5,22 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Search } from "lucide-react";
+import { useCurrency } from "@/hooks/useCurrency";
 
 interface ProductSelectorProps {
   selectedIds: string[];
   onChange: (ids: string[]) => void;
 }
 
+const getImageUrl = (fileName: string) => {
+  if (fileName.startsWith("http")) return fileName;
+  const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(fileName);
+  return publicUrl;
+};
+
 export function ProductSelector({ selectedIds, onChange }: ProductSelectorProps) {
   const [search, setSearch] = useState("");
+  const { formatPrice } = useCurrency();
 
   const { data: products } = useQuery({
     queryKey: ["all-products-selector"],
@@ -62,34 +70,35 @@ export function ProductSelector({ selectedIds, onChange }: ProductSelectorProps)
       </p>
       <ScrollArea className="h-60 border rounded-md">
         <div className="p-2 space-y-1">
-          {filtered.map((product) => (
-            <label
-              key={product.id}
-              className="flex items-center gap-3 p-2 rounded hover:bg-muted cursor-pointer"
-            >
-              <Checkbox
-                checked={selectedIds.includes(product.id)}
-                onCheckedChange={() => toggle(product.id)}
-              />
-              {(() => {
-                const imgs = Array.isArray(product.images) ? product.images : [];
-                return imgs[0] ? (
+          {filtered.map((product) => {
+            const images = Array.isArray(product.images) ? product.images : [];
+            const firstImage = images[0] as string | undefined;
+            return (
+              <label
+                key={product.id}
+                className="flex items-center gap-3 p-2 rounded hover:bg-muted cursor-pointer"
+              >
+                <Checkbox
+                  checked={selectedIds.includes(product.id)}
+                  onCheckedChange={() => toggle(product.id)}
+                />
+                {firstImage && (
                   <img
-                    src={imgs[0]}
+                    src={getImageUrl(firstImage)}
                     alt=""
                     className="w-8 h-8 object-cover rounded"
                   />
-                ) : null;
-              })()}
-              <div className="flex-1 min-w-0">
-                <p className="text-sm truncate">{product.name}</p>
-                <p className="text-xs text-muted-foreground">{product.brand || "No brand"}</p>
-              </div>
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
-                {product.price}
-              </span>
-            </label>
-          ))}
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm truncate">{product.name}</p>
+                  <p className="text-xs text-muted-foreground">{product.brand || "No brand"}</p>
+                </div>
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  {formatPrice(product.price)}
+                </span>
+              </label>
+            );
+          })}
           {filtered.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">No products found</p>
           )}

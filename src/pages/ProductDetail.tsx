@@ -8,10 +8,12 @@ import { ProductInfo } from "@/components/product/ProductInfo";
 import { Helmet } from "react-helmet";
 import { ProductHead } from "@/components/product/detail/ProductHead";
 import { SimilarProducts } from "@/components/product/SimilarProducts";
+import { useCurrency } from "@/hooks/useCurrency";
 
 const ProductDetail = () => {
   const { slug } = useParams();
   const { toast } = useToast();
+  const { currencyCode } = useCurrency();
 
   const shortId = slug?.split('-').pop()?.substring(0, 8);
 
@@ -119,7 +121,7 @@ const ProductDetail = () => {
     offers: {
       "@type": "Offer",
       price: productPrice,
-      priceCurrency: "INR",
+      priceCurrency: currencyCode,
       availability,
       url: currentUrl,
       itemCondition: "https://schema.org/NewCondition",
@@ -162,12 +164,12 @@ const ProductDetail = () => {
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="product:price:amount" content={String(productPrice)} />
-        <meta property="product:price:currency" content="INR" />
+        <meta property="product:price:currency" content={currencyCode} />
         {product.brand && <meta property="product:brand" content={product.brand} />}
         <meta property="product:availability" content={stockStatus === 'in_stock' ? 'in stock' : 'out of stock'} />
 
         <meta property="og:price:amount" content={String(productPrice)} />
-        <meta property="og:price:currency" content="INR" />
+        <meta property="og:price:currency" content={currencyCode} />
 
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={ogTitle} />

@@ -1,3 +1,5 @@
+import { useCurrency } from "@/hooks/useCurrency";
+
 interface ProductInfoProps {
   productName: string;
   productBrand: string | null;
@@ -5,13 +7,7 @@ interface ProductInfoProps {
 }
 
 export function ProductInfo({ productName, productBrand, productPrice }: ProductInfoProps) {
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
+  const { formatPrice } = useCurrency();
 
   return (
     <div className="mb-4 space-y-1">
