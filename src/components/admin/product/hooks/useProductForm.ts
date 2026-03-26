@@ -30,6 +30,9 @@ const defaultValues: ProductFormData = {
   top_notes: null,
   heart_notes: null,
   base_notes: null,
+  gender_profile: null,
+  occasion: null,
+  scent_family: null,
 };
 
 export function useProductForm({ product, onSuccess, onLimitExceeded }: UseProductFormProps) {
@@ -56,6 +59,9 @@ export function useProductForm({ product, onSuccess, onLimitExceeded }: UseProdu
       top_notes: (product as any).top_notes ?? null,
       heart_notes: (product as any).heart_notes ?? null,
       base_notes: (product as any).base_notes ?? null,
+      gender_profile: (product as any).gender_profile ?? null,
+      occasion: (product as any).occasion ?? null,
+      scent_family: (product as any).scent_family ?? null,
     } : defaultValues,
   });
 
@@ -80,6 +86,9 @@ export function useProductForm({ product, onSuccess, onLimitExceeded }: UseProdu
         top_notes: values.top_notes || null,
         heart_notes: values.heart_notes || null,
         base_notes: values.base_notes || null,
+        gender_profile: values.gender_profile || null,
+        occasion: values.occasion || null,
+        scent_family: values.scent_family || null,
       };
 
       if (product?.id) {

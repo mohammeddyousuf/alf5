@@ -41,6 +41,9 @@ export const productFormSchema = z.object({
   top_notes: z.string().nullable().optional(),
   heart_notes: z.string().nullable().optional(),
   base_notes: z.string().nullable().optional(),
+  gender_profile: z.string().nullable().optional(),
+  occasion: z.string().nullable().optional(),
+  scent_family: z.string().nullable().optional(),
 });
 
 export type ProductFormData = z.infer<typeof productFormSchema>;

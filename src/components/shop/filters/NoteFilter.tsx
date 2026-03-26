@@ -1,13 +1,6 @@
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface NoteFilterProps {
   label: string;
@@ -17,46 +10,38 @@ interface NoteFilterProps {
 }
 
 export function NoteFilter({ label, selectedNotes, setSelectedNotes, notes }: NoteFilterProps) {
-  const handleSelect = (value: string) => {
-    if (value === "all") {
-      setSelectedNotes([]);
-    } else if (!selectedNotes.includes(value)) {
-      setSelectedNotes([...selectedNotes, value]);
+  const handleToggle = (note: string) => {
+    if (selectedNotes.includes(note)) {
+      setSelectedNotes(selectedNotes.filter(n => n !== note));
+    } else {
+      setSelectedNotes([...selectedNotes, note]);
     }
   };
 
-  const handleRemove = (note: string) => {
-    setSelectedNotes(selectedNotes.filter(n => n !== note));
-  };
+  if (!notes || notes.length === 0) return null;
 
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
-      <Select
-        value=""
-        onValueChange={handleSelect}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder={selectedNotes.length > 0 ? `${selectedNotes.length} selected` : `Select ${label.toLowerCase()}`} />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All</SelectItem>
-          {notes?.filter(note => !selectedNotes.includes(note)).map((note) => (
-            <SelectItem key={note} value={note}>
-              {note}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      {selectedNotes.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {selectedNotes.map(note => (
-            <Badge key={note} variant="secondary" className="text-xs cursor-pointer" onClick={() => handleRemove(note)}>
-              {note} <X className="ml-1 h-3 w-3" />
-            </Badge>
+      <ScrollArea className="max-h-32">
+        <div className="space-y-2">
+          {notes.map((note) => (
+            <div key={note} className="flex items-center space-x-2">
+              <Checkbox
+                id={`${label}-${note}`}
+                checked={selectedNotes.includes(note)}
+                onCheckedChange={() => handleToggle(note)}
+              />
+              <label
+                htmlFor={`${label}-${note}`}
+                className="text-sm cursor-pointer leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {note}
+              </label>
+            </div>
           ))}
         </div>
-      )}
+      </ScrollArea>
     </div>
   );
 }
