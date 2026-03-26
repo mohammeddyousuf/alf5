@@ -428,7 +428,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
               name="filter_price_min"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Min Price (AED)</FormLabel>
+                  <FormLabel>Min Price</FormLabel>
                   <FormControl>
                     <Input type="number" placeholder="0" {...field} value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)} />
                   </FormControl>
@@ -440,7 +440,7 @@ export function CollectionForm({ collection, onSuccess }: CollectionFormProps) {
               name="filter_price_max"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Max Price (AED)</FormLabel>
+                  <FormLabel>Max Price</FormLabel>
                   <FormControl>
                     <Input type="number" placeholder="No limit" {...field} value={field.value ?? ""} onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)} />
                   </FormControl>
