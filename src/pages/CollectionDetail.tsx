@@ -16,14 +16,23 @@ const CollectionDetail = () => {
   const { data: collection, isLoading: isLoadingCollection } = useQuery({
     queryKey: ["collection", slug],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Try slug first, then fall back to ID lookup
+      const { data: bySlug } = await supabase
         .from("collections")
         .select("*")
         .eq("slug", slug)
-        .single();
+        .maybeSingle();
+      
+      if (bySlug) return bySlug;
+
+      const { data: byId, error } = await supabase
+        .from("collections")
+        .select("*")
+        .eq("id", slug)
+        .maybeSingle();
       
       if (error) throw error;
-      return data;
+      return byId;
     },
   });
 
