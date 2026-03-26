@@ -39,9 +39,6 @@ export function BasicFields({ form }: BasicFieldsProps) {
     },
   });
 
-  console.log("Current WhatsApp number from form:", whatsappNumber);
-  console.log("Settings WhatsApp number:", settings?.whatsapp_number);
-
   return (
     <>
       <div className="flex justify-between items-center">
@@ -105,7 +102,6 @@ export function BasicFields({ form }: BasicFieldsProps) {
                 value={field.value || ''} 
                 onChange={(e) => {
                   const value = e.target.value;
-                  // Only update if there's a value, otherwise set to null
                   field.onChange(value || null);
                 }}
                 placeholder={`Default: ${settings?.whatsapp_number || 'Loading...'}`}
@@ -204,6 +200,48 @@ export function BasicFields({ form }: BasicFieldsProps) {
             <FormLabel>Price Note</FormLabel>
             <FormControl>
               <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Price fluctuates. Please contact for latest price." />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="gender_profile"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Gender Profile</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Unisex, Men, Women" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="occasion"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Occasion</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Evening, Date Night, Office" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="scent_family"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Scent Family</FormLabel>
+            <FormControl>
+              <Input {...field} value={field.value || ''} onChange={(e) => field.onChange(e.target.value || null)} placeholder="e.g. Woody, Floral, Oriental" />
             </FormControl>
             <FormMessage />
           </FormItem>

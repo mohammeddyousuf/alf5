@@ -28,7 +28,6 @@ const Shop = () => {
     Number(getUrlParam("maxPrice")) || 0,
   ]);
 
-  // Initialize filter states from URL parameters
   const [showSaleOnly, setShowSaleOnly] = useState(getUrlParam("sale") === "true");
   const [showDiscountOnly, setShowDiscountOnly] = useState(getUrlParam("discount") === "true");
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(getUrlParam("featured") === "true");
@@ -36,18 +35,10 @@ const Shop = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | "default">(
     (getUrlParam("sort") as "asc" | "desc" | "default") || "default"
   );
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    getUrlParam("category")
-  );
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(
-    getUrlParam("subcategory")
-  );
-  const [selectedBrand, setSelectedBrand] = useState<string | null>(
-    getUrlParam("brand")
-  );
-  const [selectedLabel, setSelectedLabel] = useState<string | null>(
-    getUrlParam("label")
-  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(getUrlParam("category"));
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(getUrlParam("subcategory"));
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(getUrlParam("brand"));
+  const [selectedLabel, setSelectedLabel] = useState<string | null>(getUrlParam("label"));
   const [selectedTopNotes, setSelectedTopNotes] = useState<string[]>(
     getUrlParam("topNote")?.split(",").filter(Boolean) || []
   );
@@ -57,9 +48,17 @@ const Shop = () => {
   const [selectedBaseNotes, setSelectedBaseNotes] = useState<string[]>(
     getUrlParam("baseNote")?.split(",").filter(Boolean) || []
   );
+  const [selectedGenderProfiles, setSelectedGenderProfiles] = useState<string[]>(
+    getUrlParam("genderProfile")?.split(",").filter(Boolean) || []
+  );
+  const [selectedOccasions, setSelectedOccasions] = useState<string[]>(
+    getUrlParam("occasion")?.split(",").filter(Boolean) || []
+  );
+  const [selectedScentFamilies, setSelectedScentFamilies] = useState<string[]>(
+    getUrlParam("scentFamily")?.split(",").filter(Boolean) || []
+  );
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  // Update URL when page changes
   useEffect(() => {
     updateUrlParams({
       page: currentPage.toString(),
@@ -78,23 +77,16 @@ const Shop = () => {
       topNote: selectedTopNotes.length > 0 ? selectedTopNotes.join(",") : null,
       heartNote: selectedHeartNotes.length > 0 ? selectedHeartNotes.join(",") : null,
       baseNote: selectedBaseNotes.length > 0 ? selectedBaseNotes.join(",") : null,
+      genderProfile: selectedGenderProfiles.length > 0 ? selectedGenderProfiles.join(",") : null,
+      occasion: selectedOccasions.length > 0 ? selectedOccasions.join(",") : null,
+      scentFamily: selectedScentFamilies.length > 0 ? selectedScentFamilies.join(",") : null,
     });
   }, [
-    currentPage,
-    searchQuery,
-    priceRange,
-    showSaleOnly,
-    showDiscountOnly,
-    showFeaturedOnly,
-    showNewArrivalsOnly,
-    sortOrder,
-    selectedCategory,
-    selectedSubcategory,
-    selectedBrand,
-    selectedLabel,
-    selectedTopNotes,
-    selectedHeartNotes,
-    selectedBaseNotes,
+    currentPage, searchQuery, priceRange, showSaleOnly, showDiscountOnly,
+    showFeaturedOnly, showNewArrivalsOnly, sortOrder, selectedCategory,
+    selectedSubcategory, selectedBrand, selectedLabel, selectedTopNotes,
+    selectedHeartNotes, selectedBaseNotes, selectedGenderProfiles,
+    selectedOccasions, selectedScentFamilies,
   ]);
 
   const { data: settings } = useQuery({
@@ -115,49 +107,22 @@ const Shop = () => {
   const { data: products, isLoading, error } = useQuery({
     queryKey: [
       "shop-products",
-      selectedCategory,
-      selectedSubcategory,
-      showFeaturedOnly,
-      showSaleOnly,
-      showDiscountOnly,
-      showNewArrivalsOnly,
-      selectedLabel,
+      selectedCategory, selectedSubcategory,
+      showFeaturedOnly, showSaleOnly, showDiscountOnly,
+      showNewArrivalsOnly, selectedLabel,
     ],
     queryFn: async () => {
-      console.log("Fetching products with filters:", {
-        category: selectedCategory,
-        subcategory: selectedSubcategory,
-        featured: showFeaturedOnly,
-        sale: showSaleOnly,
-        discount: showDiscountOnly,
-        newArrivals: showNewArrivalsOnly,
-        label: selectedLabel,
-        priceRange,
-      });
-
       let query = supabase
         .from("products")
         .select(
-          "id, name, price, sale_price, discount_price, images, brand, custom_label, description, category_id, subcategory_id, featured, created_at, status, stock_status, price_note, top_notes, heart_notes, base_notes"
+          "id, name, price, sale_price, discount_price, images, brand, custom_label, description, category_id, subcategory_id, featured, created_at, status, stock_status, price_note, top_notes, heart_notes, base_notes, gender_profile, occasion, scent_family"
         )
         .eq("status", "published");
 
-      // Apply filters
-      if (selectedCategory) {
-        query = query.eq("category_id", selectedCategory);
-      }
-
-      if (selectedSubcategory) {
-        query = query.eq("subcategory_id", selectedSubcategory);
-      }
-
-      if (showFeaturedOnly) {
-        query = query.eq("featured", true);
-      }
-
-      if (selectedLabel) {
-        query = query.eq("custom_label", selectedLabel);
-      }
+      if (selectedCategory) query = query.eq("category_id", selectedCategory);
+      if (selectedSubcategory) query = query.eq("subcategory_id", selectedSubcategory);
+      if (showFeaturedOnly) query = query.eq("featured", true);
+      if (selectedLabel) query = query.eq("custom_label", selectedLabel);
 
       if (showNewArrivalsOnly) {
         const thirtyDaysAgo = new Date();
@@ -168,7 +133,6 @@ const Shop = () => {
       const { data, error } = await query;
 
       if (error) {
-        console.error("Error fetching products:", error);
         toast({
           variant: "destructive",
           title: "Error",
@@ -192,6 +156,9 @@ const Shop = () => {
     selectedTopNotes,
     selectedHeartNotes,
     selectedBaseNotes,
+    selectedGenderProfiles,
+    selectedOccasions,
+    selectedScentFamilies,
     settings,
   });
 
@@ -202,39 +169,26 @@ const Shop = () => {
     return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
   });
 
-  // Calculate pagination
   const totalPages = Math.ceil((sortedProducts?.length || 0) / PRODUCTS_PER_PAGE);
   const paginatedProducts = sortedProducts?.slice(
     (currentPage - 1) * PRODUCTS_PER_PAGE,
     currentPage * PRODUCTS_PER_PAGE
   );
 
-  // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [
-    searchQuery,
-    priceRange,
-    showSaleOnly,
-    showDiscountOnly,
-    showFeaturedOnly,
-    showNewArrivalsOnly,
-    sortOrder,
-    selectedCategory,
-    selectedSubcategory,
-    selectedBrand,
-    selectedLabel,
-    selectedTopNotes,
-    selectedHeartNotes,
-    selectedBaseNotes,
+    searchQuery, priceRange, showSaleOnly, showDiscountOnly,
+    showFeaturedOnly, showNewArrivalsOnly, sortOrder, selectedCategory,
+    selectedSubcategory, selectedBrand, selectedLabel, selectedTopNotes,
+    selectedHeartNotes, selectedBaseNotes, selectedGenderProfiles,
+    selectedOccasions, selectedScentFamilies,
   ]);
 
   if (error) {
     return (
       <div className="container py-12">
-        <p className="text-center text-destructive">
-          Failed to load products. Please try again later.
-        </p>
+        <p className="text-center text-destructive">Failed to load products. Please try again later.</p>
       </div>
     );
   }
@@ -247,12 +201,22 @@ const Shop = () => {
     );
   }
 
+  const filterProps = {
+    priceRange, setPriceRange, showSaleOnly, setShowSaleOnly,
+    showDiscountOnly, setShowDiscountOnly, sortOrder, setSortOrder,
+    selectedCategory, setSelectedCategory, selectedSubcategory, setSelectedSubcategory,
+    showFeaturedOnly, setShowFeaturedOnly, showNewArrivalsOnly, setShowNewArrivalsOnly,
+    selectedBrand, setSelectedBrand, selectedLabel, setSelectedLabel,
+    selectedTopNotes, setSelectedTopNotes, selectedHeartNotes, setSelectedHeartNotes,
+    selectedBaseNotes, setSelectedBaseNotes, selectedGenderProfiles, setSelectedGenderProfiles,
+    selectedOccasions, setSelectedOccasions, selectedScentFamilies, setSelectedScentFamilies,
+  };
+
   return (
     <div className="container py-12">
       <h1 className="text-4xl font-bold text-center mb-8">Our Products</h1>
 
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Mobile Filter Button */}
         <div className="md:hidden mb-4">
           <Sheet>
             <SheetTrigger asChild>
@@ -263,69 +227,14 @@ const Shop = () => {
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px]">
               <div className="py-4">
-                <ShopFilters
-                  priceRange={priceRange}
-                  setPriceRange={setPriceRange}
-                  showSaleOnly={showSaleOnly}
-                  setShowSaleOnly={setShowSaleOnly}
-                  showDiscountOnly={showDiscountOnly}
-                  setShowDiscountOnly={setShowDiscountOnly}
-                  sortOrder={sortOrder}
-                  setSortOrder={setSortOrder}
-                  selectedCategory={selectedCategory}
-                  setSelectedCategory={setSelectedCategory}
-                  selectedSubcategory={selectedSubcategory}
-                  setSelectedSubcategory={setSelectedSubcategory}
-                  showFeaturedOnly={showFeaturedOnly}
-                  setShowFeaturedOnly={setShowFeaturedOnly}
-                  showNewArrivalsOnly={showNewArrivalsOnly}
-                  setShowNewArrivalsOnly={setShowNewArrivalsOnly}
-                  selectedBrand={selectedBrand}
-                  setSelectedBrand={setSelectedBrand}
-                  selectedLabel={selectedLabel}
-                  setSelectedLabel={setSelectedLabel}
-                  selectedTopNotes={selectedTopNotes}
-                  setSelectedTopNotes={setSelectedTopNotes}
-                  selectedHeartNotes={selectedHeartNotes}
-                  setSelectedHeartNotes={setSelectedHeartNotes}
-                  selectedBaseNotes={selectedBaseNotes}
-                  setSelectedBaseNotes={setSelectedBaseNotes}
-                />
+                <ShopFilters {...filterProps} />
               </div>
             </SheetContent>
           </Sheet>
         </div>
 
-        {/* Desktop Filters */}
         <div className="hidden md:block w-64">
-          <ShopFilters
-            priceRange={priceRange}
-            setPriceRange={setPriceRange}
-            showSaleOnly={showSaleOnly}
-            setShowSaleOnly={setShowSaleOnly}
-            showDiscountOnly={showDiscountOnly}
-            setShowDiscountOnly={setShowDiscountOnly}
-            sortOrder={sortOrder}
-            setSortOrder={setSortOrder}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            selectedSubcategory={selectedSubcategory}
-            setSelectedSubcategory={setSelectedSubcategory}
-            showFeaturedOnly={showFeaturedOnly}
-            setShowFeaturedOnly={setShowFeaturedOnly}
-            showNewArrivalsOnly={showNewArrivalsOnly}
-            setShowNewArrivalsOnly={setShowNewArrivalsOnly}
-            selectedBrand={selectedBrand}
-            setSelectedBrand={setSelectedBrand}
-            selectedLabel={selectedLabel}
-            setSelectedLabel={setSelectedLabel}
-            selectedTopNotes={selectedTopNotes}
-            setSelectedTopNotes={setSelectedTopNotes}
-            selectedHeartNotes={selectedHeartNotes}
-            setSelectedHeartNotes={setSelectedHeartNotes}
-            selectedBaseNotes={selectedBaseNotes}
-            setSelectedBaseNotes={setSelectedBaseNotes}
-          />
+          <ShopFilters {...filterProps} />
         </div>
 
         <div className="flex-1">

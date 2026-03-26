@@ -11,6 +11,9 @@ interface FilterParams {
   selectedTopNotes: string[];
   selectedHeartNotes: string[];
   selectedBaseNotes: string[];
+  selectedGenderProfiles: string[];
+  selectedOccasions: string[];
+  selectedScentFamilies: string[];
   settings: any;
 }
 
@@ -25,6 +28,9 @@ export const useFilteredProducts = ({
   selectedTopNotes,
   selectedHeartNotes,
   selectedBaseNotes,
+  selectedGenderProfiles,
+  selectedOccasions,
+  selectedScentFamilies,
   settings,
 }: FilterParams) => {
   const isSaleValid = () => {
@@ -54,6 +60,12 @@ export const useFilteredProducts = ({
     return searches.some(s => fieldNotes.some(fn => fn.includes(s.toLowerCase())));
   };
 
+  const fieldMatchesAny = (field: string | null | undefined, searches: string[]) => {
+    if (searches.length === 0) return true;
+    if (!field) return false;
+    return searches.some(s => field.toLowerCase().trim() === s.toLowerCase().trim());
+  };
+
   const filteredProducts = products?.filter((product) => {
     const normalizedQuery = searchQuery.toLowerCase();
 
@@ -64,7 +76,10 @@ export const useFilteredProducts = ({
       (product.custom_label?.toLowerCase().includes(normalizedQuery)) ||
       (product.top_notes?.toLowerCase().includes(normalizedQuery)) ||
       (product.heart_notes?.toLowerCase().includes(normalizedQuery)) ||
-      (product.base_notes?.toLowerCase().includes(normalizedQuery));
+      (product.base_notes?.toLowerCase().includes(normalizedQuery)) ||
+      (product.gender_profile?.toLowerCase().includes(normalizedQuery)) ||
+      (product.occasion?.toLowerCase().includes(normalizedQuery)) ||
+      (product.scent_family?.toLowerCase().includes(normalizedQuery));
 
     const price = isProductOnSale(product) ? product.sale_price! : product.price;
     const meetsPrice =
@@ -80,8 +95,11 @@ export const useFilteredProducts = ({
     const meetsTopNote = noteContainsAny(product.top_notes, selectedTopNotes);
     const meetsHeartNote = noteContainsAny(product.heart_notes, selectedHeartNotes);
     const meetsBaseNote = noteContainsAny(product.base_notes, selectedBaseNotes);
+    const meetsGender = fieldMatchesAny(product.gender_profile, selectedGenderProfiles);
+    const meetsOccasion = fieldMatchesAny(product.occasion, selectedOccasions);
+    const meetsScentFamily = fieldMatchesAny(product.scent_family, selectedScentFamilies);
 
-    return matchesSearch && meetsPrice && meetsSale && meetsDiscount && meetsBrand && meetsLabel && meetsTopNote && meetsHeartNote && meetsBaseNote;
+    return matchesSearch && meetsPrice && meetsSale && meetsDiscount && meetsBrand && meetsLabel && meetsTopNote && meetsHeartNote && meetsBaseNote && meetsGender && meetsOccasion && meetsScentFamily;
   });
 
   return { filteredProducts, isProductOnSale };

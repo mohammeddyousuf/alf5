@@ -14,6 +14,7 @@ import { PriceRangeFilter } from "./filters/PriceRangeFilter";
 import { BrandFilter } from "./filters/BrandFilter";
 import { CustomLabelFilter } from "./filters/CustomLabelFilter";
 import { NoteFilter } from "./filters/NoteFilter";
+import { CheckboxFilter } from "./filters/CheckboxFilter";
 
 interface ShopFiltersProps {
   priceRange: [number, number];
@@ -42,6 +43,12 @@ interface ShopFiltersProps {
   setSelectedHeartNotes: (notes: string[]) => void;
   selectedBaseNotes: string[];
   setSelectedBaseNotes: (notes: string[]) => void;
+  selectedGenderProfiles: string[];
+  setSelectedGenderProfiles: (values: string[]) => void;
+  selectedOccasions: string[];
+  setSelectedOccasions: (values: string[]) => void;
+  selectedScentFamilies: string[];
+  setSelectedScentFamilies: (values: string[]) => void;
 }
 
 export function ShopFilters({
@@ -71,6 +78,12 @@ export function ShopFilters({
   setSelectedHeartNotes,
   selectedBaseNotes,
   setSelectedBaseNotes,
+  selectedGenderProfiles,
+  setSelectedGenderProfiles,
+  selectedOccasions,
+  setSelectedOccasions,
+  selectedScentFamilies,
+  setSelectedScentFamilies,
 }: ShopFiltersProps) {
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -133,34 +146,46 @@ export function ShopFilters({
     },
   });
 
-  const { data: noteOptions } = useQuery({
-    queryKey: ["note-options"],
+  const { data: filterOptions } = useQuery({
+    queryKey: ["filter-options"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("top_notes, heart_notes, base_notes")
+        .select("top_notes, heart_notes, base_notes, gender_profile, occasion, scent_family")
         .eq("status", "published");
       
       if (error) throw error;
 
-      const extractUnique = (field: 'top_notes' | 'heart_notes' | 'base_notes') => {
-        const allNotes = new Set<string>();
+      const extractUnique = (field: string) => {
+        const allValues = new Set<string>();
         data?.forEach(p => {
           const val = (p as any)[field];
           if (val) {
             val.split(',').forEach((n: string) => {
               const trimmed = n.trim();
-              if (trimmed) allNotes.add(trimmed);
+              if (trimmed) allValues.add(trimmed);
             });
           }
         });
-        return Array.from(allNotes).sort();
+        return Array.from(allValues).sort();
+      };
+
+      const extractUniqueSimple = (field: string) => {
+        const allValues = new Set<string>();
+        data?.forEach(p => {
+          const val = (p as any)[field];
+          if (val && val.trim()) allValues.add(val.trim());
+        });
+        return Array.from(allValues).sort();
       };
 
       return {
         topNotes: extractUnique('top_notes'),
         heartNotes: extractUnique('heart_notes'),
         baseNotes: extractUnique('base_notes'),
+        genderProfiles: extractUniqueSimple('gender_profile'),
+        occasions: extractUniqueSimple('occasion'),
+        scentFamilies: extractUniqueSimple('scent_family'),
       };
     },
   });
@@ -206,16 +231,16 @@ export function ShopFilters({
 
         {selectedCategory && (
           <div className="space-y-2">
-            <Label>Subcategory</Label>
+            <Label>Gender Profile</Label>
             <Select
               value={selectedSubcategory || "all"}
               onValueChange={(value) => setSelectedSubcategory(value === "all" ? null : value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select subcategory" />
+                <SelectValue placeholder="Select gender profile" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Subcategories</SelectItem>
+                <SelectItem value="all">All</SelectItem>
                 {subcategories?.map((subcategory) => (
                   <SelectItem key={subcategory.id} value={subcategory.id}>
                     {subcategory.name}
@@ -225,6 +250,29 @@ export function ShopFilters({
             </Select>
           </div>
         )}
+
+        <Separator />
+
+        <CheckboxFilter
+          label="Gender Profile"
+          selectedValues={selectedGenderProfiles}
+          setSelectedValues={setSelectedGenderProfiles}
+          options={filterOptions?.genderProfiles}
+        />
+
+        <CheckboxFilter
+          label="Occasion"
+          selectedValues={selectedOccasions}
+          setSelectedValues={setSelectedOccasions}
+          options={filterOptions?.occasions}
+        />
+
+        <CheckboxFilter
+          label="Scent Family"
+          selectedValues={selectedScentFamilies}
+          setSelectedValues={setSelectedScentFamilies}
+          options={filterOptions?.scentFamilies}
+        />
 
         <Separator />
 
@@ -240,21 +288,21 @@ export function ShopFilters({
           label="Top Notes"
           selectedNotes={selectedTopNotes}
           setSelectedNotes={setSelectedTopNotes}
-          notes={noteOptions?.topNotes}
+          notes={filterOptions?.topNotes}
         />
 
         <NoteFilter
           label="Heart Notes"
           selectedNotes={selectedHeartNotes}
           setSelectedNotes={setSelectedHeartNotes}
-          notes={noteOptions?.heartNotes}
+          notes={filterOptions?.heartNotes}
         />
 
         <NoteFilter
           label="Base Notes"
           selectedNotes={selectedBaseNotes}
           setSelectedNotes={setSelectedBaseNotes}
-          notes={noteOptions?.baseNotes}
+          notes={filterOptions?.baseNotes}
         />
 
         <Separator />

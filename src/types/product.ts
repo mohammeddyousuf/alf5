@@ -16,5 +16,8 @@ export interface Product {
   top_notes?: string | null;
   heart_notes?: string | null;
   base_notes?: string | null;
+  gender_profile?: string | null;
+  occasion?: string | null;
+  scent_family?: string | null;
   created_at: string;
 }

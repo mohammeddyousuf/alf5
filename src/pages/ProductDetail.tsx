@@ -99,6 +99,15 @@ const ProductDetail = () => {
   const ogDescription = product.description || `${product.name} - Available at ${websiteName}`;
   const ogTitle = `${product.name} | ${websiteName}`;
 
+  const additionalProperty: any[] = [
+    ...((product as any).gender_profile ? [{ "@type": "PropertyValue", name: "Gender Profile", value: (product as any).gender_profile }] : []),
+    ...((product as any).occasion ? [{ "@type": "PropertyValue", name: "Occasion", value: (product as any).occasion }] : []),
+    ...((product as any).scent_family ? [{ "@type": "PropertyValue", name: "Scent Family", value: (product as any).scent_family }] : []),
+    ...((product as any).top_notes ? [{ "@type": "PropertyValue", name: "Top Notes", value: (product as any).top_notes }] : []),
+    ...((product as any).heart_notes ? [{ "@type": "PropertyValue", name: "Heart Notes", value: (product as any).heart_notes }] : []),
+    ...((product as any).base_notes ? [{ "@type": "PropertyValue", name: "Base Notes", value: (product as any).base_notes }] : []),
+  ];
+
   const jsonLd: Record<string, any> = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -115,14 +124,8 @@ const ProductDetail = () => {
       url: currentUrl,
       itemCondition: "https://schema.org/NewCondition",
     },
-    additionalProperty: [
-      ...((product as any).top_notes ? [{ "@type": "PropertyValue", name: "Top Notes", value: (product as any).top_notes }] : []),
-      ...((product as any).heart_notes ? [{ "@type": "PropertyValue", name: "Heart Notes", value: (product as any).heart_notes }] : []),
-      ...((product as any).base_notes ? [{ "@type": "PropertyValue", name: "Base Notes", value: (product as any).base_notes }] : []),
-    ],
+    ...(additionalProperty.length > 0 && { additionalProperty }),
   };
-
-  if (jsonLd.additionalProperty.length === 0) delete jsonLd.additionalProperty;
 
   const handleShare = async () => {
     const shareData = {
@@ -149,7 +152,6 @@ const ProductDetail = () => {
         <meta name="description" content={ogDescription} />
         <link rel="canonical" href={currentUrl} />
 
-        {/* Open Graph / Facebook / Pinterest */}
         <meta property="og:type" content="product" />
         <meta property="og:url" content={currentUrl} />
         <meta property="og:title" content={ogTitle} />
@@ -164,11 +166,9 @@ const ProductDetail = () => {
         {product.brand && <meta property="product:brand" content={product.brand} />}
         <meta property="product:availability" content={stockStatus === 'in_stock' ? 'in stock' : 'out of stock'} />
 
-        {/* Pinterest Rich Pin verification */}
         <meta property="og:price:amount" content={String(productPrice)} />
         <meta property="og:price:currency" content="INR" />
 
-        {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={ogTitle} />
         <meta name="twitter:description" content={ogDescription} />
@@ -207,6 +207,9 @@ const ProductDetail = () => {
             baseNotes={(product as any).base_notes}
             stockStatus={(product as any).stock_status}
             priceNote={(product as any).price_note}
+            genderProfile={(product as any).gender_profile}
+            occasion={(product as any).occasion}
+            scentFamily={(product as any).scent_family}
           />
         </div>
       </div>
